@@ -1,0 +1,65 @@
+/* General Header Styles */
+.header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  /* Top Section */
+  .top-bar {
+    background-color: #2c3ea9; /* Blue background */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+  }
+  
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Search Bar */
+  .search {
+    position: relative;
+  }
+  
+  .search input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 150px;
+  }
+  
+  .clear-btn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  
+  /* Bottom Section - Navigation Bar */
+  .nav {
+    display: flex;
+    justify-content: center;
+    background: #d3d3d3; /* Light gray */
+    padding: 10px;
+  }
+  
+  .nav a {
+    text-decoration: none;
+    color: #000;
+    background: transparent;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: 5px;
+  }
+  
+  .nav a.active {
+    background: #1d2c7b; /* Darker blue for active tab */
+    color: white;
+  }
+  
