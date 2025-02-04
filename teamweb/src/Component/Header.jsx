@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Header.css"; // Import CSS
 import TeamLogo from '../assets/images/TeamLogo.jpg'
 
@@ -6,6 +6,22 @@ const Header = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [searchText, setSearchText] = useState(""); // State to manage search text
   const [menuOpen, setMenuOpen] = useState(false); // State to handle menu toggle
+
+  // Close the menu by default on small screens when component mounts
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setMenuOpen(false); // Close the menu if the screen is larger than 768px
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Check on mount if screen size is larger than 768px
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handleClear = () => {
     setSearchText(""); // Clear the search input

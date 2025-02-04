@@ -1,144 +1,143 @@
 /* General Header Styles */
 .header {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  /* Top Section */
-  .top-bar {
-    background-color: #2c3ea9; /* Blue background */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-  }
-  
-  /* Logo */
-  .logo {
-    width: 40px;
-    height: 40px;
-  }
-  
-  /* Search Bar */
-  .search {
-    position: relative;
-  }
-  
-  .search input {
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 150px;
-  }
-  
-  .clear-btn {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    background: none;
-    cursor: pointer;
-  }
-  
-  /* Top Navigation Bar (Desktop) */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Top Section */
+.top-bar {
+  background-color: #2c3ea9; /* Blue background */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+/* Logo */
+.logo {
+  width: 40px;
+  height: 40px;
+}
+
+/* Search Bar */
+.search {
+  position: relative;
+}
+
+.search input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 150px;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Top Navigation Bar (Desktop) */
+.nav {
+  display: flex;
+  justify-content: center;
+  background: #d3d3d3; /* Light gray */
+  padding: 10px;
+  gap: 10px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #000;
+  background: transparent;
+  padding: 10px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.nav a.active {
+  background: #1d2c7b; /* Darker blue for active tab */
+  color: white;
+}
+
+/* Hamburger Icon (Mobile) */
+.nav-toggle-btn {
+  display: none;
+  background-color: #2c3ea9;
+  color: white;
+  padding: 10px;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Bottom Navigation Bar (Mobile) */
+.bottom-nav {
+  display: none; /* Hide by default */
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #2c3ea9;
+  padding: 10px 0;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.nav-item {
+  background: transparent;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.nav-item img {
+  width: 24px;
+  height: 24px;
+}
+
+.nav-item.active img {
+  filter: brightness(0) saturate(100%) invert(49%) sepia(80%) saturate(410%) hue-rotate(165deg) brightness(95%) contrast(99%);
+}
+
+/* Add hover effect */
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+/* Responsive Styles for Mobile Devices */
+@media (max-width: 768px) {
+  /* Hide top nav on mobile by default */
   .nav {
-    display: flex;
-    justify-content: center;
-    background: #d3d3d3; /* Light gray */
-    padding: 10px;
-    gap: 10px;
-  }
-  
-  .nav a {
-    text-decoration: none;
-    color: #000;
-    background: transparent;
-    padding: 10px 15px;
-    margin: 0 5px;
-    border-radius: 5px;
-  }
-  
-  .nav a.active {
-    background: #1d2c7b; /* Darker blue for active tab */
-    color: white;
-  }
-  
-  /* Hamburger Icon (Mobile) */
-  .nav-toggle-btn {
-    display: none;
-    background-color: #2c3ea9;
-    color: white;
-    padding: 10px;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
-  /* Bottom Navigation Bar (Mobile) */
-  .bottom-nav {
-    display: none; /* Hide by default */
-    justify-content: space-around;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #2c3ea9;
-    padding: 10px 0;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
-  }
-  
-  .nav-item {
-    background: transparent;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  .nav-item img {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .nav-item.active img {
-    filter: brightness(0) saturate(100%) invert(49%) sepia(80%) saturate(410%) hue-rotate(165deg) brightness(95%) contrast(99%);
-  }
-  
-  /* Add hover effect */
-  .nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-  }
-  
-  /* Responsive Styles for Mobile Devices */
-  @media (max-width: 768px) {
-    /* Hide top nav on mobile */
-    .nav {
       display: none;
-    }
-  
-    /* Show bottom nav on mobile */
-    .bottom-nav {
+  }
+
+  /* Show bottom nav on mobile */
+  .bottom-nav {
       display: flex;
-    }
-  
-    /* Display hamburger menu */
-    .nav-toggle-btn {
+  }
+
+  /* Display hamburger menu */
+  .nav-toggle-btn {
       display: block;
-    }
-  
-    /* Show navigation when hamburger menu is clicked */
-    .nav.show {
+  }
+
+  /* Show navigation when hamburger menu is clicked */
+  .nav.show {
       display: flex; /* Show top nav */
       flex-direction: column;
       align-items: center;
-    }
-  
-    .nav-item img {
+  }
+
+  .nav-item img {
       width: 30px;
       height: 30px;
-    }
   }
-  
+}
