@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./Header.css"; // Import CSS
-import TeamLogo from '../assets/images/TeamLogo.jpg'
+import TeamLogo from '../../assets/images/TeamLogo.jpg'
 
 const Header = () => {
   const [activeTab, setActiveTab] = useState("home");
