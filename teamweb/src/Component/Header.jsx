@@ -1,27 +1,79 @@
 import { useState } from "react";
 import "./Header.css"; // Import CSS
+import TeamLogo from '../assets/images/TeamLogo.jpg'
 
 const Header = () => {
   const [activeTab, setActiveTab] = useState("home");
+  const [searchText, setSearchText] = useState(""); // State to manage search text
+  const [menuOpen, setMenuOpen] = useState(false); // State to handle menu toggle
+
+  const handleClear = () => {
+    setSearchText(""); // Clear the search input
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen); // Toggle the menu open/close
+  };
 
   return (
     <header className="header">
       {/* Top Section: Logo & Search Bar */}
       <div className="top-bar">
-        <img src="/logo.png" alt="School Logo" className="logo" />
+        <img src={TeamLogo} alt="School Logo" className="logo" />
         <div className="search">
-          <input type="text" placeholder="🔍" />
-          <button className="clear-btn">✖</button>
+          <input
+            type="text"
+            placeholder="🔍"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)} // Handle search input
+          />
+          <button className="clear-btn" onClick={handleClear}>
+            ✖
+          </button>
         </div>
+        {/* Hamburger icon next to search */}
+        <button className="nav-toggle-btn" onClick={toggleMenu}>
+          ☰
+        </button>
       </div>
 
-      {/* Bottom Section: Navigation Bar */}
-      <nav className="nav">
-        <a href="home.html" className={activeTab === "home" ? "active" : ""} onClick={() => setActiveTab("home")}>Home</a>
-        <a href="announcements.html" className={activeTab === "announcements" ? "active" : ""} onClick={() => setActiveTab("announcements")}>Announcements</a>
-        <a href="calendar.html" className={activeTab === "calendar" ? "active" : ""} onClick={() => setActiveTab("calendar")}>School Calendar</a>
-        <a href="pre-registration.html" className={activeTab === "pre-registration" ? "active" : ""} onClick={() => setActiveTab("pre-registration")}>Pre-Registration</a>
-        <a href="info.html" className={activeTab === "info" ? "active" : ""} onClick={() => setActiveTab("info")}>School Information</a>
+      {/* Top Navigation (Visible on Desktop) */}
+      <nav className={`nav ${menuOpen ? "show" : ""}`}>
+        <a
+          href="home.html"
+          className={activeTab === "home" ? "active" : ""}
+          onClick={() => setActiveTab("home")}
+        >
+          Home
+        </a>
+        <a
+          href="announcements.html"
+          className={activeTab === "announcements" ? "active" : ""}
+          onClick={() => setActiveTab("announcements")}
+        >
+          Announcements
+        </a>
+        <a
+          href="calendar.html"
+          className={activeTab === "calendar" ? "active" : ""}
+          onClick={() => setActiveTab("calendar")}
+        >
+          School Calendar
+        </a>
+        <a
+          href="pre-registration.html"
+          className={activeTab === "pre-registration" ? "active" : ""}
+          onClick={() => setActiveTab("pre-registration")}
+        >
+          Pre-Registration
+        </a>
+        <a
+          href="info.html"
+          className={activeTab === "info" ? "active" : ""}
+          onClick={() => setActiveTab("info")}
+        >
+          School Information
+        </a>
       </nav>
     </header>
   );

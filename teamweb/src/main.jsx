@@ -4,6 +4,8 @@ import App from './App.jsx'
 import Header from './Component/Header.jsx'
 import Footer from './Component/Footer.jsx'
 
+import './main.css'
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Header/>

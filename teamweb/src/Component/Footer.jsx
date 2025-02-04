@@ -5,12 +5,19 @@ const Footer = () => {
   return (
     <footer className="footer">
       {/* Top Row: Branding & Links */}
+      <br />
+      <br />
+      <br />
       <div className="footer-top">
         {/* Left: Branding */}
         <div className="footer-brand">
           <h2>Teamian<span>Web</span></h2>
           <p>YES WE CAN!</p>
         </div>
+        <br />
+        <br />
+        <br />
+        <br />
 
         {/* Right: Links */}
         <div className="footer-links">
@@ -31,15 +38,26 @@ const Footer = () => {
             <a href="#">Code of Conduct</a>
           </div>
         </div>
+        <br />
+        <br />
+        <br />
+        <br />
       </div>
 
       {/* Centered Contact Info */}
+      <br />
+      <br />
       <div className="footer-contact">
         <p><FaMapMarkerAlt /> 226 Lambakin, Marilao Bulacan</p>
         <p><FaEnvelope /> tmcs1983@gmail.com</p>
         <p><FaPhone /> 0956-099-3796</p>
         <p><FaFacebookF /> Team Mission Christian School, Inc</p>
+        <br />
+        <br />
+        <br />
       </div>
+      <br />
+      <br />
 
       {/* Bottom: Copyright */}
       <div className="footer-bottom">

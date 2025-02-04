@@ -12,6 +12,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
   }
   
   /* Branding Section (Left) */
@@ -41,6 +42,7 @@
     justify-content: flex-end; /* Align items to the right */
     text-align: left;
     gap: 100px; /* Ensures no space between items */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
   }
   
   .footer-links div {
@@ -59,21 +61,73 @@
     text-decoration: underline;
   }
   
+  /* Footer Contact Section */
   .footer-contact {
     display: inline-flex; /* Allows inline behavior but still respects flex properties */
     flex: none; /* Prevents it from growing or shrinking */
     gap: 20px; /* Adds space between child elements */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
   }
   
-  
-  .footer-contact a {
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-    margin-bottom: 5px;
+  /* Footer Links and Contact on 925px or below */
+  @media (max-width: 925px) {
+    .footer-links {
+      justify-content: center; /* Center the links on smaller screens */
+      gap: 20px; /* Reduce gap */
+    }
   }
   
-  .footer-contact a:hover {
-    text-decoration: underline;
+  /* Footer Links and Contact on 940px screen width */
+  @media (max-width: 940px) {
+    .footer-contact {
+      flex-direction: row; /* Switch to a horizontal layout */
+      justify-content: center; /* Center the items */
+    }
+  
+    .footer-contact > * {
+      flex: 1 1 35%; /* Each item takes 45% of width (2 per row) */
+    }
+  }
+  
+  /* Footer Links stacking for small screens (510px or smaller) */
+  @media (max-width: 510px) {
+    .footer-links {
+      flex-direction: column; /* Stack items vertically */
+      gap: 10px; /* Adjust the gap between items */
+      justify-content: center; /* Center the content */
+      text-align: center; /* Center text */
+    }
+  }
+  
+  /* Footer Links and Contact on Mobile (768px) */
+  @media (max-width: 768px) {
+    .footer-top {
+      flex-direction: column; /* Stack items vertically on smaller screens */
+      align-items: center;
+    }
+  
+    .footer-links {
+      justify-content: center; /* Center the links on smaller screens */
+      gap: 20px; /* Reduce gap */
+    }
+  
+    .footer-contact {
+      justify-content: center; /* Center contact items */
+      gap: 10px; /* Adjust the gap for mobile */
+    }
+  
+    .footer-brand {
+      text-align: center; /* Center the branding on smaller screens */
+    }
+  }
+  
+  /* Footer Links and Contact on Mobile (600px) */
+  @media (max-width: 600px) {
+    .footer-contact {
+      justify-content: center; /* Center contact items */
+      gap: 10px; /* Adjust the gap for mobile */
+      flex-direction: column; /* Stack contact links vertically */
+      text-align: center; /* Center the text */
+    }
   }
   
