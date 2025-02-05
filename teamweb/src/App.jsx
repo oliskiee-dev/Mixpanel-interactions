@@ -5,6 +5,11 @@ import Viewer from './Viewer.jsx'
 import Login from './Admin/Login.jsx'
 import ForgotPassword from './Admin/ForgotPassword.jsx';
 
+import Announcement from './Viewer/Announcement/Announcement.jsx';
+import Calendar from './Viewer/Calendar/Calendar.jsx';
+import PreRegistration from './Viewer/PreRegistration/Pre-registration.jsx';
+import SchoolInfo from './Viewer/SchoolInfo/SchoolInfo.jsx';
+
 function App(){
   return(
     <BrowserRouter>
@@ -12,6 +17,10 @@ function App(){
         <Route path="/" element={<Viewer/>}></Route>
         <Route path="Login" element={<Login/>}></Route>
         <Route path="reset-password" element={<ForgotPassword/>}></Route>
+        <Route path="announcement" element={<Announcement/>}></Route>
+        <Route path="calendar" element={<Calendar/>}></Route>
+        <Route path="preregistration" element={<PreRegistration/>}></Route>
+        <Route path="schoolinfo" element={<SchoolInfo/>}></Route>
       </Routes>
     </BrowserRouter>
   )
