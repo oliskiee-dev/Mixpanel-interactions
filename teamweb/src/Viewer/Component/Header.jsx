@@ -63,9 +63,9 @@ const Header = () => {
           Home
         </a>
         <a
-          href="announcements"
-          className={activeTab === "announcements" ? "active" : ""}
-          onClick={() => setActiveTab("announcements")}
+          href="announcement"
+          className={activeTab === "announcement" ? "active" : ""}
+          onClick={() => setActiveTab("announcement")}
         >
           Announcements
         </a>
@@ -78,8 +78,8 @@ const Header = () => {
         </a>
         <a
           href="preregistration"
-          className={activeTab === "pre-registration" ? "active" : ""}
-          onClick={() => setActiveTab("pre-registration")}
+          className={activeTab === "preregistration" ? "active" : ""}
+          onClick={() => setActiveTab("preregistration")}
         >
           Pre-Registration
         </a>

@@ -17,7 +17,7 @@ function App(){
         <Route path="/" element={<Viewer/>}></Route>
         <Route path="Login" element={<Login/>}></Route>
         <Route path="reset-password" element={<ForgotPassword/>}></Route>
-        <Route path="announcement" element={<Announcement/>}></Route>
+        <Route path="announcements" element={<Announcement/>}></Route>
         <Route path="calendar" element={<Calendar/>}></Route>
         <Route path="preregistration" element={<PreRegistration/>}></Route>
         <Route path="schoolinfo" element={<SchoolInfo/>}></Route>
