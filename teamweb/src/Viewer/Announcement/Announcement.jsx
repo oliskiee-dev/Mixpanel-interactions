@@ -4,7 +4,7 @@ function Announcement(){
     return(
         <>
         {/* Input Here */}
-        
+        <h1>RANDOM ANNOUNCEMENT</h1>
         </>
     )
 }
