@@ -4,7 +4,7 @@ function PreRegistration(){
     return(
         <>
         {/* Input Here */}
-        
+        <h1>MARC GOCON</h1>
         </>
     )
 }
