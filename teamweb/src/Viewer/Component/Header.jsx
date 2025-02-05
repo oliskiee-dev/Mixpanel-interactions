@@ -63,28 +63,28 @@ const Header = () => {
           Home
         </a>
         <a
-          href="/announcements"
+          href="announcements"
           className={activeTab === "announcements" ? "active" : ""}
           onClick={() => setActiveTab("announcements")}
         >
           Announcements
         </a>
         <a
-          href="/calendar"
+          href="calendar"
           className={activeTab === "calendar" ? "active" : ""}
           onClick={() => setActiveTab("calendar")}
         >
           School Calendar
         </a>
         <a
-          href="/preregistration"
+          href="preregistration"
           className={activeTab === "pre-registration" ? "active" : ""}
           onClick={() => setActiveTab("pre-registration")}
         >
           Pre-Registration
         </a>
         <a
-          href="/info"
+          href="info"
           className={activeTab === "info" ? "active" : ""}
           onClick={() => setActiveTab("info")}
         >
