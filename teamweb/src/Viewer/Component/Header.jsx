@@ -56,35 +56,35 @@ const Header = () => {
       {/* Top Navigation (Visible on Desktop) */}
       <nav className={`nav ${menuOpen ? "show" : ""}`}>
         <a
-          href="home.html"
+          href="/"
           className={activeTab === "home" ? "active" : ""}
           onClick={() => setActiveTab("home")}
         >
           Home
         </a>
         <a
-          href="announcements.html"
+          href="/announcements"
           className={activeTab === "announcements" ? "active" : ""}
           onClick={() => setActiveTab("announcements")}
         >
           Announcements
         </a>
         <a
-          href="calendar.html"
+          href="/calendar"
           className={activeTab === "calendar" ? "active" : ""}
           onClick={() => setActiveTab("calendar")}
         >
           School Calendar
         </a>
         <a
-          href="pre-registration.html"
+          href="/preregistration"
           className={activeTab === "pre-registration" ? "active" : ""}
           onClick={() => setActiveTab("pre-registration")}
         >
           Pre-Registration
         </a>
         <a
-          href="info.html"
+          href="/info"
           className={activeTab === "info" ? "active" : ""}
           onClick={() => setActiveTab("info")}
         >
