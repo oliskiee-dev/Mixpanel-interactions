@@ -23,6 +23,22 @@ const Header = () => {
     };
   }, []);
 
+  // Set the active tab based on the current URL path
+  useEffect(() => {
+    const path = window.location.pathname; // Get the current pathname
+    if (path === "/announcement") {
+      setActiveTab("announcement");
+    } else if (path === "/calendar") {
+      setActiveTab("calendar");
+    } else if (path === "/preregistration") {
+      setActiveTab("preregistration");
+    } else if (path === "/info") {
+      setActiveTab("info");
+    } else {
+      setActiveTab("home"); // Default to home if no match
+    }
+  }, [window.location.pathname]); // This will trigger when the URL changes
+
   const handleClear = () => {
     setSearchText(""); // Clear the search input
   };
