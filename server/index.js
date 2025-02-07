@@ -27,8 +27,8 @@ app.get('/test', async (req,res) =>{
     return res.json({items : response});
 })
 
-//Get all Announcements
-app.get('/a', async (req,res) =>{
+//Get all Announcements (Still Not Working)
+app.get('/announcement', async (req,res) =>{
     const response = await announcementModel.find();
     return res.json({announcement : response});
 })
