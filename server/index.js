@@ -20,7 +20,7 @@ connectDB()
 
 //==========VIEWER CODE==============
 // Get all Items (Debugging)
-app.get('/', async (req,res) =>{
+app.get('/test', async (req,res) =>{
     const response = await itemModel.find();
     return res.json({items : response});
 })
@@ -28,8 +28,9 @@ app.get('/', async (req,res) =>{
 //Get all Announcements
 app.get('/announcement', async (req, res) => {
     const response = await announcementModel.find();
-    return res.json({ items: response });
+    return res.json({ announcement: response });
 });
+
 //==========ADMIN CODE==============
 // app.post('/login',(req,res) =>{
 //     const {username,password} = req.body;
@@ -75,6 +76,7 @@ app.post('/login', async (req, res) => {
 
 
 const authenticate = require('./middleware/authMiddleware'); // Import middleware
+// const { default: Announcement } = require('../teamweb/src/Viewer/Announcement/Announcement.jsx');
 
 app.get('/admin-homepage', authenticate, (req, res) => {
     res.json({ message: "Welcome to the Admin Homepage!" });
