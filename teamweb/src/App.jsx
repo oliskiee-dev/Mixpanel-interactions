@@ -28,6 +28,7 @@ function App(){
   return(
     <BrowserRouter>
       <Routes>
+        {/* Viewers */}
         <Route path="/" element={<Viewer/>}></Route>
         <Route path="Login" element={<Login/>}></Route>
         <Route path="reset-password" element={<ForgotPassword/>}></Route>
@@ -35,6 +36,8 @@ function App(){
         <Route path="calendar" element={<Calendar/>}></Route>
         <Route path="preregistration" element={<PreRegistration/>}></Route>
         <Route path="schoolinfo" element={<SchoolInfo/>}></Route>
+
+        {/* Admins */}
         <Route path="/admin-homepage" element={<PrivateRoute><Homepage /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
