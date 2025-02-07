@@ -61,24 +61,34 @@ app.post('/login', async (req, res) => {
     console.log('Received request:', req.body); // Log the received data
 
     try {
+        // Find the user by username
         const user = await userModel.findOne({ username });
         if (!user) {
             return res.status(400).json({ error: "Incorrect Credentials" });
         }
 
+        // Debugging: Log the stored hashed password to ensure it's hashed
+        console.log("Stored password hash:", user.password);
+
+        // Compare the password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log("Password match result:", isMatch); // Log comparison result for debugging
+
         if (!isMatch) {
             return res.status(400).json({ error: "The password is incorrect" });
         }
 
+        // Create JWT token if credentials match
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+        // Send the response with the token
         res.status(200).json({ message: "Success", token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 
