@@ -1,7 +1,7 @@
 import React from "react";
 import AdminHeader from '../Component/AdminHeader.jsx'
 
-function ManageAnnouncement(){
+function ManageSchoolInfo(){
     return(
         <>
         <AdminHeader/>
@@ -11,4 +11,4 @@ function ManageAnnouncement(){
     )
 }
 
-export default ManageAnnouncement;
+export default ManageSchoolInfo;

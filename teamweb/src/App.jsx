@@ -11,6 +11,10 @@ import PreRegistration from './Viewer/PreRegistration/Pre-registration.jsx';
 import SchoolInfo from './Viewer/SchoolInfo/SchoolInfo.jsx';
 
 import Homepage from './Admin/Homepage.jsx';
+import ManageAnnouncement from './Admin/ManageAnnouncement/ManageAnnouncement.jsx';
+import ManageCalendar from './Admin/ManageCalendar/ManageCalendar.jsx';
+import ManagePreRegistration from './Admin/ManagePreRegistration/ManagePreRegistration.jsx';
+import ManageSchoolInfo from './Admin/ManageSchoolInfo/ManageSchoolInfo.jsx';
 
 function App(){
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,6 +43,11 @@ function App(){
 
         {/* Admins */}
         <Route path="/admin-homepage" element={<PrivateRoute><Homepage /></PrivateRoute>} />
+        <Route path="/manage-announcement" element={<PrivateRoute><ManageAnnouncement /></PrivateRoute>} />
+        <Route path="/manage-calendar" element={<PrivateRoute><ManageCalendar /></PrivateRoute>} />
+        <Route path="/manage-preregistration" element={<PrivateRoute><ManagePreRegistration /></PrivateRoute>} />
+        <Route path="/manage-schoolinfo" element={<PrivateRoute><ManageSchoolInfo /></PrivateRoute>} />
+      
       </Routes>
     </BrowserRouter>
   )
