@@ -9,6 +9,8 @@ const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
 const announcementModel = require('./models/Announcement.js')
 
+const preRegistrationModel = require('./models/PreRegistration.js')
+
 dotenv.config(); 
 const cors = require('cors')
 
@@ -35,6 +37,11 @@ app.get('/announcement', async (req, res) => {
         return res.status(500).json({ error: "Error fetching announcements" });
     }
 });
+
+app.get('/pr', async (req,res) =>{
+    const response = await preRegistrationModel.find();
+    return res.json({preregistrations : response});
+})
 
 
 //==========ADMIN CODE==============
