@@ -37,7 +37,6 @@ app.get('/announcement', async (req, res) => {
 });
 
 
-
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
 app.post('/login', async (req, res) => {
