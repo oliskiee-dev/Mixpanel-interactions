@@ -9,6 +9,7 @@ const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
 
 const announcementModel = require('./models/Announcement.js')
+const calendarModel = require('./models/Calendar.js')
 const preRegistrationModel = require('./models/PreRegistration.js')
 
 dotenv.config(); 
@@ -27,10 +28,16 @@ app.get('/test', async (req,res) =>{
     return res.json({items : response});
 })
 
-//Get all Announcements (Still Not Working)
+//Get all Announcements
 app.get('/announcement', async (req,res) =>{
     const response = await announcementModel.find();
     return res.json({announcement : response});
+})
+
+//Get all Calendar
+app.get('/calendar', async (req,res) =>{
+    const response = await calendarModel.find();
+    return res.json({calendar : response});
 })
 
 //Get all Pre-Registration
