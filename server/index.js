@@ -41,7 +41,7 @@ app.get('/calendar', async (req,res) =>{
 })
 
 //Get all Pre-Registration
-app.get('/pr', async (req,res) =>{
+app.get('/preregistration', async (req,res) =>{
     const response = await preRegistrationModel.find();
     return res.json({preregistration : response});
 })
