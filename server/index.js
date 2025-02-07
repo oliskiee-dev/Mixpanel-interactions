@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 
 const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
-const announcementModel = require("./models/Announcement.js")
+const announcementModel = require('./models/Announcement.js')
 
 dotenv.config(); 
 const cors = require('cors')
@@ -26,10 +26,12 @@ app.get('/test', async (req,res) =>{
 })
 
 //Get all Announcements
-app.get('/announcement', async (req, res) => {
+app.get('/announcement', async (req,res) =>{
     const response = await announcementModel.find();
-    return res.json({ announcement: response });
-});
+    return res.json({items : response});
+})
+
+
 
 //==========ADMIN CODE==============
 // app.post('/login',(req,res) =>{
