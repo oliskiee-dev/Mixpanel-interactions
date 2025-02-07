@@ -123,6 +123,23 @@
   color: white; /* White icon */
 }
 
+.logout-btn {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.logout-btn:hover {
+  background-color: darkred;
+}
+
 
 /* Responsive Styles for Mobile Devices */
 @media (max-width: 768px) {
