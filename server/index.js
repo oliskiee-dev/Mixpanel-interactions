@@ -20,25 +20,16 @@ connectDB()
 
 //==========VIEWER CODE==============
 // Get all Items (Debugging)
-app.get('/test', async (req,res) =>{
+app.get('/', async (req,res) =>{
     const response = await itemModel.find()
     return res.json({items : response})
 })
 
 //Get all Announcements
-app.get('/announcements', async (req, res) => {
-    console.log('Received request for announcements');
-    try {
-        const response = await announcementModel.find();
-        if (response.length === 0) {
-            console.log('No announcements found');
-        }
-        return res.json({ items: response });
-    } catch (error) {
-        console.error('Error fetching announcements:', error);
-        return res.status(500).json({ error: 'Failed to fetch announcements' });
-    }
-});
+app.get('/announcement', async (req,res) =>{
+    const response = await announcementModel.find()
+    return res.json({items : response})
+})
 
 //==========ADMIN CODE==============
 // app.post('/login',(req,res) =>{
