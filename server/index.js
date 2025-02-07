@@ -39,6 +39,7 @@ app.get('/announcement', async (req, res) => {
 
 
 //==========ADMIN CODE==============
+//Add bycrpt and hash if register will be included in the future
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     console.log('Received request:', req.body); // Log the received data
@@ -49,9 +50,8 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ error: "Incorrect Credentials" });
         }
 
-        // Compare the plain-text password with the hashed password using bcrypt
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        // Directly compare the plain-text password with the stored password
+        if (password !== user.password) {
             return res.status(400).json({ error: "The password is incorrect" });
         }
 
@@ -63,7 +63,6 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
 
 
 
