@@ -70,7 +70,7 @@ input[type="date"] {
     font-size: 14px;
 }
 
-button {
+.prereg-button{
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -84,9 +84,12 @@ button {
     box-sizing: border-box;
 }
 
-button:hover {
+.prereg-button:hover {
     background-color: #0069d9;
-}.error {
+}
+
+
+.error {
     color: red;
     font-size: 12px;
     margin-top: 5px;

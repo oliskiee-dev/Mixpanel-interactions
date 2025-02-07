@@ -158,7 +158,7 @@ function PreRegistration() {
                                 {formErrors.parentMobileNumber && <div className="error">{formErrors.parentMobileNumber}</div>}
                             </div>
                         </div>
-                        <button type="submit">Submit</button>
+                        <button className="prereg-button" type="submit">Submit</button>
                     </form>
                 )}
             </div>
