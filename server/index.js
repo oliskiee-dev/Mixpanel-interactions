@@ -40,7 +40,7 @@ app.get('/announcement', async (req, res) => {
 
 app.get('/pr', async (req,res) =>{
     const response = await preRegistrationModel.find();
-    return res.json({preregistrations : response});
+    return res.json({preregistration : response});
 })
 
 
