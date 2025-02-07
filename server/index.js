@@ -25,10 +25,10 @@ app.get('/test', async (req,res) =>{
     return res.json({items : response});
 })
 
-//Get all Announcements
+//Get all Announcements (NOT WORKING)
 app.get('/announcement', async (req,res) =>{
-    const response = await itemModel.find();
-    return res.json({items : response});
+    const response = await announcementModel.find();
+    return res.json({announcements : response});
 })
 
 
