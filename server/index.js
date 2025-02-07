@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 
 const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
-const announcementModel = require("./models/Annoucement.js")
+const announcementModel = require("./models/annoucement.js")
 
 dotenv.config(); 
 const cors = require('cors')
@@ -26,10 +26,16 @@ app.get('/', async (req,res) =>{
 })
 
 //Get all Announcements
-app.get('/', async (req,res) =>{
-    const response = await announcementModel.find()
-    return res.json({items : response})
-})
+app.get('/announcements', async (req, res) => {
+    console.log('Received request for announcements');
+    try {
+        const response = await announcementModel.find();
+        return res.json({ items: response });
+    } catch (error) {
+        console.error('Error fetching announcements:', error);
+        return res.status(500).json({ error: 'Failed to fetch announcements' });
+    }
+});
 
 //==========ADMIN CODE==============
 // app.post('/login',(req,res) =>{
@@ -47,24 +53,33 @@ app.get('/', async (req,res) =>{
 //         }
 //     })
 // })
+
+
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
+    console.log('Received request:', req.body); // Log the received data
 
     try {
         const user = await userModel.findOne({ username });
-        if (!user) return res.status(400).json({ error: "Incorrect Credentials" });
+        if (!user) {
+            return res.status(400).json({ error: "Incorrect Credentials" });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: "The password is incorrect" });
+        if (!isMatch) {
+            return res.status(400).json({ error: "The password is incorrect" });
+        }
 
-        // Generate JWT token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({ message: "Success", token });
+        res.status(200).json({ message: "Success", token });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Server error" });
     }
 });
+
+
 
 const authenticate = require('./middleware/authMiddleware'); // Import middleware
 
