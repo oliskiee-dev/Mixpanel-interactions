@@ -1,11 +1,15 @@
 const express = require('express')
 const connectDB = require('./db.js')
 
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const dotenv = require('dotenv');
+
 const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
 const announcementModel = require("./models/Annoucement.js")
 
-
+dotenv.config(); 
 const cors = require('cors')
 
 const app = express()
@@ -28,21 +32,68 @@ app.get('/', async (req,res) =>{
 })
 
 //==========ADMIN CODE==============
-app.post('/login',(req,res) =>{
-    const {username,password} = req.body;
-    userModel.findOne({username: username})
-    .then(user =>{
-        if(user){
-            if(user.password === password){
-                res.json("Success");
-            }else{
-                res.json("The password is incorrect")
-            }
-        } else {
-            res.json("Incorrect Credentials")
-        }
-    })
-})
+// app.post('/login',(req,res) =>{
+//     const {username,password} = req.body;
+//     userModel.findOne({username: username})
+//     .then(user =>{
+//         if(user){
+//             if(user.password === password){
+//                 res.json("Success");
+//             }else{
+//                 res.json("The password is incorrect")
+//             }
+//         } else {
+//             res.json("Incorrect Credentials")
+//         }
+//     })
+// })
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const user = await userModel.findOne({ username });
+        if (!user) return res.status(400).json({ error: "Incorrect Credentials" });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ error: "The password is incorrect" });
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.json({ message: "Success", token });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+const authenticate = require('./middleware/authMiddleware'); // Import middleware
+
+app.get('/admin-homepage', authenticate, (req, res) => {
+    res.json({ message: "Welcome to the Admin Homepage!" });
+});
+
+
+//REGISTER TEMP CODE
+// app.post('/register', async (req, res) => {
+//     const { username, password } = req.body;
+
+//     try {
+//         const existingUser = await userModel.findOne({ username });
+//         if (existingUser) return res.status(400).json({ error: "Username already exists" });
+
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, salt);
+
+//         const newUser = new userModel({ username, password: hashedPassword });
+//         await newUser.save();
+
+//         res.json({ message: "User registered successfully" });
+//     } catch (error) {
+//         res.status(500).json({ error: "Server error" });
+//     }
+// });
+
+
 
 app.listen(3000,() => {
     console.log("app is running");
