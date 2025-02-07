@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 
 const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
-const announcementModel = require("./models/Annoucement.js")
+const announcementModel = require("./models/Announcement.js")
 
 dotenv.config(); 
 const cors = require('cors')
