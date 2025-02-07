@@ -1,0 +1,138 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* About Us Section */
+.about-us {
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.about-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.about-text {
+    width: 60%;
+}
+
+.about-text p {
+    text-align: justify;
+    line-height: 1.6;
+}
+
+.about-image {
+    width: 35%;
+    text-align: center;
+}
+
+.about-image img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Offered Courses Section */
+.offered-courses {
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.courses-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.course-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.course-list li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.senior-high {
+    background-color: #e9f5ff;
+    padding: 15px;
+    border-radius: 8px;
+    width: 45%;
+}
+
+.senior-high h3 {
+    margin-top: 0;
+}
+
+.senior-high ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.senior-high ul li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.esc-subsidy {
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* School Images Section */
+.school-images {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+}
+
+.school-images img {
+    width: 45%;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Faculty and Staff Section */
+.faculty-staff {
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.faculty-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.faculty-box {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}

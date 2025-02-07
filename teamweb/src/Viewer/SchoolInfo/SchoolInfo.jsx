@@ -7,14 +7,18 @@ function SchoolInfo() {
     return (
         <>
             <Header />
-            <div className="container">
                 {/* About Us Section */}
                 <section className="about-us">
-                    <h2>ABOUT US</h2>
-                    <div className="about-text">
-                        <p>
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua..."
-                        </p>
+                    <div className="about-content">
+                        <div className="about-text">
+                            <h2>ABOUT US</h2>
+                            <p>
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua..."
+                            </p>
+                        </div>
+                        <div className="about-image">
+                            <img src="/path-to-blank-image.jpg" alt="Placeholder" />
+                        </div>
                     </div>
                 </section>
 
@@ -54,7 +58,6 @@ function SchoolInfo() {
                         ))}
                     </div>
                 </section>
-            </div>
             <Footer />
         </>
     );
