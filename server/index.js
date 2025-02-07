@@ -27,7 +27,7 @@ app.get('/test', async (req,res) =>{
 
 //Get all Announcements
 app.get('/announcement', async (req,res) =>{
-    const response = await announcementModel.find();
+    const response = await itemModel.find();
     return res.json({announcements : response});
 })
 
