@@ -4,8 +4,8 @@ const announcementSchema = new mongoose.Schema({
     title: String,
     description: String,
     img_url: String,
-    created_at: String,
-});
+    created_at: String
+})
 
 const announcementModel = mongoose.model("Announcement", announcementSchema);
 
