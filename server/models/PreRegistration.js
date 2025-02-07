@@ -4,6 +4,7 @@ const preRegistrationSchema = new mongoose.Schema({
     name: String,
     phone_number: Number, // Using Number type
     age: Number, // Using Number type
+    course: String,
     email: {
         type: String,
         unique: true, // Ensures email is unique
