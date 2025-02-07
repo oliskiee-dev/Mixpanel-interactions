@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './index.css'
-import {BrowserRouter,Routes, Route} from 'react-router'
+import {BrowserRouter,Routes, Route, Navigate } from 'react-router'
 import Viewer from './Viewer.jsx'
 import Login from './Admin/Login.jsx'
 import ForgotPassword from './Admin/ForgotPassword.jsx';
@@ -10,7 +10,21 @@ import Calendar from './Viewer/Calendar/Calendar.jsx';
 import PreRegistration from './Viewer/PreRegistration/Pre-registration.jsx';
 import SchoolInfo from './Viewer/SchoolInfo/SchoolInfo.jsx';
 
+import Homepage from './Admin/Homepage.jsx';
+
 function App(){
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+      const token = localStorage.getItem("token");
+      setIsAuthenticated(!!token); // Set to true if token exists
+  }, []);
+
+  const PrivateRoute = ({ children }) => {
+    const token = localStorage.getItem("token");
+    return token ? children : <Navigate to="/login" />;
+};
+
   return(
     <BrowserRouter>
       <Routes>
@@ -21,6 +35,7 @@ function App(){
         <Route path="calendar" element={<Calendar/>}></Route>
         <Route path="preregistration" element={<PreRegistration/>}></Route>
         <Route path="schoolinfo" element={<SchoolInfo/>}></Route>
+        <Route path="/admin-homepage" element={<PrivateRoute><Homepage /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   )
