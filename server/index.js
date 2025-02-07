@@ -51,7 +51,6 @@ app.get('/preregistration', async (req,res) =>{
 //Add bycrpt and hash if register will be included in the future
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Received request:', req.body); // Log the received data
 
     try {
         const user = await userModel.findOne({ username });
