@@ -6,5 +6,5 @@ const announcementSchema = new mongoose.Schema({
 })
 
 
-const announcementModel = mongoose.model("Item",announcementSchema)
+const announcementModel = mongoose.model("announcement",announcementSchema)
 module.exports = announcementModel
