@@ -26,10 +26,15 @@ app.get('/test', async (req,res) =>{
 })
 
 //Get all Announcements (NOT WORKING)
-app.get('/announcement', async (req,res) =>{
-    const response = await announcementModel.find();
-    return res.json({announcements : response});
-})
+app.get('/announcement', async (req, res) => {
+    try {
+        const response = await announcementModel.find();
+        return res.json({ announcements: response });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Error fetching announcements" });
+    }
+});
 
 
 
