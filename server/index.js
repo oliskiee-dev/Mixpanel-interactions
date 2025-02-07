@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 
 const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
-const announcementModel = require("./models/annoucement.js")
+const announcementModel = require("./models/Annoucement.js")
 
 dotenv.config(); 
 const cors = require('cors')
@@ -20,7 +20,7 @@ connectDB()
 
 //==========VIEWER CODE==============
 // Get all Items (Debugging)
-app.get('/', async (req,res) =>{
+app.get('/test', async (req,res) =>{
     const response = await itemModel.find()
     return res.json({items : response})
 })
@@ -30,6 +30,9 @@ app.get('/announcements', async (req, res) => {
     console.log('Received request for announcements');
     try {
         const response = await announcementModel.find();
+        if (response.length === 0) {
+            console.log('No announcements found');
+        }
         return res.json({ items: response });
     } catch (error) {
         console.error('Error fetching announcements:', error);
