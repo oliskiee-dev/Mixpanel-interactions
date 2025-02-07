@@ -7,8 +7,8 @@ const dotenv = require('dotenv');
 
 const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
-const announcementModel = require('./models/Announcement.js')
 
+const announcementModel = require('./models/Announcement.js')
 const preRegistrationModel = require('./models/PreRegistration.js')
 
 dotenv.config(); 
@@ -27,17 +27,13 @@ app.get('/test', async (req,res) =>{
     return res.json({items : response});
 })
 
-//Get all Announcements (NOT WORKING)
-app.get('/announcement', async (req, res) => {
-    try {
-        const response = await announcementModel.find();
-        return res.json({ announcements: response });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Error fetching announcements" });
-    }
-});
+//Get all Announcements
+app.get('/a', async (req,res) =>{
+    const response = await announcementModel.find();
+    return res.json({announcement : response});
+})
 
+//Get all Pre-Registration
 app.get('/pr', async (req,res) =>{
     const response = await preRegistrationModel.find();
     return res.json({preregistration : response});
