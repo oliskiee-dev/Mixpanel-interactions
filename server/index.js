@@ -21,16 +21,16 @@ connectDB()
 //==========VIEWER CODE==============
 // Get all Items (Debugging)
 app.get('/', async (req,res) =>{
-    const response = await itemModel.find()
-    return res.json({items : response})
+    const response = await itemModel.find();
+    return res.json({items : response});
 })
 
 //Get all Announcements
-app.get('/announcement', async (req,res) =>{
-    const response = await announcementModel.find()
-    return res.json({items : response})
-})
-
+app.get('/announcement', async (req, res) => {
+    console.log('Received request for announcements');
+    const response = await announcementModel.find();
+    return res.json({ items: response });
+});
 //==========ADMIN CODE==============
 // app.post('/login',(req,res) =>{
 //     const {username,password} = req.body;
