@@ -1,8 +1,10 @@
 const mongoose = require('mongoose')
 
 const announcementSchema = new mongoose.Schema({
-    name: String,
-    description: String
+    title: String,
+    description: String,
+    image_url:String,
+    created_at: Date,
 })
 
 
