@@ -1,4 +1,7 @@
 import React from "react";
+import './calendar.css'
+import Header from '../Component/Header.jsx';
+import Footer from '../Component/Footer.jsx';
 
 const Calendar = () => {
   // Example months and years arrays
@@ -13,9 +16,11 @@ const Calendar = () => {
   ];
 
   return (
+    <>
+    <Header/>
     <div className="calendar-container">
       {/* Navigation Bar */}
-      <nav className="navbar">
+      {/* <nav className="navbar">
         <div className="nav-links">
           <button>HOME</button>
           <button>ANNOUNCEMENTS</button>
@@ -26,7 +31,7 @@ const Calendar = () => {
         <div className="search-bar">
           <input type="text" placeholder="Search..." />
         </div>
-      </nav>
+      </nav> */}
 
       {/* Calendar Grid */}
       <div className="calendar-grid">
@@ -74,6 +79,8 @@ const Calendar = () => {
         ))}
       </div>
     </div>
+    <Footer/>
+    </>
   );
 };
 

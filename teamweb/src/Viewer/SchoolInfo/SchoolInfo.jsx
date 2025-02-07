@@ -11,7 +11,7 @@ function SchoolInfo() {
                 <section className="about-us">
                     <div className="about-content">
                         <div className="about-text">
-                            <h2>ABOUT US</h2>
+                            <h2 className="h2-title">ABOUT US</h2>
                             <p>
                                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua..."
                             </p>
@@ -24,7 +24,7 @@ function SchoolInfo() {
 
                 {/* Offered Courses Section */}
                 <section className="offered-courses">
-                    <h2>OFFERED COURSES</h2>
+                    <h2 className="h2-title">OFFERED COURSES</h2>
                     <div className="courses-container">
                         <ul className="course-list">
                             <li>KINDERGARTEN 2</li>
@@ -51,7 +51,7 @@ function SchoolInfo() {
 
                 {/* Faculty and Staff Section */}
                 <section className="faculty-staff">
-                    <h2>FACULTY AND STAFF</h2>
+                    <h2 className="h2-title">FACULTY AND STAFF</h2>
                     <div className="faculty-grid">
                         {['President', 'Faculty 1', 'Faculty 2', 'Faculty 3', 'Faculty 4', 'Faculty 5', 'Faculty 6', 'Faculty 7', 'Faculty 8'].map((name, index) => (
                             <div key={index} className="faculty-box">{name}</div>

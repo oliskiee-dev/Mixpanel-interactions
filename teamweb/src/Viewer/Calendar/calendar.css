@@ -4,7 +4,7 @@
     background-color: #f8f9fa;
   }
   
-  .navbar {
+  /* .navbar {
     display: flex;
     justify-content: space-between;
     background-color: #2a4d9c;
@@ -23,7 +23,7 @@
   .nav-links .active {
     font-weight: bold;
     text-decoration: underline;
-  }
+  } */
   
   .search-bar input {
     padding: 5px;
