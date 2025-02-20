@@ -3,6 +3,11 @@ import Header from '../Component/Header.jsx';
 import Footer from '../Component/Footer.jsx';
 import '../PreRegistration/Pre-registration.css';
 
+
+//Link them to
+//href = "appointment"
+
+
 function PreRegistration() {
     const [formData, setFormData] = useState({
         firstName: "",
