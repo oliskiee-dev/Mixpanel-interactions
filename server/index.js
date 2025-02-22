@@ -64,7 +64,14 @@ app.post('/addAnnouncement', async (req, res) => {
 //This would required add a specific id in "":id"
 // PUT - Edit an existing Announcement
 app.put('/editAnnouncement/:id', async (req, res) => {
-    const { id } = req.params; // Get the announcement ID from URL
+    let { id } = req.params; // Extract ID from URL
+    id = id.trim(); // Remove spaces and newline characters
+
+    // Validate if ID is a proper MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'Invalid announcement ID format' });
+    }
+
     const { title, description, image_url } = req.body; // Get updated data
 
     try {
@@ -77,8 +84,8 @@ app.put('/editAnnouncement/:id', async (req, res) => {
         // Update announcement details
         const updatedAnnouncement = await announcementModel.findByIdAndUpdate(
             id,
-            { title, description, image_url, updated_at: new Date() }, // Update fields
-            { new: true } // Return updated document
+            { title, description, image_url, updated_at: new Date() }, // Fields to update
+            { new: true } // Return the updated document
         );
 
         res.status(200).json({ message: 'Announcement updated successfully', announcement: updatedAnnouncement });
@@ -87,7 +94,6 @@ app.put('/editAnnouncement/:id', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 
 //Get all Calendar
