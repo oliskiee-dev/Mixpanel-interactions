@@ -40,6 +40,35 @@ app.get('/calendar', async (req,res) =>{
     return res.json({calendar : response});
 })
 
+//Add a new Calendar Event
+app.post('/addCalendar', async (req, res) => {
+    const { title, date, description } = req.body;
+
+    // Basic validation for required fields
+    if (!title || !date || !description) {
+        return res.status(400).json({ error: 'Missing required fields: title, date, or description' });
+    }
+
+    try {
+        // Create new calendar event with the current time as created_at
+        const newEvent = new calendarModel({
+            title,
+            date,
+            description,
+            created_at: new Date()  // Automatically set created_at to now
+        });
+
+        // Save the event to the database
+        const savedEvent = await newEvent.save();
+        res.status(201).json({ message: 'Event added successfully', event: savedEvent });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+
 //Get all Pre-Registration
 app.get('/preregistration', async (req,res) =>{
     const response = await preRegistrationModel.find();
