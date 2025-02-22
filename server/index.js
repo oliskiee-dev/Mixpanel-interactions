@@ -96,6 +96,31 @@ app.put('/editAnnouncement/:id', async (req, res) => {
     }
 });
 
+//This would required add a specific id in "":id"
+// DELETE - Remove an Announcement by ID
+app.delete('/deleteAnnouncement/:id', async (req, res) => {
+    let { id } = req.params;
+    id = id.trim(); // Remove spaces or newline characters
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'Invalid announcement ID format' });
+    }
+
+    try {
+        // Find and delete the announcement
+        const deletedAnnouncement = await announcementModel.findByIdAndDelete(id);
+
+        if (!deletedAnnouncement) {
+            return res.status(404).json({ error: 'Announcement not found' });
+        }
+
+        res.status(200).json({ message: 'Announcement deleted successfully', deletedAnnouncement });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 //Get all Calendar
 app.get('/calendar', async (req,res) =>{
