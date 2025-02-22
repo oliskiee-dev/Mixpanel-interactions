@@ -122,13 +122,14 @@ const AdminHeader = () => {
         >
           Manage Pre-Registration
         </a>
-        <a
+        {/* School info is static */}
+        {/* <a
           href="/manage-schoolinfo"
           className={activeTab === "manageschoolinfo" ? "active" : ""}
           onClick={() => setActiveTab("manageschoolinfo")}
         >
           Manage School Information
-        </a>
+        </a> */}
       </nav>
     </header>
   );
