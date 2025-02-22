@@ -34,6 +34,34 @@ app.get('/announcement', async (req,res) =>{
     return res.json({announcement : response});
 })
 
+// POST - Add a new Announcement
+app.post('/addAnnouncement', async (req, res) => {
+    const { title, description, image_url } = req.body;
+
+    // Basic validation for required fields
+    if (!title || !description || !image_url) {
+        return res.status(400).json({ error: 'Missing required fields: title, description, or image_url' });
+    }
+
+    try {
+        // Create new announcement with the current time as created_at
+        const newAnnouncement = new announcementModel({
+            title,
+            description,
+            image_url,
+            created_at: new Date()  // Automatically set created_at to now
+        });
+
+        // Save the announcement to the database
+        const savedAnnouncement = await newAnnouncement.save();
+        res.status(201).json({ message: 'Announcement added successfully', announcement: savedAnnouncement });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 //Get all Calendar
 app.get('/calendar', async (req,res) =>{
     const response = await calendarModel.find();
