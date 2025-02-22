@@ -61,6 +61,34 @@ app.post('/addAnnouncement', async (req, res) => {
     }
 });
 
+//This would required add a specific id in "":id"
+// PUT - Edit an existing Announcement
+app.put('/editAnnouncement/:id', async (req, res) => {
+    const { id } = req.params; // Get the announcement ID from URL
+    const { title, description, image_url } = req.body; // Get updated data
+
+    try {
+        // Check if the announcement exists
+        const existingAnnouncement = await announcementModel.findById(id);
+        if (!existingAnnouncement) {
+            return res.status(404).json({ error: 'Announcement not found' });
+        }
+
+        // Update announcement details
+        const updatedAnnouncement = await announcementModel.findByIdAndUpdate(
+            id,
+            { title, description, image_url, updated_at: new Date() }, // Update fields
+            { new: true } // Return updated document
+        );
+
+        res.status(200).json({ message: 'Announcement updated successfully', announcement: updatedAnnouncement });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 
 //Get all Calendar
 app.get('/calendar', async (req,res) =>{
