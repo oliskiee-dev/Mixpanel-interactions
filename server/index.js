@@ -1,5 +1,6 @@
 const express = require('express')
 const connectDB = require('./db.js')
+const mongoose = require('mongoose');
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
