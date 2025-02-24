@@ -158,10 +158,35 @@ app.post('/addCalendar', async (req, res) => {
 
 
 //Get all Pre-Registration
-app.get('/preregistration', async (req,res) =>{
-    const response = await preRegistrationModel.find();
-    return res.json({preregistration : response});
-})
+// Get paginated Pre-Registration records
+app.get('/preregistration', async (req, res) => {
+    try {
+        // Get page and limit from query params (default: page 1, limit 10)
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Fetch records with pagination
+        const records = await preRegistrationModel.find()
+            .skip(skip)
+            .limit(limit);
+
+        // Count total records for pagination info
+        const totalRecords = await preRegistrationModel.countDocuments();
+
+        res.json({
+            totalRecords,
+            totalPages: Math.ceil(totalRecords / limit),
+            currentPage: page,
+            preregistration: records,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 
 // POST - Add a new Pre-Registration
 app.post('/addPreRegistration', async (req, res) => {
