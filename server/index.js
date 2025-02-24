@@ -165,33 +165,37 @@ app.get('/preregistration', async (req,res) =>{
 
 // POST - Add a new Pre-Registration
 app.post('/addPreRegistration', async (req, res) => {
-    const { name, phoneNumber, age, course, email, status, appointment_date } = req.body;
+    let { name, phone_number, age, course, email, status, appointment_date } = req.body;
 
-    // Basic validation for required fields
-    if (!name || !phoneNumber || !age || !course || !email || !status || !appointment_date) {
-        return res.status(400).json({ error: 'Missing required fields: name, phoneNumber, age, course, email, status, or appointment_date' });
+    // Convert status to lowercase if provided
+    if (status) {
+        status = status.toLowerCase();
+    }
+
+    // Validate status against allowed values
+    const validStatuses = ['pending', 'approved', 'rejected'];
+    if (status && !validStatuses.includes(status)) {
+        return res.status(400).json({ error: `Invalid status value. Allowed values: ${validStatuses.join(', ')}` });
     }
 
     try {
         const newPreRegistration = new preRegistrationModel({
             name,
-            phoneNumber,
+            phone_number,
             age,
             course,
             email,
-            status,
+            status: status || 'pending',  // Default to 'pending' if not provided
             appointment_date
         });
 
-        // Save the entry to the database
-        const savedPreRegistration = await newPreRegistration.save();
-        res.status(201).json({ message: 'Pre-registration added successfully', preRegistration: savedPreRegistration });
+        const savedEntry = await newPreRegistration.save();
+        res.status(201).json({ message: "Pre-registration added successfully", preregistration: savedEntry });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: "Server error" });
     }
 });
-
 
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
