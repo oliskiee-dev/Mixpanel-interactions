@@ -163,6 +163,35 @@ app.get('/preregistration', async (req,res) =>{
     return res.json({preregistration : response});
 })
 
+// POST - Add a new Pre-Registration
+app.post('/addPreRegistration', async (req, res) => {
+    const { name, phoneNumber, age, course, email, status, appointment_date } = req.body;
+
+    // Basic validation for required fields
+    if (!name || !phoneNumber || !age || !course || !email || !status || !appointment_date) {
+        return res.status(400).json({ error: 'Missing required fields: name, phoneNumber, age, course, email, status, or appointment_date' });
+    }
+
+    try {
+        const newPreRegistration = new preRegistrationModel({
+            name,
+            phoneNumber,
+            age,
+            course,
+            email,
+            status,
+            appointment_date
+        });
+
+        // Save the entry to the database
+        const savedPreRegistration = await newPreRegistration.save();
+        res.status(201).json({ message: 'Pre-registration added successfully', preRegistration: savedPreRegistration });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
