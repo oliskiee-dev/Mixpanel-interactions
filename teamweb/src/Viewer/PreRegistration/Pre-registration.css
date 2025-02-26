@@ -100,7 +100,7 @@
 }
 
 .form-group {
-    margin-bottom: 10px;
+    margin-bottom: 1.5rem;
 }
 
 label {
@@ -233,6 +233,25 @@ button {
 
 button:hover {
     background-color: #0069d9;
+}
+
+.pre-reg-submit-btn,
+.pre-reg-next-btn,
+.pre-reg-back-btn {
+    padding: 0.75rem 2rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.pre-reg-submit-btn:hover,
+.pre-reg-next-btn:hover,
+.pre-reg-back-btn:hover {
+    background-color: #45a049;
 }
 
 .error {
@@ -514,5 +533,15 @@ button:hover {
 
     .pre-reg-success-details {
         font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .pre-reg-form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pre-reg-success-card {
+        padding: 2rem;
     }
 }
