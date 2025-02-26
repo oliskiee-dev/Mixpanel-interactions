@@ -12,6 +12,95 @@ body {
     margin-bottom: 20px;
 }
 
+/* Facilities Section */
+.facilities-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.facility-box {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+    width: 130px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.facility-box:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Courses & Facilities Container */
+.course-list,
+.facilities-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Modal Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+    position: relative;
+}
+
+/* Close Button */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: red;
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+}
+
+.close-button:hover {
+    background: darkred;
+}
+
+/* Facility Image Styling */
+.facility-img {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+
 /* About Us Section */
 .about-us {
     padding: 20px;
@@ -49,58 +138,196 @@ body {
 
 /* Offered Courses Section */
 .offered-courses {
-    padding: 20px;
-    background-color: #fff;
-    margin: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.courses-container {
-    display: flex;
-    justify-content: space-between;
-}
-
-.course-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.course-list li {
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-.senior-high {
-    background-color: #e9f5ff;
-    padding: 15px;
-    border-radius: 8px;
-    width: 45%;
-}
-
-.senior-high h3 {
-    margin-top: 0;
-}
-
-.senior-high ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.senior-high ul li {
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-.esc-subsidy {
-    background-color: #4CAF50;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 40px;
+  }
+  
+  .h2-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #1e3a8a; /* Dark blue title */
+  }
+  
+  /* Course List */
+  .courses-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+  }
+  
+  .course-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    max-width: 600px;
+  }
+  
+  /* Course Button Styling - Smaller Size */
+.course-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #2563eb; /* Green background */
+    color: white;
+    padding: 8px; /* Reduced padding */
+    border-radius: 6px; /* Smaller rounded corners */
+    margin: 6px; /* Reduced spacing */
+    font-size: 0.9rem; /* Slightly smaller text */
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+    width: 140px; /* Adjust width */
+    height: 40px; /* Adjust height */
 }
 
+.course-box:hover {
+    background-color: lightblue; /* Darker green on hover */
+    transform: scale(1.03); /* Slight scale effect */
+}
+
+/* Button inside course-box */
+.course-box button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 0.9rem; /* Smaller text */
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+}
+
+.course-box button:focus {
+    outline: none;
+}
+
+  
+  /* Senior High School Section */
+  .senior-high {
+    background-color: #eef2ff; /* Light blue background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+  }
+  
+  .senior-high h3 {
+    color: #1e3a8a;
+  }
+  
+  .senior-high ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .senior-high li {
+    background-color: white;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .esc-subsidy {
+    background-color: #2563eb;
+    color: white;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+
+  /* Modal Background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+.section-border {
+    position: relative;
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    margin-bottom: 40px; /* Spacing between sections */
+    background: white; /* Ensures the background stays white */
+}
+
+/* Fading Border Effect */
+.section-border::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 15px;
+    background: linear-gradient(to right, rgba(0, 0, 255, 0.3), rgba(0, 0, 255, 0.7), rgba(0, 0, 255, 0.3));
+    z-index: -1;
+    filter: blur(8px);
+}
+
+
+/* Close Button */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.close-button:hover {
+    color: red;
+}
+
+/* Subjects List */
+.modal-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.modal-content li {
+    background-color: #f3f4f6;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+/* Classroom Image */
+.classroom-img {
+    width: 100%;
+    max-width: 300px;
+    margin-top: 15px;
+    border-radius: 10px;
+}
+
+  
 /* School Images Section */
 .school-images {
     display: flex;
@@ -114,25 +341,37 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Faculty and Staff Section */
-.faculty-staff {
-    padding: 20px;
-    background-color: #fff;
-    margin: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
 .faculty-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    justify-items: center;
+    text-align: center;
+    margin-top: 20px;
 }
 
 .faculty-box {
-    background-color: #f9f9f9;
+    background-color: #f5f5f5;
     padding: 15px;
     border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 180px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.faculty-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.faculty-box h3 {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.faculty-box p {
+    font-size: 14px;
+    color: #555;
 }
