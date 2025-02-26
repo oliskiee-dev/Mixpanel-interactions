@@ -200,7 +200,7 @@ input[type="tel"]::placeholder {
     font-size: 14px;
 }
 
-button {
+.prereg-button{
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -213,6 +213,7 @@ button {
     width: 100%;
     box-sizing: border-box;
 }
+
 
 .pre-reg-btn-group {
     display: flex;
@@ -237,6 +238,14 @@ button:hover {
 
 .error {
     color: #dc3545;
+=======
+.prereg-button:hover {
+    background-color: #0069d9;
+}
+
+
+.error {
+    color: red;
     font-size: 12px;
     margin-top: 5px;
 }
