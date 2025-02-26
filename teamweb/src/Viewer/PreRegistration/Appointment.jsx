@@ -54,11 +54,20 @@ function Appointment() {
                     <p>Your appointment has been scheduled successfully.</p>
                     <div className="appointment-success-info">
                         <p>What happens next?</p>
-                        <ul>
-                            <li>You will receive an appointment confirmation email</li>
-                            <li>Please arrive 15 minutes before your scheduled time</li>
-                            <li>Bring any relevant documents with you</li>
-                        </ul>
+                        <div className="appointment-steps">
+                            <div className="appointment-step">
+                                <span className="appointment-step-number">1</span>
+                                <p>You will receive an appointment confirmation email</p>
+                            </div>
+                            <div className="appointment-step">
+                                <span className="appointment-step-number">2</span>
+                                <p>Please arrive 15 minutes before your scheduled time</p>
+                            </div>
+                            <div className="appointment-step">
+                                <span className="appointment-step-number">3</span>
+                                <p>Bring any relevant documents with you</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="appointment-success-buttons">
