@@ -10,7 +10,7 @@ import Principal from "../../assets/images/FacultyMembers/Principal.png";
 import Dyna from "../../assets/images/FacultyMembers/Dyna.png";
 import Claire from "../../assets/images/FacultyMembers/Claire.png";
 import Shirley from "../../assets/images/FacultyMembers/Shirley.png";
-import Maria from "../../assets/images/FacultyMembers/Shirley.png";
+import Maria from "../../assets/images/FacultyMembers/Maria.png";
 import Hasel from "../../assets/images/FacultyMembers/Hasel.png";
 import Marvelyn from "../../assets/images/FacultyMembers/Marvelyn.png";
 import Katherine from "../../assets/images/FacultyMembers/Katherine.png";
