@@ -570,14 +570,6 @@ function PreRegistration() {
                             </div>
                         )}
                     </>
-                            <div className="form-group">
-                                <label htmlFor="parentMobileNumber">MOBILE NUMBER</label>
-                                <input type="tel" id="parentMobileNumber" name="parentMobileNumber" value={formData.parentMobileNumber} onChange={handleChange} />
-                                {formErrors.parentMobileNumber && <div className="error">{formErrors.parentMobileNumber}</div>}
-                            </div>
-                        </div>
-                        <button className="prereg-button" type="submit">Submit</button>
-                    </form>
                 )}
             </div>
             <Footer />
