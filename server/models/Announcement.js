@@ -3,10 +3,10 @@ const mongoose = require('mongoose')
 const announcementSchema = new mongoose.Schema({
     title: String,
     description: String,
-    img_url: String,
-    created_at: String,
+    image_url:String,
+    created_at: Date,
 })
 
 
-const announcementModel = mongoose.model("Announcement",announcementSchema)
+const announcementModel = mongoose.model("announcement",announcementSchema)
 module.exports = announcementModel
