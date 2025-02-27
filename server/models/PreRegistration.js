@@ -12,7 +12,7 @@ const preRegistrationSchema = new mongoose.Schema({
     parent_guardian_number: Number,
     isNewStudent: { 
         type: String, 
-        enum: ['yes', 'no'], // Only "yes" or "no" allowed
+        enum: ['new', 'old'], // Only "yes" or "no" allowed
         required: true 
     },
     status: {
