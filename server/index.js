@@ -190,7 +190,7 @@ app.get('/preregistration', async (req, res) => {
 
 // POST - Add a new Pre-Registration
 app.post('/addPreRegistration', async (req, res) => {
-    let { name, phone_number, age, course, email, status, appointment_date } = req.body;
+    let { name, phone_number, age, course, email, status, appointment_date, nationality, parent_guardian_name, parent_guardian_number } = req.body;
 
     // Convert status to lowercase if provided
     if (status) {
@@ -210,8 +210,11 @@ app.post('/addPreRegistration', async (req, res) => {
             age,
             course,
             email,
+            nationality, // Added nationality
+            parent_guardian_name, // Added guardian name
+            parent_guardian_number, // Added guardian number
             status: status || 'pending',  // Default to 'pending' if not provided
-            appointment_date
+            appointment_date: appointment_date || null // Make appointment optional
         });
 
         const savedEntry = await newPreRegistration.save();
@@ -221,6 +224,7 @@ app.post('/addPreRegistration', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
