@@ -204,15 +204,15 @@ app.post('/addPreRegistration', async (req, res) => {
         parent_guardian_number, 
         preferred_time, 
         purpose_of_visit,
-        isNewStudent // ✅ Required (yes/no)
+        isNewStudent // ✅ Required (new/old)
     } = req.body;
 
     // Check if grade_level and isNewStudent are missing
     if (!grade_level) {
         return res.status(400).json({ error: "Grade level is required." });
     }
-    if (!isNewStudent || !['yes', 'no'].includes(isNewStudent.toLowerCase())) {
-        return res.status(400).json({ error: "isNewStudent must be 'yes' or 'no'." });
+    if (!isNewStudent || !['new', 'old'].includes(isNewStudent.toLowerCase())) {
+        return res.status(400).json({ error: "isNewStudent must be 'new' or 'old'." });
     }
 
     // Convert status to lowercase if provided
