@@ -93,7 +93,13 @@ body {
     background: darkred;
 }
 
-
+/* Facility Image Styling */
+.facility-img {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 5px;
+}
 
 
 /* About Us Section */
@@ -165,24 +171,24 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #2563eb; /* Green background */
+    background-color: #2563eb; 
     color: white;
-    padding: 8px; /* Reduced padding */
-    border-radius: 6px; /* Smaller rounded corners */
-    margin: 6px; /* Reduced spacing */
-    font-size: 0.9rem; /* Slightly smaller text */
+    padding: 8px; 
+    border-radius: 6px;
+    margin: 6px; 
+    font-size: 0.9rem; 
     font-weight: bold;
     transition: 0.3s ease-in-out;
     text-align: center;
     cursor: pointer;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
-    width: 140px; /* Adjust width */
-    height: 40px; /* Adjust height */
+    width: 140px; 
+    height: 40px; 
 }
 
 .course-box:hover {
-    background-color: lightblue; /* Darker green on hover */
-    transform: scale(1.03); /* Slight scale effect */
+    background-color: lightblue; 
+    transform: scale(1.03); 
 }
 
 /* Button inside course-box */
@@ -190,7 +196,7 @@ body {
     background: none;
     border: none;
     color: white;
-    font-size: 0.9rem; /* Smaller text */
+    font-size: 0.9rem; 
     font-weight: bold;
     cursor: pointer;
     width: 100%;
@@ -205,7 +211,7 @@ body {
   
   /* Senior High School Section */
   .senior-high {
-    background-color: #eef2ff; /* Light blue background */
+    background-color: #eef2ff; 
     padding: 20px;
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
@@ -378,7 +384,7 @@ body {
     color: #333;
     margin-top: 20px;
     padding-bottom: 10px;
-    border-bottom: 2px solid blue; /* Gold divider */
+    border-bottom: 2px solid blue; 
 }
 
 .faculty-grid {
