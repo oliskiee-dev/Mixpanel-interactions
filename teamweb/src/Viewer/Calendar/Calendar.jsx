@@ -7,9 +7,20 @@ const Calendar = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [tooltip, setTooltip] = useState({ visible: false, text: "", x: 0, y: 0 });
   const [today, setToday] = useState("");
+  const [calendarData, setCalendarData] = useState([]);
 
   useEffect(() => {
     setToday(new Date().toISOString().split("T")[0]);
+
+    // Fetch events and holidays from the API
+    fetch("http://localhost:3000/calendar")
+      .then((response) => response.json())
+      .then((data) => {
+        setCalendarData(data.calendar || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
   }, []);
 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
@@ -24,25 +35,12 @@ const Calendar = () => {
     return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   };
 
-  const events = [
-    { date: "2024-08-05", eventName: "Summer Festival" },
-    { date: "2025-01-13", eventName: "New Year's Celebration" },
-    { date: "2023-12-25", eventName: "Christmas Party" },
-    { date: "2026-05-20", eventName: "Science Fair" },
-    { date: "2025-02-27", eventName: "Tine's Friend Day" }, 
-  ];
+  const getEventOrHoliday = (dateStr) => {
+    const event = calendarData.find(item => item.date.slice(0, 10) === dateStr && item.type === "event");
+    const holiday = calendarData.find(item => item.date.slice(0, 10) === dateStr && item.type === "holiday");
+    return { event, holiday };
+  };
 
-  const holidays = [
-    { date: "2025-01-01", name: "New Year's Day" },
-    { date: "2025-04-09", name: "Araw ng Kagitingan" },
-    { date: "2025-06-12", name: "Independence Day" },
-    { date: "2025-12-25", name: "Christmas Day" },
-    { date: "2025-12-30", name: "Rizal Day" },
-    { date: "2025-02-27", name: "Tine's Birthday" },
-  ];
-
-  const getHolidayName = (dateStr) => holidays.find(h => h.date === dateStr)?.name || "";
-  
   const handleMouseEnter = (event, text) => {
     const rect = event.target.getBoundingClientRect();
     setTooltip({
@@ -57,19 +55,7 @@ const Calendar = () => {
     setTooltip({ visible: false, text: "", x: 0, y: 0 });
   };
 
-  const filteredEvents = events.filter(event => {
-    const eventDate = new Date(event.date);
-    return eventDate.getFullYear() === currentYear && eventDate >= new Date();
-  });
-
-  const filteredHolidays = holidays.filter(holiday => {
-    const holidayDate = new Date(holiday.date);
-    return holidayDate.getFullYear() === currentYear && holidayDate >= new Date();
-  });
-
-
-  const currentEvent = events.find(event => event.date === today);
-  const currentHoliday = holidays.find(holiday => holiday.date === today);
+  const currentEventOrHoliday = getEventOrHoliday(today);
 
   return (
     <>
@@ -81,11 +67,11 @@ const Calendar = () => {
           <button onClick={() => setCurrentYear(currentYear + 1)}>Next Year ❯</button>
         </div>
 
-        {currentEvent && (
-          <div className="current-event">Current Event: {currentEvent.eventName}</div>
+        {currentEventOrHoliday.event && (
+          <div className="current-event">Current Event: {currentEventOrHoliday.event.title}</div>
         )}
-        {currentHoliday && (
-          <div className="current-holiday">Current Holiday: {currentHoliday.name}</div>
+        {currentEventOrHoliday.holiday && (
+          <div className="current-holiday">Current Holiday: {currentEventOrHoliday.holiday.title}</div>
         )}
 
         <div className="full-year-calendar">
@@ -110,31 +96,23 @@ const Calendar = () => {
                           const dateNumber = week * 7 + day - firstDay + 1;
                           const isValidDate = dateNumber > 0 && dateNumber <= daysInMonth;
                           const dateStr = isValidDate ? formatDate(currentYear, index, dateNumber) : "";
-                          const event = filteredEvents.find(event => event.date === dateStr);
-                          const holidayName = getHolidayName(dateStr);
+                          const { event, holiday } = getEventOrHoliday(dateStr);
                           const isToday = dateStr === today;
-                          const isHoliday = Boolean(holidayName);
+                          const isHoliday = Boolean(holiday);
                           const className = isToday ? "today" : event ? "event-day" : isHoliday ? "holiday-day" : "";
-                          // Needs fix on tooltipText to show two events
-                          const tooltipText = (event?.eventName && holidayName) 
-                          ? `${event.eventName} & ${holidayName}` 
-                          : event?.eventName || holidayName || '';
-
-
-
-
-
+                          const tooltipText = (event?.title && holiday?.title) 
+                            ? `${event.title} & ${holiday.title}` 
+                            : event?.title || holiday?.title || '';
 
                           return (
-                        <td
-                          key={day}
-                          className={className}
-                          onMouseEnter={(e) => tooltipText && handleMouseEnter(e, tooltipText)}
-                          onMouseLeave={handleMouseLeave}
-                        >
-                          {isValidDate ? dateNumber : ""}
-                        </td>
-
+                            <td
+                              key={day}
+                              className={className}
+                              onMouseEnter={(e) => tooltipText && handleMouseEnter(e, tooltipText)}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {isValidDate ? dateNumber : ""}
+                            </td>
                           );
                         })}
                       </tr>
@@ -146,56 +124,83 @@ const Calendar = () => {
           })}
         </div>
 
-        {filteredEvents.length > 0 && (
-          <div className="events-section">
-            <h3>Upcoming Events</h3>
-            <ul>
-              {filteredEvents.map((event, index) => {
-                const dateObj = new Date(event.date);
-                const monthName = months[dateObj.getMonth()];
-                const day = dateObj.getDate();
-                return (
-                  <li key={index} className="event-item">
-                    <span className="event-date">{monthName} {day}</span>
-                    <span className="event-name">{event.eventName}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
+        <div className="events-section">
+  {calendarData.filter(item => 
+    item.type === "event" && 
+    new Date(item.date).getFullYear() === currentYear && 
+    new Date(item.date) >= new Date()
+  ).length > 0 && (
+    <>
+      <h3>Upcoming Events</h3>
+      <ul>
+        {calendarData
+          .filter(item => 
+            item.type === "event" && 
+            new Date(item.date).getFullYear() === currentYear && 
+            new Date(item.date) >= new Date()
+          )
+          .sort((a, b) => new Date(a.date) - new Date(b.date))  // Sorting by date
+          .map((event, index) => {
+            const dateObj = new Date(event.date);
+            const monthName = months[dateObj.getMonth()];
+            const day = dateObj.getDate();
+            return (
+              <li key={index} className="event-item">
+                <span className="event-date">{monthName} {day}</span>
+                <span className="event-name">{event.title}</span>
+              </li>
+            );
+          })}
+      </ul>
+    </>
+  )}
+</div>
 
-        {filteredHolidays.length > 0 && (
-          <div className="events-section">
-            <h3>Upcoming Holidays</h3>
-            <ul>
-              {filteredHolidays.map((holiday, index) => {
-                const dateObj = new Date(holiday.date);
-                const monthName = months[dateObj.getMonth()];
-                const day = dateObj.getDate();
-                return (
-                  <li key={index} className="holiday-item">
-                    <span className="holiday-date">{monthName} {day}</span>
-                    <span className="holiday-name">{holiday.name}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
+<div className="events-section">
+  {calendarData.filter(item => 
+    item.type === "holiday" && 
+    new Date(item.date).getFullYear() === currentYear && 
+    new Date(item.date) >= new Date()
+  ).length > 0 && (
+    <>
+      <h3>Upcoming Holidays</h3>
+      <ul>
+        {calendarData
+          .filter(item => 
+            item.type === "holiday" && 
+            new Date(item.date).getFullYear() === currentYear && 
+            new Date(item.date) >= new Date()
+          )
+          .sort((a, b) => new Date(a.date) - new Date(b.date))  // Sorting by date
+          .map((holiday, index) => {
+            const dateObj = new Date(holiday.date);
+            const monthName = months[dateObj.getMonth()];
+            const day = dateObj.getDate();
+            return (
+              <li key={index} className="holiday-item">
+                <span className="holiday-date">{monthName} {day}</span>
+                <span className="holiday-name">{holiday.title}</span>
+              </li>
+            );
+          })}
+      </ul>
+    </>
+  )}
+</div>
+
+
         {tooltip.visible && (
-        <div
-          className="tooltip visible"
-          style={{
-            position: "absolute",
-            left: `${tooltip.x}px`,
-            top: `${tooltip.y}px`,
-          }}
-        >
-          {tooltip.text}
-        </div>
-      )}
-
+          <div
+            className="tooltip visible"
+            style={{
+              position: "absolute",
+              left: `${tooltip.x}px`,
+              top: `${tooltip.y}px`,
+            }}
+          >
+            {tooltip.text}
+          </div>
+        )}
       </div>
       <Footer />
     </>
