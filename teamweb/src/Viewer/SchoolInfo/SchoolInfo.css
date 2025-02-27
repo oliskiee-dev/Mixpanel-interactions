@@ -43,6 +43,7 @@ body {
     transform: scale(1.05);
 }
 
+
 /* Courses & Facilities Container */
 .course-list,
 .facilities-container {
@@ -92,13 +93,7 @@ body {
     background: darkred;
 }
 
-/* Facility Image Styling */
-.facility-img {
-    width: 100%;
-    height: auto;
-    margin-top: 10px;
-    border-radius: 5px;
-}
+
 
 
 /* About Us Section */
@@ -375,3 +370,54 @@ body {
     font-size: 14px;
     color: #555;
 }
+
+.faculty-category {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid blue; /* Gold divider */
+}
+
+.faculty-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.faculty-box {
+    background: white;
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    width: 200px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.faculty-img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.h2-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.faculty-img {
+    width: 120px;  /* Set a fixed width */
+    height: 150px; /* Set a fixed height */
+    object-fit: cover; /* Ensures the image fills the area without distortion */
+    border-radius: 8px; /* Optional: Adds rounded corners */
+}
+
+
+
+

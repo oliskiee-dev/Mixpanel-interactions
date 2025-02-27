@@ -25,6 +25,38 @@ import Gertrudes from "../../assets/images/FacultyMembers/LiaisonOfficer.png";
 import Flor from "../../assets/images/FacultyMembers/Flor.png";
 import Raquela from "../../assets/images/FacultyMembers/Registrar.png";
 
+const facultyData = {
+    administrators: [
+        { name: "Engr. Romeo A. Corpuz, Jr.", role: "President", img: Pres },
+        { name: "Ptra. Lenora A. Corpuz", role: "Vice President", img: Vice },
+        { name: "Bishop Florante A. Rola", role: "TMPI Board", img: Bishop },
+        { name: "Ptra. Josephine D. Bermeo", role: "TMPI Board", img: Josephine },
+        { name: "Mrs. Erlinda C. Gonzales", role: "Principal", img: Principal },
+    ],
+    facultyCouncil: [
+        { name: "Mrs. Dyna Lyn B. Tangalin", role: "Teacher", img: Dyna },
+        { name: "Mrs. Claire Bloom P. Faraon", role: "Teacher", img: Claire },
+        { name: "Mrs. Shirley V. Maximo", role: "Teacher", img: Shirley },
+        { name: "Mrs. Maria Cristina M.Guinto", role: "Teacher", img: Maria },
+        { name: "Ms. Hasel Marco", role: "Teacher", img: Hasel },
+        { name: "Ms. Marvelyn Joy Bumatay", role: "Teacher", img: Marvelyn },
+        { name: "Mrs. Kathrine Joy Prado", role: "Teacher", img: Katherine },
+        { name: "Ms. Monica Amascual", role: "Teacher", img: Monica },
+        { name: "Ms. Louie Anna Dianan", role: "Teacher", img: Louie },
+        { name: "Ms. Nikka Bless Hulguin", role: "Teacher", img: Nikka },
+        { name: "Mrs. Alejandria Jandoc", role: "Teacher", img: Alejandria },
+        { name: "Ms. Jhanuarie Mae Borja", role: "Teacher", img: Jhanuarie },
+        { name: "Ms. Charmaine Suarez", role: "Teacher", img: Charmaine },
+        { name: "Mrs. Maria Teresita L.", role: "Subject Teacher", img: Teresita },
+    ],
+    supportStaff: [
+        { name: "Mrs. Gertrudes Corpuz", role: "Liaison Officer", img: Gertrudes },
+        { name: "Mrs. Flor Parungao", role: "Cashier", img: Flor },
+        { name: "Mrs. Raquela Pangyarihan", role: "Registrar", img: Raquela }
+    ]
+};
+
+
 
 
 // Data for subjects per grade
@@ -152,40 +184,47 @@ function SchoolInfo() {
             {/* Faculty and Staff Section */}
             <section className="section-border">
                 <h2 className="h2-title">FACULTY AND STAFF</h2>
+
+                {/* Administrators */}
+                <h3 className="faculty-category">ADMINISTRATORS</h3>
                 <div className="faculty-grid">
-                    {[
-                        { name: "Engr. Romeo A.Corpuz, Jr.", role: "President", img: Pres },
-                        { name: "Ptra. Lenora A. Corpuz", role: "Vice President", img: Vice },
-                        { name: "Bishop Florante A. Rola", role: "TMPI Board", img: Bishop },
-                        { name: "Ptra. Josephine D. Bermeo", role: "TMPI Board", img: Josephine },
-                        { name: "Mrs. Erlinda C. Gonzales", role: "Principal", img: Principal },
-                        { name: "Mrs. Dyna Lyn B. Tangalin", role: "Teacher", img: Dyna },
-                        { name: "Mrs. Claire Bloom P. Faraon", role: "Teacher", img: Claire },
-                        { name: "Mrs. Shirley V. Maximo", role: "Teacher", img: Shirley },
-                        { name: "Mrs. Maria Cristina M.Guinto", role: "Teacher", img: Maria },
-                        { name: "Ms. Hasel Marco", role: "Teacher", img: Hasel },
-                        { name: "Ms. Marvelyn Joy Bumatay", role: "Teacher", img: Marvelyn },
-                        { name: "Mrs. Kathrine Joy Prado", role: "Teacher", img: Katherine },
-                        { name: "Ms. Monica Amascual", role: "Teacher", img: Monica },
-                        { name: "Ms. Louie Anna Dianan", role: "Teacher", img: Louie },
-                        { name: "Ms. Nikka Bless Hulguin", role: "Teacher", img: Nikka },
-                        { name: "Mrs. Alejandria Jandoc", role: "Teacher", img: Alejandria },
-                        { name: "Ms. Jhanuarie Mae Borja", role: "Teacher", img: Jhanuarie },
-                        { name: "Ms. Charmaine Suarez", role: "Teacher", img: Charmaine },
-                        { name: "Mrs. Maria Teresita L.", role: "Subject Teacher", img: Teresita },
-                        { name: "Mrs. Gertrudes Corpuz", role: "Liaison Officer", img: Gertrudes },
-                        { name: "Mrs. Flor Parungao", role: "Cashier", img: Flor },
-                        { name: "Mrs. Raquela Pangyarihan", role: "Registrar", img: Raquela}
-                        
-                    ].map((faculty, index) => (
-                        <div key={index} className="faculty-box">
-                            <img src={faculty.img} alt={faculty.name} className="faculty-img" />
-                            <h3>{faculty.name}</h3>
-                            <p>{faculty.role}</p>
+                    {facultyData.administrators.map((member, index) => (
+                        <div className="faculty-box" key={index}>
+                            <img src={member.img} alt={member.name} className="faculty-img" />
+                            <h3>{member.name}</h3>
+                            <p>{member.role}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Faculty Council */}
+                <h3 className="faculty-category">FACULTY COUNCIL</h3>
+                <div className="faculty-grid">
+                    {facultyData.facultyCouncil.map((member, index) => (
+                        <div className="faculty-box" key={index}>
+                            <img src={member.img} alt={member.name} className="faculty-img" />
+                            <h3>{member.name}</h3>
+                            <p>{member.role}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Support Staff */}
+                <h3 className="faculty-category">SUPPORT STAFF</h3>
+                <div className="faculty-grid">
+                    {facultyData.supportStaff.map((member, index) => (
+                        <div className="faculty-box" key={index}>
+                            <img src={member.img} alt={member.name} className="faculty-img" />
+                            <h3>{member.name}</h3>
+                            <p>{member.role}</p>
                         </div>
                     ))}
                 </div>
             </section>
+            
+
+
+
 
             {/* Grade Modal Popup */}
             {isModalOpen && selectedGrade && (
