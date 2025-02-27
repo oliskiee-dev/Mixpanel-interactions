@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Header from '../Component/Header.jsx';
 import Footer from '../Component/Footer.jsx';
-import '../PreRegistration/Pre-registration.css';
-
-
-//Link them to
-//href = "appointment"
-
+import Appointment from './Appointment';
+import './Pre-registration.css';
 
 function PreRegistration() {
-    const [activeTab, setActiveTab] = useState('details');
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -25,34 +20,14 @@ function PreRegistration() {
         yearLevel: "",
         strand: "",
     });
-
     const [formErrors, setFormErrors] = useState({});
     const [registrationSuccess, setRegistrationSuccess] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [selectedTab, setSelectedTab] = useState('pre-registration');
-    const [successType, setSuccessType] = useState(null); // 'registration' or 'appointment'
-
-    const [appointmentData, setAppointmentData] = useState({
-        appointmentDate: "",
-        appointmentTime: "",
-        appointmentReason: ""
-    });
-    const [appointmentErrors, setAppointmentErrors] = useState({});
+    const [activeTab, setActiveTab] = useState('pre-reg');
 
     const handleChange = (e) => {
         setFormData({...formData, [e.target.name]: e.target.value });
         setFormErrors({...formErrors, [e.target.name]: "" });
-    };
-
-    const handleAppointmentChange = (e) => {
-        setAppointmentData({
-            ...appointmentData,
-            [e.target.name]: e.target.value
-        });
-        setAppointmentErrors({
-            ...appointmentErrors,
-            [e.target.name]: ""
-        });
     };
 
     const handleSubmit = (e) => {
@@ -61,47 +36,9 @@ function PreRegistration() {
         setFormErrors(errors);
 
         if (Object.keys(errors).length === 0) {
-            console.log("Form submitted:", formData);
-
-            setTimeout(() => {
-                setRegistrationSuccess(true);
-                setSuccessType('registration');
-                setFormData({
-                    firstName: "",
-                    lastName: "",
-                    dateOfBirth: "",
-                    gender: "",
-                    nationality: "",
-                    email: "",
-                    mobileNumber: "",
-                    isNewStudent: "",
-                    parentFirstName: "",
-                    parentLastName: "",
-                    parentMobileNumber: "",
-                    yearLevel: "",
-                    strand: "",
-                });
-                setProgress(0); // Reset progress on success
-            }, 1000);
-        }
-    };
-
-    const handleAppointmentSubmit = (e) => {
-        e.preventDefault();
-        const errors = validateAppointment(appointmentData);
-        setAppointmentErrors(errors);
-
-        if (Object.keys(errors).length === 0) {
-            console.log("Appointment submitted:", appointmentData);
-            setTimeout(() => {
-                setRegistrationSuccess(true);
-                setSuccessType('appointment');
-                setAppointmentData({
-                    appointmentDate: "",
-                    appointmentTime: "",
-                    appointmentReason: ""
-                });
-            }, 1000);
+            // Store form data in sessionStorage before redirecting
+            sessionStorage.setItem('preRegFormData', JSON.stringify(formData));
+            window.location.href = '/confirmregistration';
         }
     };
 
@@ -153,27 +90,21 @@ function PreRegistration() {
         return errors;
     };
 
-    const validateAppointment = (data) => {
-        let errors = {};
-
-        if (!data.appointmentDate) {
-            errors.appointmentDate = "Appointment Date is required";
-        }
-        if (!data.appointmentTime) {
-            errors.appointmentTime = "Appointment Time is required";
-        }
-        if (!data.appointmentReason?.trim()) {
-            errors.appointmentReason = "Purpose of Visit is required";
-        }
-
-        return errors;
-    };
-
     useEffect(() => {
-        const totalFields = Object.keys(formData).length;
-        const filledFields = Object.values(formData).filter(value => value!== "").length;
-        const calculatedProgress = filledFields / totalFields * 100;
-        setProgress(calculatedProgress);
+        const totalFields = 12; // Base number of required fields excluding strand
+        let filledFields = Object.entries(formData).filter(([key, value]) => {
+            // Don't count strand field for grades below 11
+            if (key === 'strand' && !['11', '12'].includes(formData.yearLevel)) {
+                return false;
+            }
+            return value !== "";
+        }).length;
+
+        // If grade 11 or 12 is selected, include strand in total required fields
+        const adjustedTotalFields = ['11', '12'].includes(formData.yearLevel) ? totalFields + 1 : totalFields;
+        
+        const calculatedProgress = (filledFields / adjustedTotalFields) * 100;
+        setProgress(Math.min(calculatedProgress, 100)); // Ensure progress doesn't exceed 100%
     }, [formData]);
 
     const renderDetailsTab = () => (
@@ -181,18 +112,24 @@ function PreRegistration() {
             <div className="pre-reg-title">Personal Information</div>
             <form onSubmit={handleSubmit}>
                 <div className="pre-reg-form-grid">
-                    <div className="form-group">
-                        <label htmlFor="firstName">FIRST NAME</label>
-                        <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} />
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="firstName">
+                            FIRST NAME <span className="pre-reg-required">*</span>
+                        </label>
+                        <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.firstName && <div className="error">{formErrors.firstName}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="lastName">LAST NAME</label>
-                        <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} />
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="lastName">
+                            LAST NAME <span className="pre-reg-required">*</span>
+                        </label>
+                        <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.lastName && <div className="error">{formErrors.lastName}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="dateOfBirth">DATE OF BIRTH</label>
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="dateOfBirth">
+                            DATE OF BIRTH <span className="pre-reg-required">*</span>
+                        </label>
                         <input 
                             type="date" 
                             id="dateOfBirth" 
@@ -200,26 +137,34 @@ function PreRegistration() {
                             value={formData.dateOfBirth}
                             onChange={handleChange}
                             max={new Date().toISOString().split('T')[0]} // Prevents future dates
+                            className="pre-reg-input"
                         />
                         {formErrors.dateOfBirth && <div className="error">{formErrors.dateOfBirth}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="gender">GENDER</label>
-                        <input type="text" id="gender" name="gender" value={formData.gender} onChange={handleChange} />
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="gender">
+                            GENDER <span className="pre-reg-required">*</span>
+                        </label>
+                        <input type="text" id="gender" name="gender" value={formData.gender} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.gender && <div className="error">{formErrors.gender}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="nationality">NATIONALITY</label>
-                        <input type="text" id="nationality" name="nationality" value={formData.nationality} onChange={handleChange} />
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="nationality">
+                            NATIONALITY <span className="pre-reg-required">*</span>
+                        </label>
+                        <input type="text" id="nationality" name="nationality" value={formData.nationality} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.nationality && <div className="error">{formErrors.nationality}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="yearLevel">GRADE LEVEL</label>
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="yearLevel">
+                            GRADE LEVEL <span className="pre-reg-required">*</span>
+                        </label>
                         <select
                             id="yearLevel"
                             name="yearLevel"
                             value={formData.yearLevel}
                             onChange={handleChange}
+                            className="pre-reg-select"
                         >
                             <option value="">Select Grade Level</option>
                             <option value="nursery">Nursery</option>
@@ -242,13 +187,16 @@ function PreRegistration() {
                     </div>
 
                     {(formData.yearLevel === '11' || formData.yearLevel === '12') && (
-                        <div className="form-group">
-                            <label htmlFor="strand">STRAND</label>
+                        <div className="pre-reg-form-group">
+                            <label htmlFor="strand">
+                                STRAND <span className="pre-reg-required">*</span>
+                            </label>
                             <select
                                 id="strand"
                                 name="strand"
                                 value={formData.strand}
                                 onChange={handleChange}
+                                className="pre-reg-select"
                             >
                                 <option value="">Select Strand</option>
                                 <option value="abm">ABM (Accountancy, Business and Management)</option>
@@ -259,13 +207,17 @@ function PreRegistration() {
                         </div>
                     )}
 
-                    <div className="form-group">
-                        <label htmlFor="email">EMAIL</label>
-                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} />
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="email">
+                            EMAIL <span className="pre-reg-required">*</span>
+                        </label>
+                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.email && <div className="error">{formErrors.email}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="mobileNumber">MOBILE NUMBER</label>
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="mobileNumber">
+                            MOBILE NUMBER <span className="pre-reg-required">*</span>
+                        </label>
                         <input 
                             type="tel" 
                             id="mobileNumber" 
@@ -279,33 +231,56 @@ function PreRegistration() {
                             pattern="[0-9]*"
                             maxLength="11" // Adjust this based on your country's phone number length
                             placeholder="Enter numbers only"
+                            className="pre-reg-input"
                         />
                         {formErrors.mobileNumber && <div className="error">{formErrors.mobileNumber}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="isNewStudent">ARE YOU NEW OR AN OLD STUDENT?</label>
-                        <div className="radio-group">
-                            <label>
-                                <input type="radio" name="isNewStudent" value="new" onChange={handleChange} /> NEW
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="isNewStudent">
+                            ARE YOU NEW OR AN OLD STUDENT? <span className="pre-reg-required">*</span>
+                        </label>
+                        <div className="pre-reg-radio-group">
+                            <label className="pre-reg-radio-label">
+                                <input 
+                                    type="radio" 
+                                    name="isNewStudent" 
+                                    value="new" 
+                                    onChange={handleChange} 
+                                    className="pre-reg-radio-input"
+                                />
+                                <span className="pre-reg-radio-text">NEW</span>
                             </label>
-                            <label>
-                                <input type="radio" name="isNewStudent" value="old" onChange={handleChange} /> OLD
+                            <label className="pre-reg-radio-label">
+                                <input 
+                                    type="radio" 
+                                    name="isNewStudent" 
+                                    value="old" 
+                                    onChange={handleChange} 
+                                    className="pre-reg-radio-input"
+                                />
+                                <span className="pre-reg-radio-text">OLD</span>
                             </label>
                         </div>
-                        {formErrors.isNewStudent && <div className="error">{formErrors.isNewStudent}</div>}
+                        {formErrors.isNewStudent && <div className="pre-reg-error">{formErrors.isNewStudent}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="parentFirstName">NAME OF PARENT OR GUARDIAN (FIRST NAME)</label>
-                        <input type="text" id="parentFirstName" name="parentFirstName" value={formData.parentFirstName} onChange={handleChange} />
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="parentFirstName">
+                            NAME OF PARENT OR GUARDIAN (FIRST NAME) <span className="pre-reg-required">*</span>
+                        </label>
+                        <input type="text" id="parentFirstName" name="parentFirstName" value={formData.parentFirstName} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.parentFirstName && <div className="error">{formErrors.parentFirstName}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="parentLastName">LAST NAME</label>
-                        <input type="text" id="parentLastName" name="parentLastName" value={formData.parentLastName} onChange={handleChange} />
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="parentLastName">
+                            LAST NAME <span className="pre-reg-required">*</span>
+                        </label>
+                        <input type="text" id="parentLastName" name="parentLastName" value={formData.parentLastName} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.parentLastName && <div className="error">{formErrors.parentLastName}</div>}
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="parentMobileNumber">MOBILE NUMBER</label>
+                    <div className="pre-reg-form-group">
+                        <label htmlFor="parentMobileNumber">
+                            MOBILE NUMBER <span className="pre-reg-required">*</span>
+                        </label>
                         <input 
                             type="tel" 
                             id="parentMobileNumber" 
@@ -319,6 +294,7 @@ function PreRegistration() {
                             pattern="[0-9]*"
                             maxLength="11" // Adjust this based on your country's phone number length
                             placeholder="Enter numbers only"
+                            className="pre-reg-input"
                         />
                         {formErrors.parentMobileNumber && <div className="error">{formErrors.parentMobileNumber}</div>}
                     </div>
@@ -327,102 +303,9 @@ function PreRegistration() {
                     className="pre-reg-submit-btn" 
                     type="submit"
                 >
-                    Submit
+                    Review Information
                 </button>
             </form>
-        </div>
-    );
-
-    const renderAppointmentTab = () => (
-        <div className="pre-reg-appointment-container">
-            <div className="pre-reg-title">Schedule Appointment</div>
-            <form onSubmit={handleAppointmentSubmit} className="appointment-form">
-                <div className="form-group">
-                    <label htmlFor="appointmentDate">Preferred Date *</label>
-                    <input 
-                        type="date" 
-                        id="appointmentDate" 
-                        name="appointmentDate"
-                        value={appointmentData.appointmentDate}
-                        onChange={handleAppointmentChange}
-                        min={new Date().toISOString().split('T')[0]}
-                        required
-                    />
-                    {appointmentErrors.appointmentDate && 
-                        <div className="error">{appointmentErrors.appointmentDate}</div>}
-                </div>
-                <div className="form-group">
-                    <label htmlFor="appointmentTime">Preferred Time *</label>
-                    <select 
-                        id="appointmentTime" 
-                        name="appointmentTime"
-                        value={appointmentData.appointmentTime}
-                        onChange={handleAppointmentChange}
-                        required
-                    >
-                        <option value="">Select Time</option>
-                        <option value="9:00">9:00 AM</option>
-                        <option value="10:00">10:00 AM</option>
-                        <option value="11:00">11:00 AM</option>
-                        <option value="13:00">1:00 PM</option>
-                        <option value="14:00">2:00 PM</option>
-                        <option value="15:00">3:00 PM</option>
-                    </select>
-                    {appointmentErrors.appointmentTime && 
-                        <div className="error">{appointmentErrors.appointmentTime}</div>}
-                </div>
-                <div className="form-group">
-                    <label htmlFor="appointmentReason">Purpose of Visit *</label>
-                    <textarea 
-                        id="appointmentReason" 
-                        name="appointmentReason"
-                        value={appointmentData.appointmentReason}
-                        onChange={handleAppointmentChange}
-                        rows="4"
-                        placeholder="Please describe the reason for your appointment"
-                        required
-                    ></textarea>
-                    {appointmentErrors.appointmentReason && 
-                        <div className="error">{appointmentErrors.appointmentReason}</div>}
-                </div>
-                <button 
-                    className="pre-reg-submit-btn"
-                    type="submit"
-                >
-                    Book Appointment
-                </button>
-            </form>
-        </div>
-    );
-
-    const renderConfirmTab = () => (
-        <div className="pre-reg-confirm-container">
-            <div className="pre-reg-title">Confirm Details</div>
-            {/* Add confirmation summary */}
-            <div className="pre-reg-btn-group">
-                <button 
-                    className="pre-reg-back-btn" 
-                    onClick={() => setActiveTab('appointment')}
-                >
-                    Back
-                </button>
-                <button 
-                    className="pre-reg-submit-btn" 
-                    onClick={handleSubmit}
-                >
-                    Submit
-                </button>
-            </div>
-        </div>
-    );
-
-    const renderSuccessTab = () => (
-        <div className="pre-reg-success-container">
-            <div className="pre-reg-success-icon">✓</div>
-            <div className="pre-reg-success-title">Registration Successful!</div>
-            <div className="pre-reg-success-message">
-                Thank you for pre-registering! We will contact you soon.
-            </div>
         </div>
     );
 
@@ -430,44 +313,25 @@ function PreRegistration() {
         <div className="pre-reg-success-wrapper">
             <div className="pre-reg-success-card">
                 <div className="pre-reg-success-checkmark">✓</div>
-                <h1 className="pre-reg-success-heading">
-                    {successType === 'registration' ? 'Pre-Registration Successful!' : 'Appointment Booked Successfully!'}
-                </h1>
+                <h1 className="pre-reg-success-heading">Pre-Registration Successful!</h1>
                 <div className="pre-reg-success-details">
-                    <p>{successType === 'registration' 
-                        ? 'Thank you for pre-registering with us.' 
-                        : 'Your appointment has been scheduled successfully.'}
-                    </p>
+                    <p>Thank you for pre-registering with us.</p>
                     <div className="pre-reg-success-info">
                         <p>What happens next?</p>
                         <ul>
-                            {successType === 'registration' ? (
-                                <>
-                                    <li>You will receive a confirmation email shortly</li>
-                                    <li>Our admissions team will review your application</li>
-                                    <li>We will contact you within 2-3 business days</li>
-                                </>
-                            ) : (
-                                <>
-                                    <li>You will receive an appointment confirmation email</li>
-                                    <li>Please arrive 15 minutes before your scheduled time</li>
-                                    <li>Bring any relevant documents with you</li>
-                                </>
-                            )}
+                            <li>You will receive a confirmation email shortly</li>
+                            <li>Our admissions team will review your application</li>
+                            <li>We will contact you within 2-3 business days</li>
                         </ul>
                     </div>
                 </div>
                 <div className="pre-reg-success-buttons">
-                    <button 
-                        className="pre-reg-success-home-btn"
-                        onClick={() => {
-                            setRegistrationSuccess(false);
-                            setSuccessType(null);
-                            setSelectedTab('pre-registration');
-                        }}
-                    >
+                    <a href="/" className="pre-reg-success-home-btn">
                         Return to Homepage
-                    </button>
+                    </a>
+                    <a href="/appointment" className="pre-reg-success-appointment-btn">
+                        Book an Appointment
+                    </a>
                 </div>
             </div>
         </div>
@@ -477,99 +341,44 @@ function PreRegistration() {
         <>
             <Header />
             <div className="pre-reg-main-container">
-                {registrationSuccess ? (
-                    renderSuccessPage()
-                ) : (
-                    <>
-                        <div className="pre-reg-tab-buttons">
-                            <button 
-                                className={`pre-reg-tab-btn ${selectedTab === 'pre-registration' ? 'active' : ''}`}
-                                onClick={() => setSelectedTab('pre-registration')}
-                            >
-                                Pre-Registration
-                            </button>
-                            <button 
-                                className={`pre-reg-tab-btn ${selectedTab === 'appointment' ? 'active' : ''}`}
-                                onClick={() => setSelectedTab('appointment')}
-                            >
-                                Book Appointment
-                            </button>
+                <div className="pre-reg-tabs">
+                    <button 
+                        className={`pre-reg-tab ${activeTab === 'pre-reg' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('pre-reg')}
+                    >
+                        Pre-Registration
+                    </button>
+                    <button 
+                        className={`pre-reg-tab ${activeTab === 'appointment' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('appointment')}
+                    >
+                        Book Appointment
+                    </button>
+                </div>
+
+                {activeTab === 'pre-reg' ? (
+                    registrationSuccess ? (
+                        renderSuccessPage()
+                    ) : (
+                        <div className="pre-reg-container">
+                            <div className="pre-reg-progress-bar">
+                                <div
+                                    className="pre-reg-progress"
+                                    style={{ width: `${progress}%` }}
+                                    aria-valuenow={progress}
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                            <div className="pre-reg-progress-percentage">
+                                {progress.toFixed(0)}%
+                            </div>
+
+                            {renderDetailsTab()}
                         </div>
-
-                        {selectedTab === 'pre-registration' && (
-                            <div className="pre-reg-container">
-                                <div className="pre-reg-progress-bar">
-                                    <div
-                                        className="pre-reg-progress"
-                                        style={{ width: `${progress}%` }}
-                                        aria-valuenow={progress}
-                                        aria-valuemin="0"
-                                        aria-valuemax="100"
-                                    ></div>
-                                </div>
-                                <div className="pre-reg-progress-percentage">
-                                    {progress.toFixed(0)}%
-                                </div>
-
-                                {activeTab === 'details' && renderDetailsTab()}
-                                {activeTab === 'confirm' && renderConfirmTab()}
-                                {registrationSuccess && renderSuccessTab()}
-                            </div>
-                        )}
-
-                        {selectedTab === 'appointment' && (
-                            <div className="pre-reg-appointment-section">
-                                <div className="pre-reg-title">Book an Appointment</div>
-                                <div className="appointment-form">
-                                    <div className="form-group">
-                                        <label htmlFor="appointmentDate">Preferred Date</label>
-                                        <input 
-                                            type="date" 
-                                            id="appointmentDate" 
-                                            name="appointmentDate"
-                                            value={appointmentData.appointmentDate}
-                                            onChange={handleAppointmentChange}
-                                            min={new Date().toISOString().split('T')[0]}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="appointmentTime">Preferred Time</label>
-                                        <select 
-                                            id="appointmentTime" 
-                                            name="appointmentTime"
-                                            value={appointmentData.appointmentTime}
-                                            onChange={handleAppointmentChange}
-                                        >
-                                            <option value="">Select Time</option>
-                                            <option value="9:00">9:00 AM</option>
-                                            <option value="10:00">10:00 AM</option>
-                                            <option value="11:00">11:00 AM</option>
-                                            <option value="13:00">1:00 PM</option>
-                                            <option value="14:00">2:00 PM</option>
-                                            <option value="15:00">3:00 PM</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="appointmentReason">Purpose of Visit</label>
-                                        <textarea 
-                                            id="appointmentReason" 
-                                            name="appointmentReason"
-                                            value={appointmentData.appointmentReason}
-                                            onChange={handleAppointmentChange}
-                                            rows="4"
-                                            placeholder="Please describe the reason for your appointment"
-                                        ></textarea>
-                                    </div>
-                                    <button 
-                                        className="pre-reg-submit-btn"
-                                        onClick={handleAppointmentSubmit}
-                                    >
-                                        Book Appointment
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </>
+                    )
+                ) : (
+                    <Appointment />
                 )}
             </div>
             <Footer />
