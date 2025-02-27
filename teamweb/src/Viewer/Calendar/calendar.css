@@ -192,3 +192,41 @@
     height: 28px;
   }
 }
+
+/* Upcoming Holidays Section */
+.holiday-item {
+  background: #e3f2fd;
+  padding: 8px;
+  margin-bottom: 5px;
+  border-left: 4px solid #42a5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.holiday-item .holiday-date {
+  font-weight: bold;
+  color: #1565c0;
+}
+
+.holiday-item .holiday-name {
+  color: #1e88e5;
+  font-size: 14px;
+}
+
+/* Current Event and Holiday */
+.current-event, .current-holiday {
+  background-color: #ffeb3b;
+  color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.today {
+  background-color: rgb(255, 217, 0);
+  color: black;
+  font-weight: bold;
+}
