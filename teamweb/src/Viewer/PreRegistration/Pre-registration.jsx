@@ -25,6 +25,14 @@ function PreRegistration() {
     const [progress, setProgress] = useState(0);
     const [activeTab, setActiveTab] = useState('pre-reg');
 
+    useEffect(() => {
+        // Check for existing form data when component mounts
+        const storedData = sessionStorage.getItem('preRegFormData');
+        if (storedData) {
+            setFormData(JSON.parse(storedData));
+        }
+    }, []);
+
     const handleChange = (e) => {
         setFormData({...formData, [e.target.name]: e.target.value });
         setFormErrors({...formErrors, [e.target.name]: "" });
@@ -36,7 +44,6 @@ function PreRegistration() {
         setFormErrors(errors);
 
         if (Object.keys(errors).length === 0) {
-            // Store form data in sessionStorage before redirecting
             sessionStorage.setItem('preRegFormData', JSON.stringify(formData));
             window.location.href = '/confirmregistration';
         }
