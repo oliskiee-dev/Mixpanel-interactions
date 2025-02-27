@@ -20,7 +20,7 @@ import Nikka from "../../assets/images/FacultyMembers/Nikka.png";
 import Alejandria from "../../assets/images/FacultyMembers/Alejandria.png";
 import Jhanuarie from "../../assets/images/FacultyMembers/Jhanuarie.png";
 import Charmaine from "../../assets/images/FacultyMembers/Charmaine.png";
-import Teresita  from "../../assets/images/FacultyMembers/Teresita.png";
+import Teresita from "../../assets/images/FacultyMembers/Teresita.png";
 import Gertrudes from "../../assets/images/FacultyMembers/LiaisonOfficer.png";
 import Flor from "../../assets/images/FacultyMembers/Flor.png";
 import Raquela from "../../assets/images/FacultyMembers/Registrar.png";
@@ -56,9 +56,6 @@ const facultyData = {
     ]
 };
 
-
-
-
 // Data for subjects per grade
 const subjectsData = {
     "KINDERGARTEN 1": ["Alphabet Recognition", "Basic Counting", "Arts & Crafts"],
@@ -84,13 +81,13 @@ const seniorHighStrands = [
 
 // Data for Facilities
 const facilitiesData = {
-    "Lab": "/path-to-lab-image.jpg",
+    "Laboratory": "/path-to-lab-image.jpg",
     "Music Room": "/path-to-music-room-image.jpg",
-    "Church": "/path-to-church-image.jpg",
-    "Clinic": "/path-to-clinic-image.jpg",
-    "Lounge": "/path-to-lounge-image.jpg",
-    "Canteen": "/path-to-canteen-image.jpg",
-    "Court": "/path-to-court-image.jpg",
+    "Chapel": "/path-to-church-image.jpg",
+    "Health Clinic": "/path-to-clinic-image.jpg",
+    "Student Lounge": "/path-to-lounge-image.jpg",
+    "Cafeteria": "/path-to-canteen-image.jpg",
+    "Sports Court": "/path-to-court-image.jpg",
 };
 
 function SchoolInfo() {
@@ -124,42 +121,64 @@ function SchoolInfo() {
     };
 
     return (
-        <>
+        <div className="school-info-container">
             <Header />
 
+            {/* Hero Section */}
+            <section className="hero-section">
+                <div className="hero-content">
+                    <h1>Team Mission Christian School</h1>
+                    <p>Nurturing Excellence through Faith and Knowledge</p>
+                </div>
+            </section>
+
             {/* About Us Section */}
-            <section className="about-us">
+            <section className="section about-section">
+                <div className="section-header">
+                    <h2>ABOUT US</h2>
+                    <div className="section-underline"></div>
+                </div>
                 <div className="about-content">
                     <div className="about-text">
-                        <h2 className="h2-title">ABOUT US</h2>
                         <p>
                             Team Mission Christian School was established with a vision to provide high-quality education rooted in Christian values.
                             Founded by a dedicated group of educators and faith-driven individuals, the school aimed to create a learning environment 
-                            that nurtures both academic excellence and spiritual growth. 
+                            that nurtures both academic excellence and spiritual growth.
+                        </p>
+                        <p>
+                            Our mission is to empower students with knowledge, skills, and values that prepare them for higher education and meaningful lives
+                            as responsible citizens and leaders in their communities. We foster a supportive environment where every student can discover
+                            and develop their God-given talents and purpose.
                         </p>
                     </div>
                     <div className="about-image">
-                        <img src="/path-to-blank-image.jpg" alt="Placeholder" />
+                        <img src="/path-to-school-image.jpg" alt="Team Mission Christian School" />
                     </div>
                 </div>
             </section>
 
             {/* Offered Courses Section */}
-            <section className="section-border">
-                <h2 className="h2-title">OFFERED COURSES</h2>
+            <section className="section courses-section">
+                <div className="section-header">
+                    <h2>ACADEMIC PROGRAMS</h2>
+                    <div className="section-underline"></div>
+                </div>
 
                 <div className="courses-container">
-                    <div className="course-list">
-                        {Object.keys(subjectsData).map((grade) => (
-                            <button key={grade} className="course-box" onClick={() => openModal(grade)}>
-                                {grade}
-                            </button>
-                        ))}
+                    <div className="grade-levels">
+                        <h3>GRADE LEVELS</h3>
+                        <div className="course-list">
+                            {Object.keys(subjectsData).map((grade) => (
+                                <button key={grade} className="course-button" onClick={() => openModal(grade)}>
+                                    {grade}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="senior-high">
                         <h3>SENIOR HIGH SCHOOL STRANDS</h3>
-                        <ul>
+                        <ul className="strand-list">
                             {seniorHighStrands.map((strand, index) => (
                                 <li key={index}>{strand}</li>
                             ))}
@@ -170,11 +189,14 @@ function SchoolInfo() {
             </section>
 
             {/* School Facilities Section */}
-            <section className="section-border">
-                <h2 className="h2-title">SCHOOL AMENITIES</h2>
+            <section className="section facilities-section">
+                <div className="section-header">
+                    <h2>CAMPUS FACILITIES</h2>
+                    <div className="section-underline"></div>
+                </div>
                 <div className="facilities-container">
                     {Object.keys(facilitiesData).map((facility) => (
-                        <button key={facility} className="facility-box" onClick={() => openFacilityModal(facility)}>
+                        <button key={facility} className="facility-button" onClick={() => openFacilityModal(facility)}>
                             {facility}
                         </button>
                     ))}
@@ -182,57 +204,74 @@ function SchoolInfo() {
             </section>
 
             {/* Faculty and Staff Section */}
-            <section className="section-border">
-                <h2 className="h2-title">FACULTY AND STAFF</h2>
+            <section className="section faculty-section">
+                <div className="section-header">
+                    <h2>FACULTY AND STAFF</h2>
+                    <div className="section-underline"></div>
+                </div>
 
                 {/* Administrators */}
-                <h3 className="faculty-category">ADMINISTRATORS</h3>
-                <div className="faculty-grid">
-                    {facultyData.administrators.map((member, index) => (
-                        <div className="faculty-box" key={index}>
-                            <img src={member.img} alt={member.name} className="faculty-img" />
-                            <h3>{member.name}</h3>
-                            <p>{member.role}</p>
-                        </div>
-                    ))}
+                <div className="faculty-category">
+                    <h3>ADMINISTRATORS</h3>
+                    <div className="faculty-grid">
+                        {facultyData.administrators.map((member, index) => (
+                            <div className="faculty-card" key={index}>
+                                <div className="faculty-photo">
+                                    <img src={member.img} alt={member.name} />
+                                </div>
+                                <div className="faculty-info">
+                                    <h4>{member.name}</h4>
+                                    <p>{member.role}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Faculty Council */}
-                <h3 className="faculty-category">FACULTY COUNCIL</h3>
-                <div className="faculty-grid">
-                    {facultyData.facultyCouncil.map((member, index) => (
-                        <div className="faculty-box" key={index}>
-                            <img src={member.img} alt={member.name} className="faculty-img" />
-                            <h3>{member.name}</h3>
-                            <p>{member.role}</p>
-                        </div>
-                    ))}
+                <div className="faculty-category">
+                    <h3>FACULTY COUNCIL</h3>
+                    <div className="faculty-grid">
+                        {facultyData.facultyCouncil.map((member, index) => (
+                            <div className="faculty-card" key={index}>
+                                <div className="faculty-photo">
+                                    <img src={member.img} alt={member.name} />
+                                </div>
+                                <div className="faculty-info">
+                                    <h4>{member.name}</h4>
+                                    <p>{member.role}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Support Staff */}
-                <h3 className="faculty-category">SUPPORT STAFF</h3>
-                <div className="faculty-grid">
-                    {facultyData.supportStaff.map((member, index) => (
-                        <div className="faculty-box" key={index}>
-                            <img src={member.img} alt={member.name} className="faculty-img" />
-                            <h3>{member.name}</h3>
-                            <p>{member.role}</p>
-                        </div>
-                    ))}
+                <div className="faculty-category">
+                    <h3>SUPPORT STAFF</h3>
+                    <div className="faculty-grid">
+                        {facultyData.supportStaff.map((member, index) => (
+                            <div className="faculty-card" key={index}>
+                                <div className="faculty-photo">
+                                    <img src={member.img} alt={member.name} />
+                                </div>
+                                <div className="faculty-info">
+                                    <h4>{member.name}</h4>
+                                    <p>{member.role}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
-            
-
-
-
 
             {/* Grade Modal Popup */}
             {isModalOpen && selectedGrade && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
+                <div className="modal-overlay" onClick={closeModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <button className="close-button" onClick={closeModal}>×</button>
-                        <h3>{selectedGrade} Subjects</h3>
-                        <ul>
+                        <h3>{selectedGrade} Curriculum</h3>
+                        <ul className="subject-list">
                             {subjectsData[selectedGrade].map((subject, index) => (
                                 <li key={index}>{subject}</li>
                             ))}
@@ -243,17 +282,22 @@ function SchoolInfo() {
 
             {/* Facility Modal Popup */}
             {isFacilityModalOpen && selectedFacility && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
+                <div className="modal-overlay" onClick={closeFacilityModal}>
+                    <div className="modal-content facility-modal" onClick={(e) => e.stopPropagation()}>
                         <button className="close-button" onClick={closeFacilityModal}>×</button>
                         <h3>{selectedFacility}</h3>
-                        <img src={facilitiesData[selectedFacility]} alt={selectedFacility} className="facility-img" />
+                        <div className="facility-image">
+                            <img src={facilitiesData[selectedFacility]} alt={selectedFacility} />
+                        </div>
+                        <p className="facility-description">
+                            Our state-of-the-art {selectedFacility.toLowerCase()} provides students with an excellent environment for learning and development.
+                        </p>
                     </div>
                 </div>
             )}
 
             <Footer />
-        </>
+        </div>
     );
 }
 
