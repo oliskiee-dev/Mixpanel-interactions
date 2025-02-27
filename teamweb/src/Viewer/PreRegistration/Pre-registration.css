@@ -132,20 +132,6 @@ input[type="date"] {
     font-size: 14px;
 }
 
-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 14px;
-    margin-top: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
 .pre-reg-btn-group {
     display: flex;
     gap: 1rem;
@@ -162,6 +148,17 @@ button {
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s ease;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .pre-reg-back-btn {
@@ -180,7 +177,7 @@ button {
     background-color: #e0e0e0;
 }
 
-button:hover {
+.pre-reg-submit-btn:hover {
     background-color: #0069d9;
 }
 
