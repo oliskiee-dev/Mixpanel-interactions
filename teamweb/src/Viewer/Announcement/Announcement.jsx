@@ -5,17 +5,31 @@ import "./Announcement.css";
 
 function Announcement() {
     const [announcements, setAnnouncements] = useState([]);
-    const [showAll, setShowAll] = useState(false); // Set false for three announcements
+    const [showAll, setShowAll] = useState(false);
 
     useEffect(() => {
-        // Fetch announcements from API or database (mock data for now)
+        // Mock data with placeholder images
         setAnnouncements([
-            "School event on February 15th - Join us!",
-            "New guidelines for the upcoming semester released.",
-            "Important notice about upcoming exams.",
-            "Library hours extended for finals week.",
-            "Sports fest registration now open!",
-            "New courses available for next semester.",
+            {
+                text: "School event on February 15th - Join us!",
+                image: "https://picsum.photos/800/400?random=1"
+            },
+            {
+                text: "New guidelines for the upcoming semester released.",
+                image: "https://picsum.photos/800/400?random=2"
+            },
+            {
+                text: "Important notice about upcoming exams.",
+                image: "https://picsum.photos/800/400?random=3"
+            },
+            {
+                text: "Library hours extended for finals week.",
+                image: "https://picsum.photos/800/400?random=4"
+            },
+            {
+                text: "Sports fest registration now open!",
+                image: "https://picsum.photos/800/400?random=5"
+            }
         ]);
     }, []);
 
@@ -25,7 +39,7 @@ function Announcement() {
 
     const displayedAnnouncements = showAll 
         ? announcements 
-        : announcements.slice(0, 5);
+        : announcements.slice(0, 3);
 
     return (
         <>
@@ -38,9 +52,16 @@ function Announcement() {
                 <div className="announcements-list">
                     {displayedAnnouncements.map((announcement, index) => (
                         <div key={index} className="announcement-card">
+                            <div className="announcement-image-container">
+                                <img 
+                                    src={announcement.image} 
+                                    alt={`Announcement ${index + 1}`} 
+                                    className="announcement-image"
+                                />
+                            </div>
                             <div className="announcement-content">
                                 <span className="announcement-number">ANNOUNCEMENT #{index + 1}</span>
-                                <p>{announcement}</p>
+                                <p>{announcement.text}</p>
                             </div>
                         </div>
                     ))}
