@@ -96,26 +96,26 @@
 
 /* Event Days */
 .event-day {
-  background-color: #ff4d4d;
+  background-color: #ea2a2a;
   color: white;
   font-weight: bold;
   transition: background 0.3s;
 }
 
 .event-day:hover {
-  background-color: #cc0000;
+  background-color: #eb4141;
 }
 
 /* Holiday Days */
 .holiday-day {
-  background-color: #4dafff;
+  background-color: #1a3a7e;
   color: white;
   font-weight: bold;
   transition: background 0.3s;
 }
 
 .holiday-day:hover {
-  background-color: #007bff;
+  background-color: #325aa8;
 }
 
 /* Events Section */

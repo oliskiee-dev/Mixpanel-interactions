@@ -52,7 +52,7 @@
 
 .appointment-submit-btn {
     padding: 0.75rem 2rem;
-    background-color: #4CAF50;
+    background-color: #1a3a7e;
     color: white;
     border: none;
     border-radius: 4px;
@@ -62,7 +62,7 @@
 }
 
 .appointment-submit-btn:hover {
-    background-color: #45a049;
+    background-color: #325aa8;
 }
 
 /* Success Page Styles */
@@ -84,7 +84,7 @@
 }
 
 .appointment-success-checkmark {
-    color: #4CAF50;
+    color: #1a3a7e;
     font-size: 3rem;
     margin-bottom: 1rem;
 }
@@ -100,7 +100,7 @@
 
 .appointment-success-home-btn {
     padding: 0.75rem 1.5rem;
-    background-color: #4CAF50;
+    background-color: #325aa8;
     color: white;
     text-decoration: none;
     border-radius: 4px;
@@ -108,7 +108,7 @@
 }
 
 .appointment-success-home-btn:hover {
-    background-color: #45a049;
+    background-color: #325aa8;
 }
 
 .appointment-success-info {
@@ -120,7 +120,7 @@
 }
 
 .appointment-success-info > p {
-    color: #4CAF50;
+    color: #1a3a7e;
     font-weight: 600;
     margin-bottom: 1rem;
 }
@@ -154,7 +154,7 @@
 }
 
 .appointment-step-number {
-    background-color: #4CAF50;
+    background-color: #1a3a7e;
     color: white;
     width: 24px;
     height: 24px;
