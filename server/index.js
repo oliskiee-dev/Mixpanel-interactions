@@ -228,7 +228,6 @@ app.post('/addPreRegistration', async (req, res) => {
             name,
             phone_number,
             age,
-            course,
             strand: strand || null, // Optional
             grade_level, // Required
             email,

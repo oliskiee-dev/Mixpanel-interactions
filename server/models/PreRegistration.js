@@ -4,7 +4,6 @@ const preRegistrationSchema = new mongoose.Schema({
     name: String,
     phone_number: Number,
     age: Number,
-    course: String,
     strand: { type: String, default: null }, // Added strand (optional)
     grade_level: { type: String},
     email: {
