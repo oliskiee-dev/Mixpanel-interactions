@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const calendarSchema = new mongoose.Schema({
   title: String,
   date: Date,
-  description: String,
   created_at: { type: Date, default: Date.now },
   type: {
     type: String,

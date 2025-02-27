@@ -147,7 +147,6 @@ app.post('/addCalendar', async (req, res) => {
         const newEntry = new calendarModel({
             title,
             date,
-            description,
             created_at: new Date(),  // Automatically set created_at to now
             type,  // Set the type ("event" or "holiday")
         });
