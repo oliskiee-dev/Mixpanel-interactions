@@ -190,7 +190,20 @@ app.get('/preregistration', async (req, res) => {
 
 // POST - Add a new Pre-Registration
 app.post('/addPreRegistration', async (req, res) => {
-    let { name, phone_number, age, course, email, status, appointment_date, nationality, parent_guardian_name, parent_guardian_number } = req.body;
+    let { 
+        name, 
+        phone_number, 
+        age, 
+        course, 
+        email, 
+        status, 
+        appointment_date, 
+        nationality, 
+        parent_guardian_name, 
+        parent_guardian_number, 
+        preferred_time,  // Added preferred time
+        purpose_of_visit // Added purpose of visit
+    } = req.body;
 
     // Convert status to lowercase if provided
     if (status) {
@@ -210,11 +223,13 @@ app.post('/addPreRegistration', async (req, res) => {
             age,
             course,
             email,
-            nationality, // Added nationality
-            parent_guardian_name, // Added guardian name
-            parent_guardian_number, // Added guardian number
-            status: status || 'pending',  // Default to 'pending' if not provided
-            appointment_date: appointment_date || null // Make appointment optional
+            nationality,
+            parent_guardian_name,
+            parent_guardian_number,
+            status: status || 'pending',
+            appointment_date: appointment_date || null, // Make appointment optional
+            preferred_time: preferred_time || null, // Make preferred time optional
+            purpose_of_visit: purpose_of_visit || null // Make purpose of visit optional
         });
 
         const savedEntry = await newPreRegistration.save();
@@ -224,6 +239,37 @@ app.post('/addPreRegistration', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
+
+// POST - Add a Booking
+app.post('/addBooking', async (req, res) => {
+    const { email, appointment_date, preferred_time, purpose_of_visit } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: "Email is required to update the booking." });
+    }
+
+    try {
+        const user = await preRegistrationModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found. Please register first." });
+        }
+
+        // Update appointment details
+        user.appointment_date = appointment_date || user.appointment_date;
+        user.preferred_time = preferred_time || user.preferred_time;
+        user.purpose_of_visit = purpose_of_visit || user.purpose_of_visit;
+
+        await user.save();
+        res.status(200).json({ message: "Appointment updated successfully", user });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 
 //==========ADMIN CODE==============

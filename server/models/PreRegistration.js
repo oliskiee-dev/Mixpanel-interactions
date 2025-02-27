@@ -2,16 +2,16 @@ const mongoose = require('mongoose');
 
 const preRegistrationSchema = new mongoose.Schema({
     name: String,
-    phone_number: Number, // Using Number type
-    age: Number, // Using Number type
+    phone_number: Number,
+    age: Number,
     course: String,
     email: {
         type: String,
-        unique: true, // Ensures email is unique
+        unique: true,
     },
-    nationality: String, // Added nationality
-    parent_guardian_name: String, // Added parent/guardian name
-    parent_guardian_number: Number, // Added parent/guardian contact number
+    nationality: String,
+    parent_guardian_name: String,
+    parent_guardian_number: Number,
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected'],
@@ -20,7 +20,9 @@ const preRegistrationSchema = new mongoose.Schema({
     appointment_date: {
         type: Date,
     },
-}, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
+    preferred_time: String, // Added preferred time
+    purpose_of_visit: String // Added purpose of visit
+}, { timestamps: true });
 
 const preRegistrationModel = mongoose.model('preRegistration', preRegistrationSchema);
 module.exports = preRegistrationModel;
