@@ -9,6 +9,9 @@ const preRegistrationSchema = new mongoose.Schema({
         type: String,
         unique: true, // Ensures email is unique
     },
+    nationality: String, // Added nationality
+    parent_guardian_name: String, // Added parent/guardian name
+    parent_guardian_number: Number, // Added parent/guardian contact number
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected'],
