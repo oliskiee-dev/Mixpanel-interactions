@@ -24,23 +24,28 @@ function ConfirmRegistration() {
     const handleConfirm = async () => {
         if (!formData) return;
     
+        const gradeLevel = formData.yearLevel;
+        const isSeniorHigh = gradeLevel === "11" || gradeLevel === "12";
+    
         const preRegistrationData = {
             name: `${formData.firstName} ${formData.lastName}`,
             phone_number: formData.mobileNumber,
             age: new Date().getFullYear() - new Date(formData.dateOfBirth).getFullYear(), // Calculate age
-            course: formData.yearLevel, // Assuming grade level corresponds to course
+            grade_level: gradeLevel, // Required
+            strand: isSeniorHigh ? formData.strand || "" : "", // Strand only if Grade 11 or 12
             email: formData.email,
             nationality: formData.nationality,
             parent_guardian_name: `${formData.parentFirstName} ${formData.parentLastName}`,
             parent_guardian_number: formData.parentMobileNumber,
-            status: 'pending' // Default status
+            isNewStudent: formData.isNewStudent?.toLowerCase() === "new" ? "new" : "old", // Ensure 'new' or 'old'
+            status: "pending" // Default status
         };
     
         try {
-            const response = await fetch('http://localhost:3000/addPreRegistration', {
-                method: 'POST',
+            const response = await fetch("http://localhost:3000/addPreRegistration", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify(preRegistrationData),
             });
@@ -49,18 +54,20 @@ function ConfirmRegistration() {
     
             if (response.ok) {
                 // Store success status and clear form data
-                sessionStorage.setItem('registrationSuccess', 'true');
-                sessionStorage.removeItem('preRegFormData');
+                sessionStorage.setItem("registrationSuccess", "true");
+                sessionStorage.removeItem("preRegFormData");
                 // Redirect to success page
-                window.location.href = '/success';
+                window.location.href = "/success";
             } else {
-                alert(`Error: ${result.error || 'Something went wrong'}`);
+                alert(`Error: ${result.error || "Something went wrong"}`);
             }
         } catch (error) {
-            console.error('Error submitting registration:', error);
-            alert('Failed to submit registration. Please try again.');
+            console.error("Error submitting registration:", error);
+            alert("Failed to submit registration. Please try again.");
         }
     };
+    
+    
     
 
     if (!formData) return null;
@@ -90,9 +97,12 @@ function ConfirmRegistration() {
                     <div className="pre-reg-confirm-grid">
                         <p><strong>Student Status:</strong> {formData.isNewStudent === 'new' ? 'New Student' : 'Old Student'}</p>
                         <p><strong>Grade Level:</strong> {formData.yearLevel}</p>
-                        {formData.strand && <p><strong>Strand:</strong> {formData.strand}</p>}
+                        {(formData.yearLevel === "11" || formData.yearLevel === "12") && formData.strand && (
+                            <p><strong>Strand:</strong> {formData.strand}</p>
+                        )}
                     </div>
                 </div>
+
 
                 {/* Parent/Guardian Information Section */}
                 <div className="pre-reg-confirm-section">
