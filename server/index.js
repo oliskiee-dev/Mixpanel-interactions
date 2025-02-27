@@ -232,30 +232,61 @@ app.post('/addPreRegistration', async (req, res) => {
     }
 
     try {
-        const newPreRegistration = new preRegistrationModel({
-            name,
-            phone_number,
-            age,
-            strand: strand || null, // Optional
-            grade_level, // Required
-            email,
-            nationality,
-            parent_guardian_name,
-            parent_guardian_number,
-            isNewStudent: isNewStudent.toLowerCase(), // Ensure lowercase for consistency
-            status: status || 'pending', // Default to 'pending' if not provided
-            appointment_date: appointment_date || null, // Optional
-            preferred_time: preferred_time || null, // Optional
-            purpose_of_visit: purpose_of_visit || null // Optional
-        });
+        // Check if a pre-registration with the same email already exists
+        const existingPreRegistration = await preRegistrationModel.findOne({ email });
+        
+        let preRegistrationData;
+        if (existingPreRegistration) {
+            // If entry exists, update the existing pre-registration
+            preRegistrationData = await preRegistrationModel.findOneAndUpdate(
+                { email }, // Find the document by email
+                { 
+                    name,
+                    phone_number,
+                    age,
+                    strand: strand || null, // Optional
+                    grade_level, // Required
+                    nationality,
+                    parent_guardian_name,
+                    parent_guardian_number,
+                    isNewStudent: isNewStudent.toLowerCase(), // Ensure lowercase for consistency
+                    status: status || 'pending', // Default to 'pending' if not provided
+                    appointment_date: appointment_date || null, // Optional
+                    preferred_time: preferred_time || null, // Optional
+                    purpose_of_visit: purpose_of_visit || null // Optional
+                },
+                { new: true } // Return the updated document
+            );
+        } else {
+            // If no existing entry, create a new one
+            preRegistrationData = new preRegistrationModel({
+                name,
+                phone_number,
+                age,
+                strand: strand || null, // Optional
+                grade_level, // Required
+                email,
+                nationality,
+                parent_guardian_name,
+                parent_guardian_number,
+                isNewStudent: isNewStudent.toLowerCase(), // Ensure lowercase for consistency
+                status: status || 'pending', // Default to 'pending' if not provided
+                appointment_date: appointment_date || null, // Optional
+                preferred_time: preferred_time || null, // Optional
+                purpose_of_visit: purpose_of_visit || null // Optional
+            });
 
-        const savedEntry = await newPreRegistration.save();
-        res.status(201).json({ message: "Pre-registration added successfully", preregistration: savedEntry });
+            // Save the new entry
+            await preRegistrationData.save();
+        }
+
+        res.status(201).json({ message: "Pre-registration processed successfully", preregistration: preRegistrationData });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 
