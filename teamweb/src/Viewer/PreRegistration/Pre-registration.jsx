@@ -142,10 +142,12 @@ function PreRegistration() {
                         {formErrors.dateOfBirth && <div className="error">{formErrors.dateOfBirth}</div>}
                     </div>
                     <div className="pre-reg-form-group">
-                        <label htmlFor="gender">
-                            GENDER <span className="pre-reg-required">*</span>
-                        </label>
-                        <input type="text" id="gender" name="gender" value={formData.gender} onChange={handleChange} className="pre-reg-input" />
+                    <label htmlFor="gender">GENDER</label>
+                        <select id="gender" name="gender" value={formData.gender} onChange={handleChange}>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
                         {formErrors.gender && <div className="error">{formErrors.gender}</div>}
                     </div>
                     <div className="pre-reg-form-group">
