@@ -5,6 +5,7 @@ import './Appointment.css';
 
 function Appointment() {
     const [appointmentData, setAppointmentData] = useState({
+        email: "",
         appointmentDate: "",
         appointmentTime: "",
         appointmentReason: "",
@@ -26,6 +27,8 @@ function Appointment() {
 
     const validateAppointment = (data) => {
         let errors = {};
+        if (!data.email.trim()) errors.email = "Email is required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = "Invalid email format";
         if (!data.appointmentDate) errors.appointmentDate = "Appointment Date is required";
         if (!data.appointmentTime) errors.appointmentTime = "Appointment Time is required";
         if (!data.appointmentReason?.trim()) errors.appointmentReason = "Purpose of Visit is required";
@@ -45,53 +48,37 @@ function Appointment() {
         }
     };
 
-    const renderSuccessPage = () => (
-        <div className="appointment-success-wrapper">
-            <div className="appointment-success-card">
-                <div className="appointment-success-checkmark">✓</div>
-                <h1 className="appointment-success-heading">Appointment Booked Successfully!</h1>
-                <div className="appointment-success-details">
-                    <p>Your appointment has been scheduled successfully.</p>
-                    <div className="appointment-success-info">
-                        <p>What happens next?</p>
-                        <div className="appointment-steps">
-                            <div className="appointment-step">
-                                <span className="appointment-step-number">1</span>
-                                <p>You will receive an appointment confirmation email</p>
-                            </div>
-                            <div className="appointment-step">
-                                <span className="appointment-step-number">2</span>
-                                <p>Please arrive 15 minutes before your scheduled time</p>
-                            </div>
-                            <div className="appointment-step">
-                                <span className="appointment-step-number">3</span>
-                                <p>Bring any relevant documents with you</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="appointment-success-buttons">
-                    <a href="/" className="appointment-success-home-btn">
-                        Return to Homepage
-                    </a>
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <>
             <div className="appointment-main-container">
                 {appointmentSuccess ? (
-                    renderSuccessPage()
+                    <div className="appointment-success-wrapper">
+                        <div className="appointment-success-card">
+                            <div className="appointment-success-checkmark">✓</div>
+                            <h1 className="appointment-success-heading">Appointment Booked Successfully!</h1>
+                            <p>You will receive an appointment confirmation email at {appointmentData.email}.</p>
+                            <a href="/" className="appointment-success-home-btn">Return to Homepage</a>
+                        </div>
+                    </div>
                 ) : (
                     <div className="appointment-section">
                         <div className="appointment-title">Book an Appointment</div>
                         <form onSubmit={handleSubmit} className="appointment-form">
                             <div className="appointment-form-group">
-                                <label htmlFor="appointmentDate">
-                                    Preferred Date <span className="appointment-required">*</span>
-                                </label>
+                                <label htmlFor="email">Email <span className="appointment-required">*</span></label>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="email"
+                                    value={appointmentData.email}
+                                    onChange={handleAppointmentChange}
+                                    required
+                                />
+                                {appointmentErrors.email && 
+                                    <div className="appointment-error">{appointmentErrors.email}</div>}
+                            </div>
+                            <div className="appointment-form-group">
+                                <label htmlFor="appointmentDate">Preferred Date <span className="appointment-required">*</span></label>
                                 <input 
                                     type="date" 
                                     id="appointmentDate" 
@@ -105,9 +92,7 @@ function Appointment() {
                                     <div className="appointment-error">{appointmentErrors.appointmentDate}</div>}
                             </div>
                             <div className="appointment-form-group">
-                                <label htmlFor="appointmentTime">
-                                    Preferred Time <span className="appointment-required">*</span>
-                                </label>
+                                <label htmlFor="appointmentTime">Preferred Time <span className="appointment-required">*</span></label>
                                 <select 
                                     id="appointmentTime" 
                                     name="appointmentTime"
@@ -127,9 +112,7 @@ function Appointment() {
                                     <div className="appointment-error">{appointmentErrors.appointmentTime}</div>}
                             </div>
                             <div className="appointment-form-group">
-                                <label htmlFor="appointmentReason">
-                                    Purpose of Visit <span className="appointment-required">*</span>
-                                </label>
+                                <label htmlFor="appointmentReason">Purpose of Visit <span className="appointment-required">*</span></label>
                                 <textarea 
                                     id="appointmentReason" 
                                     name="appointmentReason"
@@ -154,7 +137,6 @@ function Appointment() {
                     </div>
                 )}
             </div>
-
         </>
     );
 }
