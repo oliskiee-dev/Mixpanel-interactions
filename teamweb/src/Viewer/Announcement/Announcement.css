@@ -1,27 +1,103 @@
-.announcement-container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+/* Reset container styles to ensure proper alignment */
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.announcement-main-container {
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Title styling - explicitly positioned at the left */
+.announcement-header {
+    width: 100%;
+    padding: 0 0 10px 20px; /* Add left padding to match the page layout */
+    margin: 0;
+    box-sizing: border-box;
+    text-align: left;
 }
 
 .announcement-title {
-    font-size: 24px;
-    font-weight: bold;
     color: #002366;
-    margin-bottom: 15px;
+    font-size: 28px; /* Increased size */
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+    padding-bottom: 5px;
+    margin: 20px 0;
+    text-align: left;
+    position: relative;
+}
+
+/* Create extended underline */
+.announcement-title:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%; /* Extends the line to double the text width */
+    height: 2px;
+    background-color: #002366;
+}
+
+/* Center the announcements list but keep the header left-aligned */
+.announcements-list {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .announcement-card {
-    background-color: #ffffff;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 18px;
-    color: #333;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    background-color: #fff;
 }
 
+.announcement-content {
+    padding: 10px 15px;
+}
+
+.announcement-number {
+    color: #666;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.announcement-content p {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+}
+
+.button-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.view-all-button {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 150px;
+    transition: background-color 0.3s;
+}
+
+.view-all-button:hover {
+    background-color: #f0f0f0;
+}
+
+.announcement-footer {
+    margin-top: auto;
+}
