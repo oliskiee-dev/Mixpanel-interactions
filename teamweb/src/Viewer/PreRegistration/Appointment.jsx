@@ -35,18 +35,40 @@ function Appointment() {
         return errors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const errors = validateAppointment(appointmentData);
         setAppointmentErrors(errors);
-
+    
         if (Object.keys(errors).length === 0) {
-            console.log("Appointment submitted:", appointmentData);
-            setTimeout(() => {
-                setAppointmentSuccess(true);
-            }, 1000);
+            try {
+                const response = await fetch('http://localhost:3000/addBooking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: appointmentData.email,
+                        appointment_date: appointmentData.appointmentDate,
+                        preferred_time: appointmentData.appointmentTime,
+                        purpose_of_visit: appointmentData.appointmentReason,
+                    }),
+                });
+    
+                const result = await response.json();
+    
+                if (response.ok) {
+                    setAppointmentSuccess(true);
+                } else {
+                    alert(result.error || 'Failed to book appointment. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting appointment:', error);
+                alert('Failed to connect to the server. Please try again.');
+            }
         }
     };
+    
 
     return (
         <>
@@ -57,6 +79,8 @@ function Appointment() {
                             <div className="appointment-success-checkmark">✓</div>
                             <h1 className="appointment-success-heading">Appointment Booked Successfully!</h1>
                             <p>You will receive an appointment confirmation email at {appointmentData.email}.</p>
+                            <br />
+                            <br />
                             <a href="/" className="appointment-success-home-btn">Return to Homepage</a>
                         </div>
                     </div>
