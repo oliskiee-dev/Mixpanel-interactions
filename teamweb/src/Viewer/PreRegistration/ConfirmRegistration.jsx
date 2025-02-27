@@ -21,14 +21,47 @@ function ConfirmRegistration() {
         window.location.href = '/preregistration?edit=true';
     };
 
-    const handleConfirm = () => {
-        // Store that registration was successful
-        sessionStorage.setItem('registrationSuccess', 'true');
-        // Clear form data
-        sessionStorage.removeItem('preRegFormData');
-        // Redirect to success page
-        window.location.href = '/success';
+    const handleConfirm = async () => {
+        if (!formData) return;
+    
+        const preRegistrationData = {
+            name: `${formData.firstName} ${formData.lastName}`,
+            phone_number: formData.mobileNumber,
+            age: new Date().getFullYear() - new Date(formData.dateOfBirth).getFullYear(), // Calculate age
+            course: formData.yearLevel, // Assuming grade level corresponds to course
+            email: formData.email,
+            nationality: formData.nationality,
+            parent_guardian_name: `${formData.parentFirstName} ${formData.parentLastName}`,
+            parent_guardian_number: formData.parentMobileNumber,
+            status: 'pending' // Default status
+        };
+    
+        try {
+            const response = await fetch('http://localhost:3000/addPreRegistration', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(preRegistrationData),
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                // Store success status and clear form data
+                sessionStorage.setItem('registrationSuccess', 'true');
+                sessionStorage.removeItem('preRegFormData');
+                // Redirect to success page
+                window.location.href = '/success';
+            } else {
+                alert(`Error: ${result.error || 'Something went wrong'}`);
+            }
+        } catch (error) {
+            console.error('Error submitting registration:', error);
+            alert('Failed to submit registration. Please try again.');
+        }
     };
+    
 
     if (!formData) return null;
 
