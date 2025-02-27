@@ -59,23 +59,45 @@ body, html {
     border: 1px solid #ccc;
     margin-bottom: 15px;
     background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden; /* This ensures the image doesn't overflow */
+}
+
+.announcement-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.announcement-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.announcement-image:hover {
+    transform: scale(1.05);
 }
 
 .announcement-content {
-    padding: 10px 15px;
+    padding: 15px;
 }
 
 .announcement-number {
-    color: #666;
-    font-size: 12px;
+    color: #002366;
+    font-size: 14px;
+    font-weight: bold;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .announcement-content p {
     margin: 0;
     padding: 0;
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #333;
 }
 
 .button-container {
