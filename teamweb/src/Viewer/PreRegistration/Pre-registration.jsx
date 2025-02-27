@@ -283,14 +283,14 @@ function PreRegistration() {
                     </div>
                     <div className="pre-reg-form-group">
                         <label htmlFor="parentLastName">
-                            LAST NAME <span className="pre-reg-required">*</span>
+                            NAME OF PARENT OR GUARDIAN (LAST NAME) <span className="pre-reg-required">*</span>
                         </label>
                         <input type="text" id="parentLastName" name="parentLastName" value={formData.parentLastName} onChange={handleChange} className="pre-reg-input" />
                         {formErrors.parentLastName && <div className="error">{formErrors.parentLastName}</div>}
                     </div>
                     <div className="pre-reg-form-group">
                         <label htmlFor="parentMobileNumber">
-                            MOBILE NUMBER <span className="pre-reg-required">*</span>
+                            NAME OF PARENT OR GUARDIAN (MOBILE NUMBER) <span className="pre-reg-required">*</span>
                         </label>
                         <input 
                             type="tel" 
