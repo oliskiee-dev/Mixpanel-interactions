@@ -130,25 +130,31 @@ app.get('/calendar', async (req,res) =>{
 
 //Add a new Calendar Event
 app.post('/addCalendar', async (req, res) => {
-    const { title, date, description } = req.body;
+    const { title, date, description, type } = req.body;
 
     // Basic validation for required fields
-    if (!title || !date || !description) {
-        return res.status(400).json({ error: 'Missing required fields: title, date, or description' });
+    if (!title || !date || !description || !type) {
+        return res.status(400).json({ error: 'Missing required fields: title, date, description, or type' });
+    }
+
+    // Validate that the type is either "event" or "holiday"
+    if (!['event', 'holiday'].includes(type)) {
+        return res.status(400).json({ error: 'Invalid type. It should be either "event" or "holiday".' });
     }
 
     try {
-        // Create new calendar event with the current time as created_at
-        const newEvent = new calendarModel({
+        // Create new calendar entry with the current time as created_at
+        const newEntry = new calendarModel({
             title,
             date,
             description,
-            created_at: new Date()  // Automatically set created_at to now
+            created_at: new Date(),  // Automatically set created_at to now
+            type,  // Set the type ("event" or "holiday")
         });
 
-        // Save the event to the database
-        const savedEvent = await newEvent.save();
-        res.status(201).json({ message: 'Event added successfully', event: savedEvent });
+        // Save the entry to the database
+        const savedEntry = await newEntry.save();
+        res.status(201).json({ message: 'Calendar entry added successfully', entry: savedEntry });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });
