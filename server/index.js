@@ -194,9 +194,8 @@ app.post('/addPreRegistration', async (req, res) => {
         name, 
         phone_number, 
         age, 
-        course, 
         strand, // Optional
-        grade_level, // ✅ Required
+        grade_level, // Required
         email, 
         status, 
         appointment_date, 
@@ -204,12 +203,16 @@ app.post('/addPreRegistration', async (req, res) => {
         parent_guardian_name, 
         parent_guardian_number, 
         preferred_time, 
-        purpose_of_visit 
+        purpose_of_visit,
+        isNewStudent // ✅ Required (yes/no)
     } = req.body;
 
-    // Check if grade_level is missing
+    // Check if grade_level and isNewStudent are missing
     if (!grade_level) {
         return res.status(400).json({ error: "Grade level is required." });
+    }
+    if (!isNewStudent || !['yes', 'no'].includes(isNewStudent.toLowerCase())) {
+        return res.status(400).json({ error: "isNewStudent must be 'yes' or 'no'." });
     }
 
     // Convert status to lowercase if provided
@@ -234,6 +237,7 @@ app.post('/addPreRegistration', async (req, res) => {
             nationality,
             parent_guardian_name,
             parent_guardian_number,
+            isNewStudent: isNewStudent.toLowerCase(), // Ensure lowercase for consistency
             status: status || 'pending', // Default to 'pending' if not provided
             appointment_date: appointment_date || null, // Optional
             preferred_time: preferred_time || null, // Optional
@@ -247,6 +251,7 @@ app.post('/addPreRegistration', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 
