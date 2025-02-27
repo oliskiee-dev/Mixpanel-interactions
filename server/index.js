@@ -195,14 +195,15 @@ app.post('/addPreRegistration', async (req, res) => {
         phone_number, 
         age, 
         course, 
+        strand, // Added strand as optional
         email, 
         status, 
         appointment_date, 
         nationality, 
         parent_guardian_name, 
         parent_guardian_number, 
-        preferred_time,  // Added preferred time
-        purpose_of_visit // Added purpose of visit
+        preferred_time, 
+        purpose_of_visit 
     } = req.body;
 
     // Convert status to lowercase if provided
@@ -222,14 +223,15 @@ app.post('/addPreRegistration', async (req, res) => {
             phone_number,
             age,
             course,
+            strand: strand || null, // Optional strand
             email,
             nationality,
             parent_guardian_name,
             parent_guardian_number,
-            status: status || 'pending',
-            appointment_date: appointment_date || null, // Make appointment optional
-            preferred_time: preferred_time || null, // Make preferred time optional
-            purpose_of_visit: purpose_of_visit || null // Make purpose of visit optional
+            status: status || 'pending', // Default to 'pending' if not provided
+            appointment_date: appointment_date || null, // Optional
+            preferred_time: preferred_time || null, // Optional
+            purpose_of_visit: purpose_of_visit || null // Optional
         });
 
         const savedEntry = await newPreRegistration.save();
@@ -239,6 +241,7 @@ app.post('/addPreRegistration', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 // POST - Add a Booking

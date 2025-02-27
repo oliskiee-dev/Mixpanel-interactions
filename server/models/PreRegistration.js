@@ -5,6 +5,7 @@ const preRegistrationSchema = new mongoose.Schema({
     phone_number: Number,
     age: Number,
     course: String,
+    strand: { type: String, default: null }, // Added strand (optional)
     email: {
         type: String,
         unique: true,
@@ -19,9 +20,16 @@ const preRegistrationSchema = new mongoose.Schema({
     },
     appointment_date: {
         type: Date,
+        default: null
     },
-    preferred_time: String, // Added preferred time
-    purpose_of_visit: String // Added purpose of visit
+    preferred_time: {
+        type: String,
+        default: null
+    },
+    purpose_of_visit: {
+        type: String,
+        default: null
+    }
 }, { timestamps: true });
 
 const preRegistrationModel = mongoose.model('preRegistration', preRegistrationSchema);
