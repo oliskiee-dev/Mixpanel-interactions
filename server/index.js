@@ -195,7 +195,8 @@ app.post('/addPreRegistration', async (req, res) => {
         phone_number, 
         age, 
         course, 
-        strand, // Added strand as optional
+        strand, // Optional
+        grade_level, // ✅ Required
         email, 
         status, 
         appointment_date, 
@@ -205,6 +206,11 @@ app.post('/addPreRegistration', async (req, res) => {
         preferred_time, 
         purpose_of_visit 
     } = req.body;
+
+    // Check if grade_level is missing
+    if (!grade_level) {
+        return res.status(400).json({ error: "Grade level is required." });
+    }
 
     // Convert status to lowercase if provided
     if (status) {
@@ -223,7 +229,8 @@ app.post('/addPreRegistration', async (req, res) => {
             phone_number,
             age,
             course,
-            strand: strand || null, // Optional strand
+            strand: strand || null, // Optional
+            grade_level, // Required
             email,
             nationality,
             parent_guardian_name,
