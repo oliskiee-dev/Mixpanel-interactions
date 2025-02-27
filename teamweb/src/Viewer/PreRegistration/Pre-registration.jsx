@@ -254,6 +254,7 @@ function PreRegistration() {
                                     type="radio" 
                                     name="isNewStudent" 
                                     value="new" 
+                                    checked={formData?.isNewStudent === "new"} 
                                     onChange={handleChange} 
                                     className="pre-reg-radio-input"
                                 />
@@ -264,6 +265,7 @@ function PreRegistration() {
                                     type="radio" 
                                     name="isNewStudent" 
                                     value="old" 
+                                    checked={formData?.isNewStudent === "old"} 
                                     onChange={handleChange} 
                                     className="pre-reg-radio-input"
                                 />
