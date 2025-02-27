@@ -11,9 +11,15 @@ function ConfirmRegistration() {
         if (storedData) {
             setFormData(JSON.parse(storedData));
         } else {
-            window.location.href = '/pre-registration';
+            window.location.href = '/preregistration';
         }
     }, []);
+
+    const handleEdit = (e) => {
+        e.preventDefault();
+        // Keep the data in sessionStorage when going back to edit
+        window.location.href = '/preregistration?edit=true';
+    };
 
     const handleConfirm = () => {
         // Store that registration was successful
@@ -65,9 +71,12 @@ function ConfirmRegistration() {
                 </div>
 
                 <div className="pre-reg-confirm-buttons">
-                    <a href="/preregistration" className="pre-reg-edit-btn">
+                    <button 
+                        onClick={handleEdit}
+                        className="pre-reg-edit-btn"
+                    >
                         Edit Information
-                    </a>
+                    </button>
                     <button 
                         onClick={handleConfirm}
                         className="pre-reg-confirm-btn"
