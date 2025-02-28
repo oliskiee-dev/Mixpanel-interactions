@@ -4,11 +4,7 @@ import Footer from "./Viewer/Component/Footer.jsx";
 import "./Viewer.css"; 
 
 function Viewer() {
-  const [images, setImages] = useState([
-    { _id: 1, filepath: "/assets/images/school.jpg" },
-    { _id: 2, filepath: "/assets/images/class.png" },
-    { _id: 3, filepath: "/assets/images/school.jpg" },
-  ]);
+  const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -17,7 +13,8 @@ function Viewer() {
 
   const fetchImages = async () => {
     try {
-      const response = await fetch("http://localhost:3000/images");
+      const response = await fetch("http://localhost:3000/homepage/images");
+      if (!response.ok) throw new Error("Failed to fetch images");
       const data = await response.json();
       setImages(data);
     } catch (error) {
@@ -49,7 +46,6 @@ function Viewer() {
       {/* Main Section */}
       <div className="main-container">
         <div className="school-image-container">
-          {/* ✅ No need for "http://localhost:5000" for local images */}
           <img src="/assets/images/school.jpg" alt="School" className="school-image" />
         </div>
 
@@ -66,25 +62,25 @@ function Viewer() {
       <div className="latest-news">
         <h2>LATEST NEWS</h2>
         <div className="news-container">
-  {/* Left Arrow */}
-  <button className="prev-btn" onClick={prevSlide}>‹</button>
+          {/* Left Arrow */}
+          <button className="prev-btn" onClick={prevSlide}>‹</button>
 
-  {images.length > 0 ? (
-    <div className="news-item">
-      <img 
-        src={images[currentIndex].filepath.startsWith("/assets") ? images[currentIndex].filepath : `http://localhost:5000${images[currentIndex].filepath}`} 
-        alt="News" 
-        className="news-image" 
-      />
-    </div>
-  ) : (
-    <p>No news images uploaded yet.</p>
-  )}
+          {images.length > 0 ? (
+            <div className="news-item">
+              {console.log("Rendering image from:", `http://localhost:3000/uploads/${images[currentIndex].image_url}`)}
+              <img 
+                src={`http://localhost:3000/uploads/${images[currentIndex].image_url}`} 
+                alt="News" 
+                className="news-image" 
+              />
+            </div>
+          ) : (
+            <p>No news images uploaded yet.</p>
+          )}
 
-  {/* Right Arrow */}
-  <button className="next-btn" onClick={nextSlide}>›</button>
-</div>
-
+          {/* Right Arrow */}
+          <button className="next-btn" onClick={nextSlide}>›</button>
+        </div>
       </div>
 
       <Footer />
