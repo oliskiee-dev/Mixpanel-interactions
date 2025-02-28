@@ -416,6 +416,98 @@ app.post('/login', async (req, res) => {
 });
 
 
+// POST - Add new announcement with image
+router.post("/addAnnouncement", upload.single("image"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "Image file is required" });
+        }
+
+        const { title, description } = req.body;
+        const image_url = req.file.filename; // Store only the filename
+
+        const newAnnouncement = new Announcement({ title, description, image_url });
+        await newAnnouncement.save();
+
+        res.status(201).json({
+            message: "Announcement added successfully",
+            announcement: newAnnouncement,
+        });
+    } catch (error) {
+        console.error("Error adding announcement:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// PUT - Edit an existing announcement (image optional)
+router.put("/editAnnouncement/:id", upload.single("image"), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description } = req.body;
+
+        // Find existing announcement
+        const existingAnnouncement = await Announcement.findById(id);
+        if (!existingAnnouncement) {
+            return res.status(404).json({ error: "Announcement not found" });
+        }
+
+        // Update fields
+        let image_url = existingAnnouncement.image_url; // Keep existing image if none is uploaded
+        if (req.file) {
+            image_url = req.file.filename;
+
+            // Delete old image from server
+            const oldImagePath = path.join(__dirname, "../uploads", existingAnnouncement.image_url);
+            fs.unlink(oldImagePath, (err) => {
+                if (err) console.error("Error deleting old image:", err);
+            });
+        }
+
+        // Update database record
+        const updatedAnnouncement = await Announcement.findByIdAndUpdate(
+            id,
+            { title, description, image_url },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: "Announcement updated successfully",
+            announcement: updatedAnnouncement,
+        });
+    } catch (error) {
+        console.error("Error updating announcement:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// DELETE - Remove an announcement and its image
+router.delete("/deleteAnnouncement/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the announcement
+        const announcement = await Announcement.findById(id);
+        if (!announcement) {
+            return res.status(404).json({ error: "Announcement not found" });
+        }
+
+        // Delete image file from server
+        const imagePath = path.join(__dirname, "../uploads", announcement.image_url);
+        fs.unlink(imagePath, (err) => {
+            if (err) console.error("Error deleting file:", err);
+        });
+
+        // Remove from database
+        await Announcement.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Announcement deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting announcement:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+
 
 
 

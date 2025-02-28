@@ -4,7 +4,7 @@ const announcementSchema = new mongoose.Schema({
     title: String,
     description: String,
     image_url:String,
-    created_at: Date,
+    created_at: { type: Date, default: Date.now },
 })
 
 
