@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 
 const userModel = require('./models/user.js')
@@ -59,23 +60,31 @@ app.post("/upload-image", upload.single("image"), async (req, res) => {
 });
 
 // Delete Image
-router.delete("/delete-image/:filename", async (req, res) => {
+app.delete("/delete-image/:filename", async (req, res) => {
     try {
-      const { filename } = req.params;
-  
-      // Find and delete the image from MongoDB
-      const deletedImage = await Homepage.findOneAndDelete({ image_url: `/homepage/${filename}` });
-  
-      if (!deletedImage) {
-        return res.status(404).json({ message: "Image not found" });
-      }
-  
-      res.json({ message: "Image deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error deleting image" });
-    }
-  });
+        const { filename } = req.params;
 
+        // Find and delete from MongoDB
+        const deletedImage = await homepageModel.findOneAndDelete({ image_url: filename });
+
+        if (!deletedImage) {
+            return res.status(404).json({ message: "Image not found in database" });
+        }
+
+        // Delete from server storage
+        const filePath = path.join(__dirname, "uploads", filename);
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error("Error deleting file:", err);
+                return res.status(500).json({ message: "Failed to delete file from server" });
+            }
+            res.json({ message: "Image deleted successfully" });
+        });
+    } catch (error) {
+        console.error("Error deleting image:", error);
+        res.status(500).json({ message: "Error deleting image" });
+    }
+});
 
 //==========VIEWER CODE==============
 // Get all images
