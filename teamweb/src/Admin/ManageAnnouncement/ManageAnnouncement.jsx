@@ -20,12 +20,14 @@ function ManageAnnouncement() {
 
     const fetchAnnouncements = async () => {
         try {
-            const response = await fetch("http://localhost:3000/announcements");
+            const response = await fetch("http://localhost:3000/announcement");
             if (!response.ok) throw new Error("Failed to fetch announcements");
             const data = await response.json();
-            setAnnouncements(data);
+            console.log("Fetched announcements:", data);
+            setAnnouncements(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error fetching announcements:", error);
+            setAnnouncements([]);
         }
     };
 
@@ -33,37 +35,41 @@ function ManageAnnouncement() {
         const file = event.target.files[0];
         if (file) {
             const previewURL = URL.createObjectURL(file);
-            setNewAnnouncement(prev => ({ ...prev, preview: previewURL, image: file }));
+            setNewAnnouncement(prev => {
+                if (prev.preview) URL.revokeObjectURL(prev.preview); // Cleanup old preview
+                return { ...prev, preview: previewURL, image: file };
+            });
         }
     };
 
-    const handleCreateAnnouncement = async () => {
-        if (!newAnnouncement.title || !newAnnouncement.description) {
-            alert("Please fill in both title and description fields");
-            return;
+    const handleCreateAnnouncement = async (event) => {
+        event.preventDefault();
+    
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", description);
+        if (imageFile) {
+            formData.append("image", imageFile); // Append image file
         }
-
+    
         try {
-            const formData = new FormData();
-            formData.append("title", newAnnouncement.title);
-            formData.append("description", newAnnouncement.description);
-            if (newAnnouncement.image) {
-                formData.append("image", newAnnouncement.image);
-            }
-
             const response = await fetch("http://localhost:3000/addAnnouncement", {
                 method: "POST",
                 body: formData,
             });
-
+    
+            const data = await response.json();
             if (response.ok) {
-                setNewAnnouncement({ title: "", description: "", image: null, preview: null });
-                fetchAnnouncements();
+                console.log("Announcement added:", data);
+                fetchAnnouncements(); // Refresh the announcements list
+            } else {
+                console.error("Error adding announcement:", data.error);
             }
         } catch (error) {
-            console.error("Error creating announcement:", error);
+            console.error("Error submitting announcement:", error);
         }
     };
+    
 
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this announcement?")) {
@@ -80,7 +86,7 @@ function ManageAnnouncement() {
         }
     };
 
-    // Calculate pagination
+    // Pagination calculations
     const indexOfLastAnnouncement = pageNumber * announcementsPerPage;
     const indexOfFirstAnnouncement = indexOfLastAnnouncement - announcementsPerPage;
     const currentAnnouncements = announcements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
@@ -100,7 +106,7 @@ function ManageAnnouncement() {
                 {/* Create/Edit Announcement Form */}
                 <div className="announcement-form">
                     <h3 className="form-section-title">{editingId ? "Edit Announcement" : "Create New Announcement"}</h3>
-                    
+
                     <div className="form-group">
                         <label htmlFor="announcement-title">Title</label>
                         <input
@@ -112,7 +118,7 @@ function ManageAnnouncement() {
                             maxLength={100}
                         />
                     </div>
-                    
+
                     <div className="form-group">
                         <label htmlFor="announcement-description">Description</label>
                         <textarea
@@ -125,7 +131,7 @@ function ManageAnnouncement() {
                         />
                         <small className="char-count">{newAnnouncement.description.length}/500 characters</small>
                     </div>
-                    
+
                     <div className="form-group">
                         <label className="custom-file-upload">
                             <input type="file" onChange={handleFileChange} accept="image/*" />
@@ -143,7 +149,7 @@ function ManageAnnouncement() {
                             </div>
                         )}
                     </div>
-                    
+
                     <div className="form-actions">
                         <button 
                             onClick={handleCreateAnnouncement}
@@ -167,42 +173,25 @@ function ManageAnnouncement() {
 
                 <h3 className="section-title">Current Announcements</h3>
 
-                {/* Announcement List Grid */}
+                {/* Announcement List */}
                 <div className="announcements-grid">
                     {currentAnnouncements.length > 0 ? (
                         currentAnnouncements.map((announcement) => {
-                            const imagePath = `http://localhost:3000/announcement/${announcement.image}`;
+                            const imagePath = announcement.image
+                                ? `http://localhost:3000/announcement/${announcement.image}`
+                                : null;
                             return (
                                 <div key={announcement._id} className="announcement-card">
-                                    {announcement.image && (
+                                    {imagePath && (
                                         <div className="card-image-container">
                                             <img src={imagePath} alt={announcement.title} className="card-image" />
                                         </div>
                                     )}
                                     <div className="card-content">
                                         <h4 className="card-title">{announcement.title}</h4>
-                                        <div className="card-description-container">
-                                            <p className="card-description">{announcement.description}</p>
-                                        </div>
+                                        <p className="card-description">{announcement.description}</p>
                                         <div className="card-actions">
-                                            <button 
-                                                onClick={() => {
-                                                    setEditingId(announcement._id);
-                                                    setNewAnnouncement({
-                                                        title: announcement.title,
-                                                        description: announcement.description,
-                                                        image: null,
-                                                        preview: announcement.image ? imagePath : null
-                                                    });
-                                                }} 
-                                                className="edit-btn"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button 
-                                                onClick={() => handleDelete(announcement._id)} 
-                                                className="delete-btn"
-                                            >
+                                            <button onClick={() => handleDelete(announcement._id)} className="delete-btn">
                                                 Delete
                                             </button>
                                         </div>
@@ -212,41 +201,10 @@ function ManageAnnouncement() {
                         })
                     ) : (
                         <div className="no-announcements">
-                            <p>No announcements available. Create your first announcement above.</p>
+                            <p>No announcements available.</p>
                         </div>
                     )}
                 </div>
-                
-                {/* Pagination */}
-                {announcements.length > announcementsPerPage && (
-                    <div className="pagination">
-                        <button 
-                            onClick={() => paginate(pageNumber > 1 ? pageNumber - 1 : 1)}
-                            disabled={pageNumber === 1}
-                            className="page-button"
-                        >
-                            Previous
-                        </button>
-                        
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => paginate(index + 1)}
-                                className={`page-button ${pageNumber === index + 1 ? 'active' : ''}`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        
-                        <button 
-                            onClick={() => paginate(pageNumber < totalPages ? pageNumber + 1 : totalPages)}
-                            disabled={pageNumber === totalPages}
-                            className="page-button"
-                        >
-                            Next
-                        </button>
-                    </div>
-                )}
             </div>
         </>
     );
