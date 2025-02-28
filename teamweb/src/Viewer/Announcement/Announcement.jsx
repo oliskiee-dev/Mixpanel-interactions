@@ -5,41 +5,41 @@ import "./Announcement.css";
 
 function Announcement() {
     const [announcements, setAnnouncements] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
     const [showAll, setShowAll] = useState(false);
+    const announcementsPerPage = 10;
+    const initialDisplayCount = 5; // Number of announcements to show initially
 
     useEffect(() => {
-        // Mock data with placeholder images
-        setAnnouncements([
-            {
-                text: "School event on February 15th - Join us!",
-                image: "https://picsum.photos/800/400?random=1"
-            },
-            {
-                text: "New guidelines for the upcoming semester released.",
-                image: "https://picsum.photos/800/400?random=2"
-            },
-            {
-                text: "Important notice about upcoming exams.",
-                image: "https://picsum.photos/800/400?random=3"
-            },
-            {
-                text: "Library hours extended for finals week.",
-                image: "https://picsum.photos/800/400?random=4"
-            },
-            {
-                text: "Sports fest registration now open!",
-                image: "https://picsum.photos/800/400?random=5"
-            }
-        ]);
+        // Generate 30 announcements with mock data
+        const mockAnnouncements = Array.from({ length: 30 }, (_, index) => ({
+            text: `Announcement ${index + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+            image: `https://picsum.photos/800/400?random=${index + 1}`
+        }));
+        setAnnouncements(mockAnnouncements);
     }, []);
+
+    // Calculate pagination and display logic
+    const indexOfLastAnnouncement = currentPage * announcementsPerPage;
+    const indexOfFirstAnnouncement = indexOfLastAnnouncement - announcementsPerPage;
+    
+    // Get current page's announcements
+    const getCurrentPageAnnouncements = () => {
+        const pageAnnouncements = announcements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
+        return showAll ? pageAnnouncements : pageAnnouncements.slice(0, initialDisplayCount);
+    };
+
+    const currentAnnouncements = getCurrentPageAnnouncements();
+    const totalPages = Math.ceil(announcements.length / announcementsPerPage);
+
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        setShowAll(false); // Reset show all when changing pages
+    };
 
     const toggleShowAll = () => {
         setShowAll(!showAll);
     };
-
-    const displayedAnnouncements = showAll 
-        ? announcements 
-        : announcements.slice(0, 3);
 
     return (
         <>
@@ -50,17 +50,19 @@ function Announcement() {
                 </div>
                 
                 <div className="announcements-list">
-                    {displayedAnnouncements.map((announcement, index) => (
-                        <div key={index} className="announcement-card">
+                    {currentAnnouncements.map((announcement, index) => (
+                        <div key={indexOfFirstAnnouncement + index} className="announcement-card">
                             <div className="announcement-image-container">
                                 <img 
                                     src={announcement.image} 
-                                    alt={`Announcement ${index + 1}`} 
+                                    alt={`Announcement ${indexOfFirstAnnouncement + index + 1}`} 
                                     className="announcement-image"
                                 />
                             </div>
                             <div className="announcement-content">
-                                <span className="announcement-number">ANNOUNCEMENT #{index + 1}</span>
+                                <span className="announcement-number">
+                                    ANNOUNCEMENT #{indexOfFirstAnnouncement + index + 1}
+                                </span>
                                 <p>{announcement.text}</p>
                             </div>
                         </div>
@@ -69,8 +71,20 @@ function Announcement() {
                 
                 <div className="button-container">
                     <button className="view-all-button" onClick={toggleShowAll}>
-                        {showAll ? "Show Less" : "View All Announcements"}
+                        {showAll ? "Show Less" : `Show All Announcements (${announcementsPerPage - initialDisplayCount} more)`}
                     </button>
+                </div>
+
+                <div className="pagination">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i + 1}
+                            className={`page-button ${currentPage === i + 1 ? 'active' : ''}`}
+                            onClick={() => paginate(i + 1)}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
                 </div>
             </div>
             <Footer className="announcement-footer" />
