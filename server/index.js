@@ -6,9 +6,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 
-const itemModel = require('./models/item.js')// For debugging
 const userModel = require('./models/user.js')
 
+const homepageModel = require('./models/Homepage.js')
 const announcementModel = require('./models/Announcement.js')
 const calendarModel = require('./models/Calendar.js')
 const preRegistrationModel = require('./models/PreRegistration.js')
@@ -23,9 +23,9 @@ app.use(cors())
 connectDB()
 
 //==========VIEWER CODE==============
-// Get all Items (Debugging)
-app.get('/test', async (req,res) =>{
-    const response = await itemModel.find();
+// Get all images
+app.get('/homepage', async (req,res) =>{
+    const response = await homepageModel.find();
     return res.json({items : response});
 })
 
