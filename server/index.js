@@ -32,7 +32,7 @@ connectDB()
 // Image Upload Setup
 // Multer Storage Setup
 const storageHomepage = multer.diskStorage({
-    destination: "./uploads/Homepage",
+    destination: "./uploads",
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
@@ -80,7 +80,7 @@ app.delete("/delete-image/:filename", async (req, res) => {
         }
 
         // Delete from server storage
-        const filePath = path.join(__dirname, "uploads/Homepage", filename);
+        const filePath = path.join(__dirname, "uploads", filename);
         fs.unlink(filePath, (err) => {
             if (err) {
                 console.error("Error deleting file:", err);
