@@ -540,7 +540,7 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 // });
 
 app.use("/homepage", router);
-app.use("/hoempage", express.static(path.join(__dirname, "homepage")));
+app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 
 app.listen(3000,() => {
     console.log("app is running");
