@@ -547,7 +547,7 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 // });
 
 app.use("/homepage", router);
-app.use("/homepage/images", express.static(path.join(__dirname, "homepage")));
+app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 
 // app.use("/announcement", router);
 // app.use("/announcement", express.static(path.join(__dirname, "announcement")));
