@@ -5,15 +5,16 @@ import "./Homepage.css"; // Ensure to apply styles properly
 function Homepage() {
   const [images, setImages] = useState([]);
 
-  // useEffect(() => {
-  //   fetchImages();
-  // }, []);
+  useEffect(() => {
+    fetchImages();
+  }, []);
 
   const fetchImages = async () => {
     try {
-      const response = await fetch("http://localhost:5000/homepage");
+      const response = await fetch("http://localhost:3000/homepage/images");
       if (!response.ok) throw new Error("Failed to fetch images");
       const data = await response.json();
+      console.log("Fetched images:", data);
       setImages(data);
     } catch (error) {
       console.error("Error fetching images:", error);
@@ -28,7 +29,7 @@ function Homepage() {
     formData.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:5000/upload-image", {
+      const response = await fetch("http://localhost:3000/upload-image", {
         method: "POST",
         body: formData,
       });
@@ -42,7 +43,7 @@ function Homepage() {
 
   const handleDelete = async (filename) => {
     try {
-      const response = await fetch(`http://localhost:5000/delete-image/${filename}`, {
+      const response = await fetch(`http://localhost:3000/delete-image/${filename}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -71,12 +72,16 @@ function Homepage() {
 
         {/* Image List Grid */}
         <div className="image-list">
-          {images.map((img) => (
-            <div key={img._id} className="image-box">
-              <img src={`http://localhost:5000/homepage/${img.image_url}`} alt="Uploaded" className="preview-image" />
-              <button onClick={() => handleDelete(img.image_url)} className="delete-btn">🗑 Delete</button>
-            </div>
-          ))}
+          {images.map((img) => {
+            const imagePath = `http://localhost:3000/uploads/${img.image_url}`;
+            console.log("Rendering image from:", imagePath);
+            return (
+              <div key={img._id} className="image-box">
+                <img src={imagePath} alt="Uploaded" className="preview-image" />
+                <button onClick={() => handleDelete(img.image_url)} className="delete-btn">🗑 Delete</button>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
