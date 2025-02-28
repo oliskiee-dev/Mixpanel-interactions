@@ -103,92 +103,92 @@ app.get('/announcement', async (req,res) =>{
     return res.json({announcement : response});
 })
 
-// POST - Add a new Announcement
-app.post('/addAnnouncement', async (req, res) => {
-    const { title, description, image_url } = req.body;
+// // POST - Add a new Announcement
+// app.post('/addAnnouncement', async (req, res) => {
+//     const { title, description, image_url } = req.body;
 
-    // Basic validation for required fields
-    if (!title || !description || !image_url) {
-        return res.status(400).json({ error: 'Missing required fields: title, description, or image_url' });
-    }
+//     // Basic validation for required fields
+//     if (!title || !description || !image_url) {
+//         return res.status(400).json({ error: 'Missing required fields: title, description, or image_url' });
+//     }
 
-    try {
-        // Create new announcement with the current time as created_at
-        const newAnnouncement = new announcementModel({
-            title,
-            description,
-            image_url,
-            created_at: new Date()  // Automatically set created_at to now
-        });
+//     try {
+//         // Create new announcement with the current time as created_at
+//         const newAnnouncement = new announcementModel({
+//             title,
+//             description,
+//             image_url,
+//             created_at: new Date()  // Automatically set created_at to now
+//         });
 
-        // Save the announcement to the database
-        const savedAnnouncement = await newAnnouncement.save();
-        res.status(201).json({ message: 'Announcement added successfully', announcement: savedAnnouncement });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+//         // Save the announcement to the database
+//         const savedAnnouncement = await newAnnouncement.save();
+//         res.status(201).json({ message: 'Announcement added successfully', announcement: savedAnnouncement });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
-//This would required add a specific id in "":id"
-// PUT - Edit an existing Announcement
-app.put('/editAnnouncement/:id', async (req, res) => {
-    let { id } = req.params; // Extract ID from URL
-    id = id.trim(); // Remove spaces and newline characters
+// //This would required add a specific id in "":id"
+// // PUT - Edit an existing Announcement
+// app.put('/editAnnouncement/:id', async (req, res) => {
+//     let { id } = req.params; // Extract ID from URL
+//     id = id.trim(); // Remove spaces and newline characters
 
-    // Validate if ID is a proper MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'Invalid announcement ID format' });
-    }
+//     // Validate if ID is a proper MongoDB ObjectId
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//         return res.status(400).json({ error: 'Invalid announcement ID format' });
+//     }
 
-    const { title, description, image_url } = req.body; // Get updated data
+//     const { title, description, image_url } = req.body; // Get updated data
 
-    try {
-        // Check if the announcement exists
-        const existingAnnouncement = await announcementModel.findById(id);
-        if (!existingAnnouncement) {
-            return res.status(404).json({ error: 'Announcement not found' });
-        }
+//     try {
+//         // Check if the announcement exists
+//         const existingAnnouncement = await announcementModel.findById(id);
+//         if (!existingAnnouncement) {
+//             return res.status(404).json({ error: 'Announcement not found' });
+//         }
 
-        // Update announcement details
-        const updatedAnnouncement = await announcementModel.findByIdAndUpdate(
-            id,
-            { title, description, image_url, updated_at: new Date() }, // Fields to update
-            { new: true } // Return the updated document
-        );
+//         // Update announcement details
+//         const updatedAnnouncement = await announcementModel.findByIdAndUpdate(
+//             id,
+//             { title, description, image_url, updated_at: new Date() }, // Fields to update
+//             { new: true } // Return the updated document
+//         );
 
-        res.status(200).json({ message: 'Announcement updated successfully', announcement: updatedAnnouncement });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+//         res.status(200).json({ message: 'Announcement updated successfully', announcement: updatedAnnouncement });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
-//This would required add a specific id in "":id"
-// DELETE - Remove an Announcement by ID
-app.delete('/deleteAnnouncement/:id', async (req, res) => {
-    let { id } = req.params;
-    id = id.trim(); // Remove spaces or newline characters
+// //This would required add a specific id in "":id"
+// // DELETE - Remove an Announcement by ID
+// app.delete('/deleteAnnouncement/:id', async (req, res) => {
+//     let { id } = req.params;
+//     id = id.trim(); // Remove spaces or newline characters
 
-    // Validate ObjectId format
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'Invalid announcement ID format' });
-    }
+//     // Validate ObjectId format
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//         return res.status(400).json({ error: 'Invalid announcement ID format' });
+//     }
 
-    try {
-        // Find and delete the announcement
-        const deletedAnnouncement = await announcementModel.findByIdAndDelete(id);
+//     try {
+//         // Find and delete the announcement
+//         const deletedAnnouncement = await announcementModel.findByIdAndDelete(id);
 
-        if (!deletedAnnouncement) {
-            return res.status(404).json({ error: 'Announcement not found' });
-        }
+//         if (!deletedAnnouncement) {
+//             return res.status(404).json({ error: 'Announcement not found' });
+//         }
 
-        res.status(200).json({ message: 'Announcement deleted successfully', deletedAnnouncement });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+//         res.status(200).json({ message: 'Announcement deleted successfully', deletedAnnouncement });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
 //Get all Calendar
 app.get('/calendar', async (req,res) =>{
