@@ -27,41 +27,65 @@ connectDB()
 
 
 // Image Upload Setup
+// Configure Multer Storage
 const storage = multer.diskStorage({
-    destination: './uploads/',
+    destination: "./uploads/",
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
-const upload = multer({ storage });
-app.use('/uploads', express.static('uploads'));
+      const filename = `${Date.now()}-${file.originalname}`;
+      cb(null, filename);
+    },
+  });
+  
+  const upload = multer({ storage });
+  
 
 // Upload Image
-app.post('/upload-image', upload.single('image'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
+router.post("/upload-image", upload.single("image"), async (req, res) => {
+    try {
+      const imageUrl = `/homepage/${req.file.filename}`;
+  
+      const newImage = new Homepage({
+        image_url: imageUrl,
+        created_at: new Date(),
+      });
+  
+      await newImage.save();
+      res.status(201).json({ message: "Image uploaded successfully", image: newImage });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error saving image to database" });
     }
-    res.json({ imageUrl: `/uploads/${req.file.filename}` });
-});
+  });
 
 // Delete Image
-app.delete('/delete-image/:filename', (req, res) => {
-    const filePath = path.join(__dirname, 'uploads', req.params.filename);
-    fs.unlink(filePath, (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Failed to delete image' });
-        }
-        res.json({ message: 'Image deleted successfully' });
-    });
-});
+router.delete("/delete-image/:filename", async (req, res) => {
+    try {
+      const { filename } = req.params;
+  
+      // Find and delete the image from MongoDB
+      const deletedImage = await Homepage.findOneAndDelete({ image_url: `/homepage/${filename}` });
+  
+      if (!deletedImage) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+  
+      res.json({ message: "Image deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting image" });
+    }
+  });
 
 
 //==========VIEWER CODE==============
 // Get all images
-app.get('/homepage', async (req,res) =>{
-    const response = await homepageModel.find();
-    return res.json({items : response});
-})
+router.get("/images", async (req, res) => {
+    try {
+      const images = await Homepage.find();
+      res.json(images);
+    } catch (error) {
+      res.status(500).json({ message: "Error retrieving images" });
+    }
+  });
 
 //Get all Announcements
 app.get('/announcement', async (req,res) =>{
