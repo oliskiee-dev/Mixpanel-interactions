@@ -32,7 +32,7 @@ connectDB()
 // Image Upload Setup
 // Multer Storage Setup
 const storage = multer.diskStorage({
-    destination: "./uploads/",
+    destination: "./homepage/",
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
@@ -457,7 +457,7 @@ router.put("/editAnnouncement/:id", upload.single("image"), async (req, res) => 
             image_url = req.file.filename;
 
             // Delete old image from server
-            const oldImagePath = path.join(__dirname, "../uploads", existingAnnouncement.image_url);
+            const oldImagePath = path.join(__dirname, "../homepage", existingAnnouncement.image_url);
             fs.unlink(oldImagePath, (err) => {
                 if (err) console.error("Error deleting old image:", err);
             });
@@ -492,7 +492,7 @@ router.delete("/deleteAnnouncement/:id", async (req, res) => {
         }
 
         // Delete image file from server
-        const imagePath = path.join(__dirname, "../uploads", announcement.image_url);
+        const imagePath = path.join(__dirname, "../homepage", announcement.image_url);
         fs.unlink(imagePath, (err) => {
             if (err) console.error("Error deleting file:", err);
         });
@@ -540,7 +540,7 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 // });
 
 app.use("/homepage", router);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/hoempage", express.static(path.join(__dirname, "homepage")));
 
 app.listen(3000,() => {
     console.log("app is running");
