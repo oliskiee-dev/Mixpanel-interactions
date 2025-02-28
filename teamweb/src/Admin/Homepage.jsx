@@ -6,11 +6,12 @@ function Homepage() {
   const [images, setImages] = useState([]);
 
   useEffect(() => {
-    fetchImages();
+    // Temporarily disable fetching images until the database has data
+    // fetchImages();
   }, []);
 
   const fetchImages = async () => {
-    const response = await fetch("http://localhost:5000/images");
+    const response = await fetch("http://localhost:5000/homepage");
     const data = await response.json();
     setImages(data);
   };
@@ -22,23 +23,23 @@ function Homepage() {
     const formData = new FormData();
     formData.append("image", file);
 
-    const response = await fetch("http://localhost:5000/upload", {
+    const response = await fetch("http://localhost:5000/upload-image", {
       method: "POST",
       body: formData,
     });
 
     if (response.ok) {
-      fetchImages();
+      // fetchImages(); // Temporarily disable fetching images after upload
     }
   };
 
-  const handleDelete = async (id) => {
-    const response = await fetch(`http://localhost:5000/delete/${id}`, {
+  const handleDelete = async (filename) => {
+    const response = await fetch(`http://localhost:5000/delete-image/${filename}`, {
       method: "DELETE",
     });
 
     if (response.ok) {
-      fetchImages();
+      // fetchImages(); // Temporarily disable fetching images after deletion
     }
   };
 
@@ -58,15 +59,15 @@ function Homepage() {
           </label>
         </div>
 
-        {/* Image List Grid */}
-        <div className="image-list">
+        {/* Image List Grid - Temporarily Disabled */}
+        {/* <div className="image-list">
           {images.map((img) => (
             <div key={img._id} className="image-box">
-              <img src={`http://localhost:5000${img.filepath}`} alt="Uploaded" className="preview-image" />
-              <button onClick={() => handleDelete(img._id)} className="delete-btn">🗑 Delete</button>
+              <img src={`http://localhost:5000/homepage/${img.filename}`} alt="Uploaded" className="preview-image" />
+              <button onClick={() => handleDelete(img.filename)} className="delete-btn">🗑 Delete</button>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </>
   );

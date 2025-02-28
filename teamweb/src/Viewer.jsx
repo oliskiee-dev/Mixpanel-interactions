@@ -17,7 +17,7 @@ function Viewer() {
 
   const fetchImages = async () => {
     try {
-      const response = await fetch("http://localhost:5000/images");
+      const response = await fetch("http://localhost:3000/images");
       const data = await response.json();
       setImages(data);
     } catch (error) {
