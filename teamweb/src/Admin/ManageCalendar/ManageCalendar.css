@@ -212,7 +212,7 @@
     border-bottom: 1px solid var(--medium-grey);
     transition: background-color 0.2s;
     padding: 8px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     border-left: 4px solid var(--secondary-color);
     display: flex;
     justify-content: space-between;
