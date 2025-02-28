@@ -31,26 +31,18 @@ connectDB()
 
 // Image Upload Setup
 // Multer Storage Setup
-const storageHomepage = multer.diskStorage({
-    destination: "./uploads",
+const storage = multer.diskStorage({
+    destination: "./uploads/",
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
 
-const storageAnnouncement = multer.diskStorage({
-    destination: "./uploads/Announcement",
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
-
-const uploadHomepage = multer({ storageHomepage });
-const uploadAnnouncement = multer({ storageAnnouncement });
+const upload = multer({ storage });
   
 
 // Upload Image
-app.post("/upload-image", uploadHomepage.single("image"), async (req, res) => {
+app.post("/upload-image", upload.single("image"), async (req, res) => {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     try {
@@ -425,7 +417,7 @@ app.post('/login', async (req, res) => {
 
 
 // POST - Add new announcement with image
-router.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, res) => {
+router.post("/addAnnouncement", upload.single("image"), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: "Image file is required" });
@@ -448,7 +440,7 @@ router.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, 
 });
 
 // PUT - Edit an existing announcement (image optional)
-router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (req, res) => {
+router.put("/editAnnouncement/:id", upload.single("image"), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description } = req.body;
