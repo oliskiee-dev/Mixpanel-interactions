@@ -81,7 +81,7 @@ router.delete("/delete-image/:filename", async (req, res) => {
 // Get all images
 router.get("/images", async (req, res) => {
     try {
-      const images = await Homepage.find();
+      const images = await homepageModel.find();
       res.json(images);
     } catch (error) {
       res.status(500).json({ message: "Error retrieving images" });
