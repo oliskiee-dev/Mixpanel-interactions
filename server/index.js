@@ -45,11 +45,11 @@ const storageAnnouncement = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage : storageHomepage});
+const uploadHomepage = multer({ storage : storageHomepage});
   
 
 // Upload Image
-app.post("/upload-image", upload.single("image"), async (req, res) => {
+app.post("/upload-image", uploadHomepage.single("image"), async (req, res) => {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     try {
