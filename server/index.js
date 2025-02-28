@@ -44,20 +44,16 @@ const storage = multer.diskStorage({
 // Upload Image
 router.post("/upload-image", upload.single("image"), async (req, res) => {
     try {
-      const imageUrl = `/homepage/${req.file.filename}`;
-  
-      const newImage = new Homepage({
-        image_url: imageUrl,
-        created_at: new Date(),
-      });
-  
-      await newImage.save();
-      res.status(201).json({ message: "Image uploaded successfully", image: newImage });
+        const newImage = new Homepage({
+            image_url: `/uploads/${req.file.filename}`,
+            created_at: new Date(),
+        });
+        await newImage.save();
+        res.status(201).json({ message: "Image uploaded successfully" });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error saving image to database" });
+        res.status(500).json({ message: "Error uploading image" });
     }
-  });
+});
 
 // Delete Image
 router.delete("/delete-image/:filename", async (req, res) => {
