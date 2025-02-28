@@ -67,9 +67,9 @@ function Viewer() {
 
           {images.length > 0 ? (
             <div className="news-item">
-              {console.log("Rendering image from:", `http://localhost:3000/uploads/${images[currentIndex].image_url}`)}
+              {console.log("Rendering image from:", `http://localhost:3000/homepage/${images[currentIndex].image_url}`)}
               <img 
-                src={`http://localhost:3000/uploads/${images[currentIndex].image_url}`} 
+                src={`http://localhost:3000/homepage/${images[currentIndex].image_url}`} 
                 alt="News" 
                 className="news-image" 
               />

@@ -1,246 +1,173 @@
-/* Reset container styles to ensure proper alignment */
-body, html {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.announcement-main-container {
-    flex: 1;
+/* Base layout styles */
+.admin-container {
     width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
     box-sizing: border-box;
 }
 
-/* Title styling - explicitly positioned at the left */
+/* Header Styling */
 .announcement-header {
-    width: 100%;
-    padding: 0 0 10px 20px; /* Add left padding to match the page layout */
-    margin: 0;
-    box-sizing: border-box;
-    text-align: left;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #002366;
+    padding-bottom: 15px;
 }
 
 .announcement-title {
     color: #002366;
-    font-size: 28px; /* Increased size */
+    font-size: 28px;
     font-weight: bold;
+    margin: 0 0 5px 0;
     text-transform: uppercase;
-    display: inline-block;
-    padding-bottom: 5px;
-    margin: 20px 0;
-    text-align: left;
-    position: relative;
+    letter-spacing: 0.5px;
 }
 
-/* Create extended underline */
-.announcement-title:after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 200%; /* Extends the line to double the text width */
-    height: 2px;
-    background-color: #002366;
-}
-
-/* Center the announcements list but keep the header left-aligned */
-.announcements-list {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 20px;
-    box-sizing: border-box;
-}
-
-.announcement-card {
-    border: 1px solid #ccc;
-    margin-bottom: 15px;
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden; /* This ensures the image doesn't overflow */
-}
-
-.announcement-image-container {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-}
-
-.announcement-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.announcement-image:hover {
-    transform: scale(1.05);
-}
-
-.announcement-content {
-    padding: 15px;
-}
-
-.announcement-number {
-    color: #002366;
-    font-size: 14px;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.announcement-content p {
-    margin: 0;
-    padding: 0;
+.announcement-subtitle {
+    color: #666;
     font-size: 16px;
-    line-height: 1.4;
-    color: #333;
+    margin: 0;
 }
 
-.button-container {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.view-all-button {
-    background-color: #fff;
-    border: 1px solid #002366;
-    border-radius: 20px;
-    padding: 8px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    min-width: 150px;
-    transition: all 0.3s ease;
+/* Section Titles */
+.section-title, .form-section-title {
     color: #002366;
+    font-size: 22px;
+    margin: 30px 0 20px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.view-all-button:hover {
-    background-color: #002366;
-    color: white;
-}
-
-.announcement-footer {
-    margin-top: auto;
-}
-
-/* Add these styles at the end of your existing CSS */
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px 0;
-    padding: 20px 0;
-}
-
-.page-button {
-    padding: 8px 16px;
-    border: 1px solid #002366;
-    background-color: white;
-    color: #002366;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
-
-.page-button:hover {
-    background-color: #002366;
-    color: white;
-}
-
-.page-button.active {
-    background-color: #002366;
-    color: white;
-}
-
+/* Form Styling */
 .announcement-form {
-    width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
+    background-color: #f9f9f9;
+    padding: 25px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e0e0e0;
-}
-
-.announcement-form-title {
-    color: #002366;
-    font-size: 20px;
-    margin-bottom: 20px;
-    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
 }
 
 .form-group {
-    margin-bottom: 15px;
-    width: 100%;
+    margin-bottom: 20px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    color: #002366;
-    font-weight: 500;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
 }
 
 .form-group input[type="text"] {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #002366;
-    border-radius: 4px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     font-size: 16px;
-    box-sizing: border-box;
+    transition: border-color 0.3s;
 }
 
-.form-group input[type="file"] {
-    display: none;
+.form-group input[type="text"]:focus {
+    border-color: #002366;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 35, 102, 0.2);
 }
 
-.custom-file-upload {
-    display: block;
+.description-textarea {
     width: 100%;
-    padding: 10px;
+    height: 120px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: none;
+    font-family: inherit;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.description-textarea:focus {
+    border-color: #002366;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 35, 102, 0.2);
+}
+
+.char-count {
+    display: block;
+    text-align: right;
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* File Upload Styling */
+.custom-file-upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    background-color: #002366;
+    color: white;
+    border-radius: 6px;
     cursor: pointer;
-    background-color: #fff;
-    border: 1px solid #002366;
-    border-radius: 4px;
-    color: #002366;
-    transition: all 0.3s ease;
-    text-align: center;
-    box-sizing: border-box;
+    font-weight: 600;
+    transition: background-color 0.3s;
 }
 
 .custom-file-upload:hover {
-    background-color: #002366;
-    color: white;
+    background-color: #001845;
+}
+
+.custom-file-upload i {
+    margin-right: 8px;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
 }
 
 .preview-container {
-    margin-top: 10px;
-    max-width: 200px;
+    margin-top: 15px;
+    position: relative;
+    max-width: 300px;
 }
 
 .preview-image {
     width: 100%;
-    height: auto;
-    border-radius: 4px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.form-buttons {
-    margin-top: 20px;
+.remove-image-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.remove-image-btn:hover {
+    background-color: rgba(255, 0, 0, 0.9);
+}
+
+/* Form Buttons */
+.form-actions {
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    margin-top: 25px;
 }
 
 .submit-button, .cancel-button {
-    padding: 10px 20px;
-    border-radius: 4px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
+    font-size: 16px;
 }
 
 .submit-button {
@@ -251,73 +178,189 @@ body, html {
 
 .submit-button:hover {
     background-color: #001845;
+    box-shadow: 0 2px 8px rgba(0, 35, 102, 0.3);
 }
 
 .cancel-button {
-    background-color: #fff;
-    color: #002366;
-    border: 1px solid #002366;
+    background-color: #f1f1f1;
+    color: #333;
+    border: 1px solid #ccc;
 }
 
 .cancel-button:hover {
-    background-color: #f5f5f5;
+    background-color: #e5e5e5;
 }
 
-.announcement-form input[type="text"] {
+/* Announcements Grid */
+.announcements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.announcement-card {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid #eaeaea;
+}
+
+.announcement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card-image-container {
+    height: 200px;
+    overflow: hidden;
+}
+
+.card-image {
     width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #002366;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.announcement-card:hover .card-image {
+    transform: scale(1.05);
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.card-title {
+    margin: 0 0 15px 0;
+    color: #002366;
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-description-container {
+    height: 100px;
+    overflow: auto;
+    margin-bottom: 15px;
+    border: 1px solid #eaeaea;
+    padding: 10px;
     border-radius: 4px;
+    background-color: #f9f9f9;
 }
 
-.announcement-form input[type="file"] {
-    margin-bottom: 10px;
+.card-description {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
 }
 
-.announcement-form button {
-    background-color: #002366;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.announcement-form button:hover {
-    background-color: #001845;
-}
-
-.announcement-actions {
+.card-actions {
     display: flex;
-    gap: 10px;
+    justify-content: space-between;
     margin-top: 15px;
 }
 
-.announcement-actions button {
+.edit-btn, .delete-btn {
     padding: 8px 16px;
     border-radius: 4px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.announcement-actions button:first-child {
-    background-color: #002366;
-    color: white;
+    transition: all 0.3s;
     border: none;
 }
 
-.announcement-actions button:first-child:hover {
+.edit-btn {
+    background-color: #002366;
+    color: white;
+}
+
+.edit-btn:hover {
     background-color: #001845;
 }
 
-.announcement-actions button:last-child {
+.delete-btn {
     background-color: #ff4444;
     color: white;
-    border: none;
 }
 
-.announcement-actions button:last-child:hover {
+.delete-btn:hover {
     background-color: #cc0000;
+}
+
+/* Pagination Styling */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 30px 0;
+}
+
+.page-button {
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid #002366;
+    border-radius: 4px;
+    color: #002366;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.page-button:hover {
+    background-color: #e6eaf0;
+}
+
+.page-button.active {
+    background-color: #002366;
+    color: white;
+}
+
+.page-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* No announcements message */
+.no-announcements {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px dashed #ccc;
+}
+
+.no-announcements p {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .announcements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .announcement-title {
+        font-size: 24px;
+    }
+    
+    .card-image-container {
+        height: 180px;
+    }
 }

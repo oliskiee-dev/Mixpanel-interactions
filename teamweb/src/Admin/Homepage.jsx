@@ -66,14 +66,14 @@ function Homepage() {
           <h3>Upload an Image</h3>
           <label className="custom-file-upload">
             <input type="file" onChange={handleUpload} />
-            📂 Choose File
+            📂 Choose Image
           </label>
         </div>
 
         {/* Image List Grid */}
         <div className="image-list">
           {images.map((img) => {
-            const imagePath = `http://localhost:3000/uploads/${img.image_url}`;
+            const imagePath = `http://localhost:3000/homepage/${img.image_url}`;
             console.log("Rendering image from:", imagePath);
             return (
               <div key={img._id} className="image-box">
