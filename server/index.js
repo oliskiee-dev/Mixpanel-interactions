@@ -439,6 +439,7 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 // });
 
 app.use("/homepage", router);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(3000,() => {
     console.log("app is running");
