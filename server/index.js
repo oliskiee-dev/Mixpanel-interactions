@@ -336,14 +336,13 @@ app.post('/login', async (req, res) => {
     }
 });
 
-
 // POST - Add new announcement with image
 app.post("/addAnnouncement", async (req, res) => {
     try {
         const { title, description } = req.body;
         const image = req.file ? req.file.filename : null;
 
-        const newAnnouncement = new Announcement({ title, description, image });
+        const newAnnouncement = new announcementModel({ title, description, image });
         await newAnnouncement.save();
         
         res.status(201).json({ message: "Announcement added successfully" });
@@ -380,7 +379,7 @@ router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (r
         }
 
         // Update database record
-        const updatedAnnouncement = await Announcement.findByIdAndUpdate(
+        const updatedAnnouncement = await announcementModel.findByIdAndUpdate(
             id,
             { title, description, image_url },
             { new: true }
@@ -402,7 +401,7 @@ router.delete("/deleteAnnouncement/:id", async (req, res) => {
         const { id } = req.params;
 
         // Find the announcement
-        const announcement = await Announcement.findById(id);
+        const announcement = await announcementModel.findById(id);
         if (!announcement) {
             return res.status(404).json({ error: "Announcement not found" });
         }
