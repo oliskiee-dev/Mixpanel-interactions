@@ -5,15 +5,19 @@ import "./Homepage.css"; // Ensure to apply styles properly
 function Homepage() {
   const [images, setImages] = useState([]);
 
-  useEffect(() => {
-    // Temporarily disable fetching images until the database has data
-    // fetchImages();
-  }, []);
+  // useEffect(() => {
+  //   fetchImages();
+  // }, []);
 
   const fetchImages = async () => {
-    const response = await fetch("http://localhost:5000/homepage");
-    const data = await response.json();
-    setImages(data);
+    try {
+      const response = await fetch("http://localhost:5000/homepage");
+      if (!response.ok) throw new Error("Failed to fetch images");
+      const data = await response.json();
+      setImages(data);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+    }
   };
 
   const handleUpload = async (event) => {
@@ -23,23 +27,29 @@ function Homepage() {
     const formData = new FormData();
     formData.append("image", file);
 
-    const response = await fetch("http://localhost:5000/upload-image", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (response.ok) {
-      // fetchImages(); // Temporarily disable fetching images after upload
+    try {
+      const response = await fetch("http://localhost:5000/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        fetchImages();
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
   };
 
   const handleDelete = async (filename) => {
-    const response = await fetch(`http://localhost:5000/delete-image/${filename}`, {
-      method: "DELETE",
-    });
-
-    if (response.ok) {
-      // fetchImages(); // Temporarily disable fetching images after deletion
+    try {
+      const response = await fetch(`http://localhost:5000/delete-image/${filename}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        fetchImages();
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
     }
   };
 
@@ -59,15 +69,15 @@ function Homepage() {
           </label>
         </div>
 
-        {/* Image List Grid - Temporarily Disabled */}
-        {/* <div className="image-list">
+        {/* Image List Grid */}
+        <div className="image-list">
           {images.map((img) => (
             <div key={img._id} className="image-box">
-              <img src={`http://localhost:5000/homepage/${img.filename}`} alt="Uploaded" className="preview-image" />
-              <button onClick={() => handleDelete(img.filename)} className="delete-btn">🗑 Delete</button>
+              <img src={`http://localhost:5000/homepage/${img.image_url}`} alt="Uploaded" className="preview-image" />
+              <button onClick={() => handleDelete(img.image_url)} className="delete-btn">🗑 Delete</button>
             </div>
           ))}
-        </div> */}
+        </div>
       </div>
     </>
   );
