@@ -338,32 +338,18 @@ app.post('/login', async (req, res) => {
 
 
 // POST - Add new announcement with image
-router.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, res) => {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-
+app.post("/addAnnouncement", async (req, res) => {
     try {
         const { title, description } = req.body;
+        const image = req.file ? req.file.filename : null;
 
-        if (!title || !description) {
-            return res.status(400).json({ message: "Title and description are required" });
-        }
-
-        const newAnnouncement = new Announcement({
-            title,
-            description,
-            image_url: req.file.filename, // Save only the filename, not the full path
-            created_at: new Date(),
-        });
-
+        const newAnnouncement = new Announcement({ title, description, image });
         await newAnnouncement.save();
-
-        res.status(201).json({
-            message: "Announcement added successfully",
-            announcement: newAnnouncement,
-        });
+        
+        res.status(201).json({ message: "Announcement added successfully" });
     } catch (error) {
         console.error("Error adding announcement:", error);
-        res.status(500).json({ message: "Error saving announcement to database" });
+        res.status(500).json({ error: "Failed to add announcement" });
     }
 });
 
