@@ -5,7 +5,6 @@ import './ManageAnnouncement.css';
 function ManageAnnouncement() {
     const [announcements, setAnnouncements] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [showAll, setShowAll] = useState(false);
     const [newAnnouncement, setNewAnnouncement] = useState({ text: '', image: null });
     const [editingId, setEditingId] = useState(null);
     const announcementsPerPage = 10;
@@ -99,8 +98,7 @@ function ManageAnnouncement() {
     const indexOfFirstAnnouncement = indexOfLastAnnouncement - announcementsPerPage;
     
     const getCurrentPageAnnouncements = () => {
-        const pageAnnouncements = announcements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
-        return showAll ? pageAnnouncements : pageAnnouncements.slice(0, initialDisplayCount);
+        return announcements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
     };
 
     const currentAnnouncements = getCurrentPageAnnouncements();
@@ -108,11 +106,6 @@ function ManageAnnouncement() {
 
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
-        setShowAll(false);
-    };
-
-    const toggleShowAll = () => {
-        setShowAll(!showAll);
     };
 
     return (
@@ -219,12 +212,6 @@ function ManageAnnouncement() {
                     ))}
                 </div>
                 
-                <div className="button-container">
-                    <button className="view-all-button" onClick={toggleShowAll}>
-                        {showAll ? "Show Less" : `Show All Announcements (${announcementsPerPage - initialDisplayCount} more)`}
-                    </button>
-                </div>
-
                 <div className="pagination">
                     {Array.from({ length: totalPages }, (_, i) => (
                         <button
