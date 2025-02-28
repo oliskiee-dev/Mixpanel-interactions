@@ -5,6 +5,9 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
+const multer = require('multer');
+const path = require('path');
+
 
 const userModel = require('./models/user.js')
 
@@ -21,6 +24,37 @@ app.use(express.json())
 app.use(cors())
 
 connectDB()
+
+
+// Image Upload Setup
+const storage = multer.diskStorage({
+    destination: './uploads/',
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    }
+});
+const upload = multer({ storage });
+app.use('/uploads', express.static('uploads'));
+
+// Upload Image
+app.post('/upload-image', upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    res.json({ imageUrl: `/uploads/${req.file.filename}` });
+});
+
+// Delete Image
+app.delete('/delete-image/:filename', (req, res) => {
+    const filePath = path.join(__dirname, 'uploads', req.params.filename);
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete image' });
+        }
+        res.json({ message: 'Image deleted successfully' });
+    });
+});
+
 
 //==========VIEWER CODE==============
 // Get all images
