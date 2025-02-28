@@ -31,14 +31,21 @@ connectDB()
 
 // Image Upload Setup
 // Multer Storage Setup
-const storage = multer.diskStorage({
+const storageHomepage = multer.diskStorage({
     destination: "./homepage/",
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
 
-const upload = multer({ storage });
+const storageAnnouncemnt = multer.diskStorage({
+    destination: "./homepage/",
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    }
+});
+
+const upload = multer({ storageHomepage, storageAnnouncemnt });
   
 
 // Upload Image
@@ -541,6 +548,10 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 
 app.use("/homepage", router);
 app.use("/homepage", express.static(path.join(__dirname, "homepage")));
+
+app.use("/announcement", router);
+app.use("/announcement", express.static(path.join(__dirname, "announcement")));
+
 
 app.listen(3000,() => {
     console.log("app is running");
