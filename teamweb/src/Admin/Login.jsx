@@ -16,7 +16,7 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(""); 
-        console.log(formData) //Debug
+        console.log(formData); // Debugging
         try {
             const response = await fetch("http://localhost:3000/login", {
                 method: "POST",
@@ -27,7 +27,8 @@ function Login() {
             const data = await response.json();
             if (response.status === 200 && data.token) {
                 localStorage.setItem("token", data.token); // Save token
-                navigate("/admin-homepage"); 
+                localStorage.setItem("username", formData.username); // Save username
+                navigate("/admin-homepage"); // Navigate to the admin homepage
             } else {
                 setError(`Error: ${data.error || "Login failed"}`);
             }
@@ -35,6 +36,7 @@ function Login() {
             setError("Error: An error occurred. Please try again.");
         }
     };
+    
     
     
 

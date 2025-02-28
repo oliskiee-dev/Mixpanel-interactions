@@ -1,78 +1,91 @@
-.pre-registration-container {
-    width: 90%;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-}.progress-bar {
+.pre-reg-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
     height: 20px;
     background-color: #e9ecef;
     border-radius: 5px;
     margin-bottom: 10px;
     overflow: hidden;
     width: 100%;
-}.progress {
-    height: 100%;
-    width: 0%;
-    background-color: #007bff;
+}
+
+.pre-reg-progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #cdd3e1;
     border-radius: 5px;
-    transition: width 0.5s ease-in-out;
-}.progress-percentage {
+    margin-bottom: 1rem;
+}
+
+.pre-reg-progress {
+    height: 100%;
+    background-color: #1a3a7e;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+.progress-percentage {
     text-align: center;
     font-size: 14px;
     color: #333; 
     margin-bottom: 20px;
-}.pre-registration-container h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #007bff;
-    font-size: 1.5em;
-}.pre-registration-container h2 {
-    margin-bottom: 10px;
-    color: #343a40;
-    font-size: 1.2em;
-}.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}.form-group {
-    margin-bottom: 10px;
 }
 
-label {
+.pre-reg-progress-percentage {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: bold;
+}
+
+.pre-reg-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.pre-reg-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.pre-reg-form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
     font-size: 14px;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="date"] {
+.pre-reg-form-group input[type="text"],
+.pre-reg-form-group input[type="email"],
+.pre-reg-form-group input[type="tel"],
+.pre-reg-form-group input[type="date"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ced4da;
     border-radius: 3px;
     box-sizing: border-box;
     font-size: 14px;
-}.radio-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}.radio-group label {
-    font-size: 14px;
 }
 
-.prereg-button{
+.pre-reg-submit-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #1a3a7e;
     color: white;
     border: none;
     border-radius: 3px;
@@ -84,30 +97,339 @@ input[type="date"] {
     box-sizing: border-box;
 }
 
-.prereg-button:hover {
-    background-color: #0069d9;
+.pre-reg-submit-btn:hover {
+    background-color: #325aa8;
 }
-
 
 .error {
     color: red;
     font-size: 12px;
     margin-top: 5px;
-}.success-message {
-    color: green;
+}
+
+.success-message {
+    color: #1a3a7e;
     margin-top: 10px;
 }
 
-@media (max-width: 500px) {
-  .pre-registration-container h1 {
-        font-size: 1.2em;
+.pre-reg-main-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+
+.pre-reg-success-wrapper {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 2rem;
+}
+
+.pre-reg-success-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 3rem;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+.pre-reg-success-checkmark {
+    font-size: 5rem;
+    color: #1a3a7e;
+    margin-bottom: 1.5rem;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.pre-reg-success-heading {
+    color: #325aa8;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.pre-reg-success-details {
+    margin-bottom: 2rem;
+    color: #325aa8;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.pre-reg-success-info {
+    text-align: left;
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.pre-reg-success-info ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 1rem;
+}
+
+.pre-reg-success-info li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.pre-reg-success-info li::before {
+    content: "•";
+    color: #1a3a7e;
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.pre-reg-success-buttons {
+    margin-top: 2rem;
+}
+
+.pre-reg-success-buttons a {
+    text-decoration: none;
+}
+
+.pre-reg-success-home-btn {
+    background-color: #1a3a7e;
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+    max-width: 300px;
+}
+
+.pre-reg-success-home-btn:hover {
+    background-color: #325aa8;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .pre-reg-success-card {
+        padding: 2rem;
     }
 
-  .form-grid {
-        grid-template-columns: 1fr;
+    .pre-reg-success-heading {
+        font-size: 2rem;
     }
 
-    button {
-        font-size: 14px;
+    .pre-reg-success-details {
+        font-size: 1rem;
+    }
+}
+
+.pre-reg-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pre-reg-tab {
+    padding: 1rem 2rem;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    cursor: pointer;
+    position: relative;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.pre-reg-tab.active {
+    color: #1a3a7e;
+    font-weight: 600;
+}
+
+.pre-reg-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #325aa8;
+    border-radius: 3px;
+}
+
+.pre-reg-tab:hover {
+    color: #325aa8;
+}
+
+/* Add these styles for required fields and form controls */
+.pre-reg-required {
+    color: #ff0000;
+    margin-left: 4px;
+}
+
+.pre-reg-form-group {
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.pre-reg-form-group input,
+.pre-reg-form-group select,
+.pre-reg-form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    height: 42px; /* Make all inputs same height */
+    box-sizing: border-box;
+}
+
+.pre-reg-form-group textarea {
+    height: auto;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.pre-reg-form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+}
+
+.pre-reg-form-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.pre-reg-radio-group {
+    display: flex;
+    gap: 2rem;
+    margin-top: 0.5rem;
+}
+
+.pre-reg-radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.pre-reg-radio-text {
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.pre-reg-radio-input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.pre-reg-radio-input:checked {
+    accent-color: #1a3a7e;
+}
+
+.pre-reg-confirm-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pre-reg-confirm-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+}
+
+.pre-reg-confirm-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.pre-reg-confirm-section h3 {
+    color: #1a3a7e;
+    margin-bottom: 1rem;
+}
+
+.pre-reg-confirm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.pre-reg-confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.pre-reg-edit-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.pre-reg-confirm-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #1a3a7e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pre-reg-edit-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.pre-reg-confirm-btn:hover {
+    background-color: #325aa8;
+}
+
+@media (max-width: 768px) {
+    .pre-reg-confirm-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .pre-reg-confirm-buttons {
+        flex-direction: column;
     }
 }

@@ -1,12 +1,11 @@
 import React from "react";
 import AdminHeader from '../Component/AdminHeader.jsx'
 
-//Link to
-//href="/create-announcement"
-//href="/delete-announcement"
-//href="/modify-announcement"
+//href="/update-appointment"
+//href="/update-preregistration"
+//href="/view-report"
 
-function ManageAnnouncement(){
+function ViewReports(){
     return(
         <>
         <AdminHeader/>
@@ -16,4 +15,4 @@ function ManageAnnouncement(){
     )
 }
 
-export default ManageAnnouncement;
+export default ViewReports;
