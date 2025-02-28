@@ -72,7 +72,7 @@ app.delete("/delete-image/:filename", async (req, res) => {
         }
 
         // Delete from server storage
-        const filePath = path.join(__dirname, "uploads", filename);
+        const filePath = path.join(__dirname, "homepage", filename);
         fs.unlink(filePath, (err) => {
             if (err) {
                 console.error("Error deleting file:", err);
