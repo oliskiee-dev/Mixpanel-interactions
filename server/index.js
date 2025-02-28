@@ -76,6 +76,7 @@ router.delete("/delete-image/:filename", async (req, res) => {
     }
   });
 
+  module.exports = router;
 
 //==========VIEWER CODE==============
 // Get all images
@@ -437,8 +438,6 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 //         res.status(500).json({ error: "Server error" });
 //     }
 // });
-
-
 
 app.listen(3000,() => {
     console.log("app is running");
