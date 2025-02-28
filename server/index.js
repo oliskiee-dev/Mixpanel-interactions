@@ -45,7 +45,7 @@ const storageAnnouncement = multer.diskStorage({
     }
 });
 
-const upload = multer({ storageHomepage});
+const upload = multer({ storage : storageHomepage});
   
 
 // Upload Image
@@ -547,10 +547,10 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 // });
 
 app.use("/homepage", router);
-app.use("/homepage", express.static(path.join(__dirname, "homepage")));
+app.use("/homepage/images", express.static(path.join(__dirname, "homepage")));
 
-app.use("/announcement", router);
-app.use("/announcement", express.static(path.join(__dirname, "announcement")));
+// app.use("/announcement", router);
+// app.use("/announcement", express.static(path.join(__dirname, "announcement")));
 
 
 app.listen(3000,() => {
