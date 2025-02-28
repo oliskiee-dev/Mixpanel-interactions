@@ -46,6 +46,7 @@ const storageAnnouncement = multer.diskStorage({
 });
 
 const uploadHomepage = multer({ storage : storageHomepage});
+const uploadAnnouncement = multer({ storage : storageAnnouncement});
   
 
 // Upload Image
@@ -424,7 +425,7 @@ app.post('/login', async (req, res) => {
 
 
 // POST - Add new announcement with image
-router.post("/addAnnouncement", uploadHomepage.single("image"), async (req, res) => {
+router.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: "Image file is required" });
@@ -447,7 +448,7 @@ router.post("/addAnnouncement", uploadHomepage.single("image"), async (req, res)
 });
 
 // PUT - Edit an existing announcement (image optional)
-router.put("/editAnnouncement/:id", uploadHomepage.single("image"), async (req, res) => {
+router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description } = req.body;
@@ -549,8 +550,8 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 app.use("/homepage", router);
 app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 
-// app.use("/announcement", router);
-// app.use("/announcement", express.static(path.join(__dirname, "announcement")));
+app.use("/announcement", router);
+app.use("/announcement", express.static(path.join(__dirname, "announcement")));
 
 
 app.listen(3000,() => {
