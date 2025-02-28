@@ -31,14 +31,14 @@ connectDB()
 
 // Image Upload Setup
 // Multer Storage Setup
-const storageHomepage = multer.diskStorage({
-    destination: "./uploads/HomePage",
+const storage = multer.diskStorage({
+    destination: "./uploads",
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
 
-const upload = multer({ storageHomepage });
+const upload = multer({ storage });
   
 
 // Upload Image
