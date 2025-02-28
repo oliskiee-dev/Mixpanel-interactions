@@ -29,29 +29,30 @@ connectDB()
 
 
 // Image Upload Setup
-// Configure Multer Storage
+// Multer Storage Setup
 const storage = multer.diskStorage({
     destination: "./uploads/",
     filename: (req, file, cb) => {
-      const filename = `${Date.now()}-${file.originalname}`;
-      cb(null, filename);
-    },
-  });
-  
-  const upload = multer({ storage });
+        cb(null, `${Date.now()}-${file.originalname}`);
+    }
+});
   
 
 // Upload Image
-router.post("/upload-image", upload.single("image"), async (req, res) => {
+app.post("/upload-image", upload.single("image"), async (req, res) => {
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
     try {
-        const newImage = new Homepage({
-            image_url: `/uploads/${req.file.filename}`,
+        const newImage = new homepageModel({
+            image_url: req.file.filename, // Save only filename
             created_at: new Date(),
         });
+
         await newImage.save();
-        res.status(201).json({ message: "Image uploaded successfully" });
+        res.status(201).json({ message: "Image uploaded successfully", image: newImage });
     } catch (error) {
-        res.status(500).json({ message: "Error uploading image" });
+        console.error("Error saving image:", error);
+        res.status(500).json({ message: "Error saving image to database" });
     }
 });
 
