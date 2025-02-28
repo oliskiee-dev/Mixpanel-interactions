@@ -1,0 +1,323 @@
+/* Reset container styles to ensure proper alignment */
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.announcement-main-container {
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Title styling - explicitly positioned at the left */
+.announcement-header {
+    width: 100%;
+    padding: 0 0 10px 20px; /* Add left padding to match the page layout */
+    margin: 0;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.announcement-title {
+    color: #002366;
+    font-size: 28px; /* Increased size */
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+    padding-bottom: 5px;
+    margin: 20px 0;
+    text-align: left;
+    position: relative;
+}
+
+/* Create extended underline */
+.announcement-title:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%; /* Extends the line to double the text width */
+    height: 2px;
+    background-color: #002366;
+}
+
+/* Center the announcements list but keep the header left-aligned */
+.announcements-list {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.announcement-card {
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden; /* This ensures the image doesn't overflow */
+}
+
+.announcement-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.announcement-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.announcement-image:hover {
+    transform: scale(1.05);
+}
+
+.announcement-content {
+    padding: 15px;
+}
+
+.announcement-number {
+    color: #002366;
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.announcement-content p {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.button-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.view-all-button {
+    background-color: #fff;
+    border: 1px solid #002366;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 150px;
+    transition: all 0.3s ease;
+    color: #002366;
+}
+
+.view-all-button:hover {
+    background-color: #002366;
+    color: white;
+}
+
+.announcement-footer {
+    margin-top: auto;
+}
+
+/* Add these styles at the end of your existing CSS */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 20px 0;
+}
+
+.page-button {
+    padding: 8px 16px;
+    border: 1px solid #002366;
+    background-color: white;
+    color: #002366;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.page-button:hover {
+    background-color: #002366;
+    color: white;
+}
+
+.page-button.active {
+    background-color: #002366;
+    color: white;
+}
+
+.announcement-form {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.announcement-form-title {
+    color: #002366;
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #002366;
+    font-weight: 500;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #002366;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-group input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #002366;
+    border-radius: 4px;
+    color: #002366;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.custom-file-upload:hover {
+    background-color: #002366;
+    color: white;
+}
+
+.preview-container {
+    margin-top: 10px;
+    max-width: 200px;
+}
+
+.preview-image {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.form-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.submit-button, .cancel-button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.submit-button {
+    background-color: #002366;
+    color: white;
+    border: none;
+}
+
+.submit-button:hover {
+    background-color: #001845;
+}
+
+.cancel-button {
+    background-color: #fff;
+    color: #002366;
+    border: 1px solid #002366;
+}
+
+.cancel-button:hover {
+    background-color: #f5f5f5;
+}
+
+.announcement-form input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #002366;
+    border-radius: 4px;
+}
+
+.announcement-form input[type="file"] {
+    margin-bottom: 10px;
+}
+
+.announcement-form button {
+    background-color: #002366;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.announcement-form button:hover {
+    background-color: #001845;
+}
+
+.announcement-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.announcement-actions button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.announcement-actions button:first-child {
+    background-color: #002366;
+    color: white;
+    border: none;
+}
+
+.announcement-actions button:first-child:hover {
+    background-color: #001845;
+}
+
+.announcement-actions button:last-child {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+}
+
+.announcement-actions button:last-child:hover {
+    background-color: #cc0000;
+}
