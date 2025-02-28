@@ -438,7 +438,7 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 //     }
 // });
 
-module.exports = router;
+app.use("/homepage", router);
 
 app.listen(3000,() => {
     console.log("app is running");
