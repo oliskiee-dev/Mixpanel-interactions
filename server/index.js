@@ -38,14 +38,14 @@ const storageHomepage = multer.diskStorage({
     }
 });
 
-const storageAnnouncemnt = multer.diskStorage({
+const storageAnnouncement = multer.diskStorage({
     destination: "./announcement/",
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
 
-const upload = multer({ storageHomepage, storageAnnouncemnt });
+const upload = multer({ storageHomepage});
   
 
 // Upload Image
