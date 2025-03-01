@@ -405,7 +405,7 @@ router.delete("/deleteAnnouncement/:id", async (req, res) => {
         }
 
         // Delete image file from server
-        const imagePath = path.join(__dirname, "../announcement", announcement.image_url);
+        const imagePath = path.join(__dirname, "announcement", announcement.image_url);
         fs.unlink(imagePath, (err) => {
             if (err) console.error("Error deleting file:", err);
         });
