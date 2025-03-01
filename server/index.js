@@ -394,26 +394,34 @@ router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (r
 });
 
 // DELETE - Remove an announcement and its image
-router.delete("/deleteAnnouncement/:id", async (req, res) => {
+app.delete("/deleteAnnouncement/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        console.log("Received ID:", id);  // Debugging line
 
+        // Find the announcement to delete
         const announcement = await announcementModel.findById(id);
-        console.log("Found Announcement:", announcement);  // Debugging line
-
         if (!announcement) {
-            return res.status(404).json({ message: "Announcement not found" });
+            return res.status(404).json({ error: "Announcement not found" });
         }
 
-        await announcementModel.findByIdAndDelete(id);
-        res.json({ message: "Announcement deleted successfully" });
+        // Delete the associated image if it exists
+        if (announcement.image_url) {
+            const imagePath = path.join(__dirname, "announcement", announcement.image_url);
+            fs.unlink(imagePath, (err) => {
+                if (err) console.error("Error deleting image:", err);
+            });
+        }
 
+        // Delete the announcement from MongoDB
+        await announcementModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Announcement deleted successfully" });
     } catch (error) {
         console.error("Error deleting announcement:", error);
-        res.status(500).json({ message: "Error deleting announcement" });
+        res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 
