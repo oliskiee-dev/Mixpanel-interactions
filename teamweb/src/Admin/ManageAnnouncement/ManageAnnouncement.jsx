@@ -12,7 +12,9 @@ function ManageAnnouncement() {
     });
     const [editingId, setEditingId] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
-    const [showForm, setShowForm] = useState(false);
+    const [showFormModal, setShowFormModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
     const announcementsPerPage = 6;
 
     useEffect(() => {
@@ -69,25 +71,30 @@ function ManageAnnouncement() {
     const resetForm = () => {
         setNewAnnouncement({ title: "", description: "", image_url: null, preview: null });
         setEditingId(null);
-        setShowForm(false);
+        setShowFormModal(false);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this announcement?")) {
-            try {
-                const response = await fetch(`http://localhost:3000/deleteAnnouncement/${id}`, {
-                    method: "DELETE",
-                });
-    
-                if (response.ok) {
-                    fetchAnnouncements();
-                } else {
-                    console.error("Failed to delete announcement:", await response.text());
-                }
-            } catch (error) {
-                console.error("Error deleting announcement:", error);
+    const handleDelete = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/deleteAnnouncement/${deleteId}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                fetchAnnouncements();
+                setShowDeleteModal(false);
+                setDeleteId(null);
+            } else {
+                console.error("Failed to delete announcement:", await response.text());
             }
+        } catch (error) {
+            console.error("Error deleting announcement:", error);
         }
+    };
+    
+    const openDeleteModal = (id) => {
+        setDeleteId(id);
+        setShowDeleteModal(true);
     };
     
     const handleEdit = (announcement) => {
@@ -98,8 +105,12 @@ function ManageAnnouncement() {
             image_url: null, 
             preview: announcement.image_url ? `http://localhost:3000/announcement/${announcement.image_url}` : null 
         });
-        setShowForm(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setShowFormModal(true);
+    };
+
+    const openAddModal = () => {
+        resetForm();
+        setShowFormModal(true);
     };
 
     // Pagination calculations
@@ -118,97 +129,14 @@ function ManageAnnouncement() {
                     <div className="header-flex">
                         <h2 className="announcement-title">Announcements</h2>
                         <button 
-                            className={`add-post-btn ${showForm ? 'active' : ''}`}
-                            onClick={() => setShowForm(!showForm)}
+                            className="add-post-btn"
+                            onClick={openAddModal}
                         >
-                            {showForm ? 'Cancel' : '+ Add Post'}
+                            + Add Post
                         </button>
                     </div>
                     <p className="announcement-subtitle">Manage school announcements and communications</p>
                 </div>
-
-                {/* Create/Edit Announcement Form - Hidden by default */}
-                {showForm && (
-                    <div className="announcement-form">
-                        <h3 className="form-section-title">
-                            {editingId ? "Edit Announcement" : "Create New Announcement"}
-                        </h3>
-
-                        <form onSubmit={handleCreateOrUpdateAnnouncement}>
-                            <div className="form-group">
-                                <label htmlFor="announcement-title">Title</label>
-                                <input
-                                    id="announcement-title"
-                                    type="text"
-                                    placeholder="Enter announcement title"
-                                    value={newAnnouncement.title}
-                                    onChange={(e) => setNewAnnouncement(prev => ({ ...prev, title: e.target.value }))}
-                                    maxLength={100}
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="announcement-description">Description</label>
-                                <textarea
-                                    id="announcement-description"
-                                    placeholder="Enter announcement details"
-                                    value={newAnnouncement.description}
-                                    onChange={(e) => setNewAnnouncement(prev => ({ ...prev, description: e.target.value }))}
-                                    className="description-textarea"
-                                    maxLength={500}
-                                    required
-                                />
-                                <small className="char-count">{newAnnouncement.description.length}/500 characters</small>
-                            </div>
-
-                            <div className="form-group">
-                                <label className="custom-file-upload">
-                                    <input 
-                                        type="file" 
-                                        onChange={(e) => setNewAnnouncement(prev => ({ 
-                                            ...prev, 
-                                            image_url: e.target.files[0], 
-                                            preview: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : prev.preview 
-                                        }))} 
-                                        accept="image/*" 
-                                    />
-                                    <i className="fa fa-cloud-upload"></i> Upload Image
-                                </label>
-
-                                {(newAnnouncement.preview || newAnnouncement.image_url) && (
-                                    <div className="preview-container">
-                                        <img 
-                                            src={newAnnouncement.preview} 
-                                            alt="Preview" 
-                                            className="preview-image" 
-                                        />
-                                        <button 
-                                            type="button"
-                                            className="remove-image-btn"
-                                            onClick={() => setNewAnnouncement(prev => ({ ...prev, image_url: null, preview: null }))}
-                                        >
-                                            Remove Image
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-actions">
-                                <button type="submit" className="submit-button">
-                                    {editingId ? "Update Announcement" : "Post Announcement"}
-                                </button>
-                                <button 
-                                    type="button"
-                                    onClick={resetForm}
-                                    className="cancel-button"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                )}
 
                 {/* Announcement List Section */}
                 <div className="announcement-list-section">
@@ -251,7 +179,7 @@ function ManageAnnouncement() {
                                             <button onClick={() => handleEdit(announcement)} className="edit-btn">
                                                 <i className="fa fa-pencil"></i> Edit
                                             </button>
-                                            <button onClick={() => handleDelete(announcement._id)} className="delete-btn">
+                                            <button onClick={() => openDeleteModal(announcement._id)} className="delete-btn">
                                                 <i className="fa fa-trash"></i> Delete
                                             </button>
                                         </div>
@@ -265,7 +193,7 @@ function ManageAnnouncement() {
                                 <p>No announcements available.</p>
                                 <button 
                                     className="create-first-btn"
-                                    onClick={() => setShowForm(true)}
+                                    onClick={openAddModal}
                                 >
                                     Create your first announcement
                                 </button>
@@ -303,6 +231,127 @@ function ManageAnnouncement() {
                     )}
                 </div>
             </div>
+
+            {/* Create/Edit Announcement Modal */}
+            {showFormModal && (
+                <div className="modal-overlay">
+                    <div className="modal-container">
+                        <div className="modal-header">
+                            <h3>{editingId ? "Edit Announcement" : "Create New Announcement"}</h3>
+                            <button className="modal-close" onClick={resetForm}>
+                                <i className="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleCreateOrUpdateAnnouncement}>
+                                <div className="form-group">
+                                    <label htmlFor="announcement-title">Title</label>
+                                    <input
+                                        id="announcement-title"
+                                        type="text"
+                                        placeholder="Enter announcement title"
+                                        value={newAnnouncement.title}
+                                        onChange={(e) => setNewAnnouncement(prev => ({ ...prev, title: e.target.value }))}
+                                        maxLength={100}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="announcement-description">Description</label>
+                                    <textarea
+                                        id="announcement-description"
+                                        placeholder="Enter announcement details"
+                                        value={newAnnouncement.description}
+                                        onChange={(e) => setNewAnnouncement(prev => ({ ...prev, description: e.target.value }))}
+                                        className="description-textarea"
+                                        maxLength={500}
+                                        required
+                                    />
+                                    <small className="char-count">{newAnnouncement.description.length}/500 characters</small>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="custom-file-upload">
+                                        <input 
+                                            type="file" 
+                                            onChange={(e) => setNewAnnouncement(prev => ({ 
+                                                ...prev, 
+                                                image_url: e.target.files[0], 
+                                                preview: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : prev.preview 
+                                            }))} 
+                                            accept="image/*" 
+                                        />
+                                        <i className="fa fa-cloud-upload"></i> Upload Image
+                                    </label>
+
+                                    {(newAnnouncement.preview || newAnnouncement.image_url) && (
+                                        <div className="preview-container">
+                                            <img 
+                                                src={newAnnouncement.preview} 
+                                                alt="Preview" 
+                                                className="preview-image" 
+                                            />
+                                            <button 
+                                                type="button"
+                                                className="remove-image-btn"
+                                                onClick={() => setNewAnnouncement(prev => ({ ...prev, image_url: null, preview: null }))}
+                                            >
+                                                Remove Image
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button type="submit" className="submit-button">
+                                        {editingId ? "Update Announcement" : "Post Announcement"}
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={resetForm}
+                                        className="cancel-button"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="modal-overlay">
+                    <div className="modal-container delete-modal">
+                        <div className="modal-header">
+                            <h3>Confirm Deletion</h3>
+                            <button className="modal-close" onClick={() => setShowDeleteModal(false)}>
+                                <i className="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="delete-warning">
+                                <i className="fa fa-exclamation-triangle"></i>
+                                <p>Are you sure you want to delete this announcement?</p>
+                                <p className="delete-note">This action cannot be undone.</p>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button onClick={handleDelete} className="delete-confirm-btn">
+                                Yes, Delete
+                            </button>
+                            <button 
+                                onClick={() => setShowDeleteModal(false)} 
+                                className="delete-cancel-btn"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
