@@ -337,22 +337,20 @@ app.post('/login', async (req, res) => {
 });
 
 // POST - Add new announcement with image
-app.post("/addAnnouncement", async (req, res) => {
+app.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, res) => {
     try {
         const { title, description } = req.body;
-        const image = req.file ? req.file.filename : null;
+        const image_url = req.file ? req.file.filename : null; // Match schema field name
 
-        const newAnnouncement = new announcementModel({ title, description, image });
+        const newAnnouncement = new announcementModel({ title, description, image_url });
         await newAnnouncement.save();
         
-        res.status(201).json({ message: "Announcement added successfully" });
+        res.status(201).json({ message: "Announcement added successfully", newAnnouncement });
     } catch (error) {
         console.error("Error adding announcement:", error);
         res.status(500).json({ error: "Failed to add announcement" });
     }
 });
-
-
 
 // PUT - Edit an existing announcement (image optional)
 router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (req, res) => {
