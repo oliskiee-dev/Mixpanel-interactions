@@ -45,11 +45,14 @@ function ManageAnnouncement() {
     const handleCreateAnnouncement = async (event) => {
         event.preventDefault();
     
+        console.log("Current newAnnouncement:", newAnnouncement); // Debugging
+    
         const formData = new FormData();
-        formData.append("title", title);
-        formData.append("description", description);
-        if (imageFile) {
-            formData.append("image", imageFile); // Append image file
+        formData.append("title", newAnnouncement.title);
+        formData.append("description", newAnnouncement.description);
+    
+        if (newAnnouncement.image) {
+            formData.append("image", newAnnouncement.image);
         }
     
         try {
@@ -59,9 +62,12 @@ function ManageAnnouncement() {
             });
     
             const data = await response.json();
+            console.log("Server response:", data);
+    
             if (response.ok) {
                 console.log("Announcement added:", data);
-                fetchAnnouncements(); // Refresh the announcements list
+                setNewAnnouncement({ title: "", description: "", image: null, preview: null });
+                fetchAnnouncements();
             } else {
                 console.error("Error adding announcement:", data.error);
             }
@@ -69,6 +75,8 @@ function ManageAnnouncement() {
             console.error("Error submitting announcement:", error);
         }
     };
+    
+    
     
 
     const handleDelete = async (id) => {
