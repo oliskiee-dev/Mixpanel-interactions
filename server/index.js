@@ -371,7 +371,7 @@ router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (r
 
             // Delete old image if it exists
             if (existingAnnouncement.image_url) {
-                const oldImagePath = path.join(__dirname, "../homepage", existingAnnouncement.image_url);
+                const oldImagePath = path.join(__dirname, "announcement", existingAnnouncement.image_url);
                 fs.unlink(oldImagePath, (err) => {
                     if (err) console.error("Error deleting old image:", err);
                 });
