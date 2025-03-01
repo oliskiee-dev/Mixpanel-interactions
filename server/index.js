@@ -337,7 +337,7 @@ app.post('/login', async (req, res) => {
 });
 
 // POST - Add new announcement with image
-app.post("/addAnnouncement", upload.single("image"), async (req, res) => {
+app.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, res) => {
     try {
         const { title, description } = req.body;
         const image = req.file ? req.file.filename : null;
