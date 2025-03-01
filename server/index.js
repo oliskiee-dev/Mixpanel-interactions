@@ -359,24 +359,26 @@ router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (r
         const { title, description } = req.body;
 
         // Find existing announcement
-        const existingAnnouncement = await Announcement.findById(id);
+        const existingAnnouncement = await announcementModel.findById(id);
         if (!existingAnnouncement) {
             return res.status(404).json({ error: "Announcement not found" });
         }
 
-        // Update fields
-        let image_url = existingAnnouncement.image_url; // Keep existing image if none is uploaded
+        // Keep existing image if no new file is uploaded
+        let image_url = existingAnnouncement.image_url;
         if (req.file) {
             image_url = req.file.filename;
 
-            // Delete old image from server
-            const oldImagePath = path.join(__dirname, "../homepage", existingAnnouncement.image_url);
-            fs.unlink(oldImagePath, (err) => {
-                if (err) console.error("Error deleting old image:", err);
-            });
+            // Delete old image if it exists
+            if (existingAnnouncement.image_url) {
+                const oldImagePath = path.join(__dirname, "../homepage", existingAnnouncement.image_url);
+                fs.unlink(oldImagePath, (err) => {
+                    if (err) console.error("Error deleting old image:", err);
+                });
+            }
         }
 
-        // Update database record
+        // Update announcement
         const updatedAnnouncement = await announcementModel.findByIdAndUpdate(
             id,
             { title, description, image_url },
@@ -392,6 +394,7 @@ router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (r
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 // DELETE - Remove an announcement and its image
 app.delete("/deleteAnnouncement/:id", async (req, res) => {
