@@ -337,7 +337,7 @@ app.post('/login', async (req, res) => {
 });
 
 // POST - Add new announcement with image
-app.post("/addAnnouncement", async (req, res) => {
+app.post("/addAnnouncement", upload.single("image"), async (req, res) => {
     try {
         const { title, description } = req.body;
         const image = req.file ? req.file.filename : null;
@@ -351,7 +351,6 @@ app.post("/addAnnouncement", async (req, res) => {
         res.status(500).json({ error: "Failed to add announcement" });
     }
 });
-
 
 
 // PUT - Edit an existing announcement (image optional)
