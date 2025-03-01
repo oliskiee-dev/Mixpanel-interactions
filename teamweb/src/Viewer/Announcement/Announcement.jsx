@@ -1,44 +1,43 @@
-import Header from '../Component/Header.jsx';
-import Footer from '../Component/Footer.jsx';
+import Header from "../Component/Header.jsx";
+import Footer from "../Component/Footer.jsx";
 import React, { useState, useEffect } from "react";
 import "./Announcement.css";
 
 function Announcement() {
     const [announcements, setAnnouncements] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [showAll, setShowAll] = useState(false);
-    const announcementsPerPage = 10;
-    const initialDisplayCount = 5; // Number of announcements to show initially
+    const announcementsPerPage = 5; // Show 5 announcements per page
 
     useEffect(() => {
-        // Generate 30 announcements with mock data
-        const mockAnnouncements = Array.from({ length: 30 }, (_, index) => ({
-            text: `Announcement ${index + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-            image: `https://picsum.photos/800/400?random=${index + 1}`
-        }));
-        setAnnouncements(mockAnnouncements);
+        fetchAnnouncements();
     }, []);
 
-    // Calculate pagination and display logic
+    const fetchAnnouncements = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/announcement");
+            if (!response.ok) throw new Error("Failed to fetch announcements");
+            
+            const data = await response.json();
+            console.log("Fetched announcements:", data);
+
+            if (data.announcement && Array.isArray(data.announcement)) {
+                setAnnouncements(data.announcement);
+            }
+        } catch (error) {
+            console.error("Error fetching announcements:", error);
+        }
+    };
+
+    // Calculate pagination
     const indexOfLastAnnouncement = currentPage * announcementsPerPage;
     const indexOfFirstAnnouncement = indexOfLastAnnouncement - announcementsPerPage;
     
     // Get current page's announcements
-    const getCurrentPageAnnouncements = () => {
-        const pageAnnouncements = announcements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
-        return showAll ? pageAnnouncements : pageAnnouncements.slice(0, initialDisplayCount);
-    };
-
-    const currentAnnouncements = getCurrentPageAnnouncements();
+    const currentAnnouncements = announcements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
     const totalPages = Math.ceil(announcements.length / announcementsPerPage);
 
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
-        setShowAll(false); // Reset show all when changing pages
-    };
-
-    const toggleShowAll = () => {
-        setShowAll(!showAll);
     };
 
     return (
@@ -50,31 +49,34 @@ function Announcement() {
                 </div>
                 
                 <div className="announcements-list">
-                    {currentAnnouncements.map((announcement, index) => (
-                        <div key={indexOfFirstAnnouncement + index} className="announcement-card">
-                            <div className="announcement-image-container">
-                                <img 
-                                    src={announcement.image} 
-                                    alt={`Announcement ${indexOfFirstAnnouncement + index + 1}`} 
-                                    className="announcement-image"
-                                />
+                    {currentAnnouncements.map((announcement, index) => {
+                        const imagePath = `http://localhost:3000/announcement/${announcement.image_url}`;
+                        console.log("Rendering image from:", imagePath);
+
+                        return (
+                            <div key={indexOfFirstAnnouncement + index} className="announcement-card">
+                                {announcement.image_url && (
+                                    <div className="announcement-image-container">
+                                        <img 
+                                            src={imagePath} 
+                                            alt={announcement.title} 
+                                            className="announcement-image"
+                                        />
+                                    </div>
+                                )}
+                                <div className="announcement-content">
+                                    <span className="announcement-number">
+                                        ANNOUNCEMENT #{indexOfFirstAnnouncement + index + 1}
+                                    </span>
+                                    <h3>{announcement.title}</h3>
+                                    <p>{announcement.description}</p>
+                                </div>
                             </div>
-                            <div className="announcement-content">
-                                <span className="announcement-number">
-                                    ANNOUNCEMENT #{indexOfFirstAnnouncement + index + 1}
-                                </span>
-                                <p>{announcement.text}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                
-                <div className="button-container">
-                    <button className="view-all-button" onClick={toggleShowAll}>
-                        {showAll ? "Show Less" : `Show All Announcements (${announcementsPerPage - initialDisplayCount} more)`}
-                    </button>
+                        );
+                    })}
                 </div>
 
+                {/* Pagination */}
                 <div className="pagination">
                     {Array.from({ length: totalPages }, (_, i) => (
                         <button
