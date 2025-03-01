@@ -398,28 +398,32 @@ router.delete("/deleteAnnouncement/:id", async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find the announcement
+        // Find the announcement in the database
         const announcement = await announcementModel.findById(id);
+
         if (!announcement) {
-            return res.status(404).json({ error: "Announcement not found" });
+            return res.status(404).json({ message: "Announcement not found" });
         }
 
-        // Delete image file from server
-        const imagePath = path.join(__dirname, "announcement", announcement.image_url);
-        fs.unlink(imagePath, (err) => {
-            if (err) console.error("Error deleting file:", err);
-        });
+        // Delete image file if exists
+        if (announcement.image_url) {
+            const imagePath = path.join(__dirname, "../announcement", announcement.image_url);
+            fs.unlink(imagePath, (err) => {
+                if (err) {
+                    console.error("Error deleting image file:", err);
+                }
+            });
+        }
 
-        // Remove from database
-        await Announcement.findByIdAndDelete(id);
+        // Delete the announcement from the database
+        await announcementModel.findByIdAndDelete(id);
 
-        res.status(200).json({ message: "Announcement deleted successfully" });
+        res.json({ message: "Announcement deleted successfully" });
     } catch (error) {
         console.error("Error deleting announcement:", error);
-        res.status(500).json({ error: "Server error" });
+        res.status(500).json({ message: "Error deleting announcement" });
     }
 });
-
 
 
 
