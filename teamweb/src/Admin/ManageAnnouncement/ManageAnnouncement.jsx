@@ -36,16 +36,15 @@ function ManageAnnouncement() {
         if (file) {
             const previewURL = URL.createObjectURL(file);
             setNewAnnouncement(prev => {
-                if (prev.preview) URL.revokeObjectURL(prev.preview); // Cleanup old preview
+                if (prev.preview) URL.revokeObjectURL(prev.preview); // Cleanup previous preview
                 return { ...prev, preview: previewURL, image: file };
             });
         }
     };
+    
 
     const handleCreateAnnouncement = async (event) => {
         event.preventDefault();
-    
-        console.log("Current newAnnouncement:", newAnnouncement); // Debugging
     
         const formData = new FormData();
         formData.append("title", newAnnouncement.title);
@@ -53,6 +52,12 @@ function ManageAnnouncement() {
     
         if (newAnnouncement.image) {
             formData.append("image", newAnnouncement.image);
+        }
+    
+        // Debugging: Log form data before sending it
+        console.log("Form Data Entries:");
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
         }
     
         try {
@@ -65,7 +70,6 @@ function ManageAnnouncement() {
             console.log("Server response:", data);
     
             if (response.ok) {
-                console.log("Announcement added:", data);
                 setNewAnnouncement({ title: "", description: "", image: null, preview: null });
                 fetchAnnouncements();
             } else {
@@ -74,8 +78,7 @@ function ManageAnnouncement() {
         } catch (error) {
             console.error("Error submitting announcement:", error);
         }
-    };
-    
+    };    
     
     
 
