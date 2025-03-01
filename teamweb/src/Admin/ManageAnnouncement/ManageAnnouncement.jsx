@@ -51,7 +51,7 @@ function ManageAnnouncement() {
         if (imageFile) {
             formData.append("image", imageFile); // Append image file
         }
-    
+
         try {
             const response = await fetch("http://localhost:3000/addAnnouncement", {
                 method: "POST",
@@ -202,7 +202,7 @@ function ManageAnnouncement() {
                     ) : (
                         <div className="no-announcements">
                             <p>No announcements available.</p>
-                        </div>
+                     </div>
                     )}
                 </div>
             </div>
