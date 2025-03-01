@@ -353,7 +353,7 @@ app.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, res
 });
 
 // PUT - Edit an existing announcement (image optional)
-router.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (req, res) => {
+app.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description } = req.body;
