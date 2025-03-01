@@ -213,7 +213,7 @@ function ManageAnnouncement() {
                     ) : (
                         <div className="no-announcements">
                             <p>No announcements available.</p>
-                        </div>
+                     </div>
                     )}
                 </div>
             </div>

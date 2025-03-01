@@ -335,15 +335,25 @@
   .form-group {
     margin-bottom: 1.5rem;
   }
+
+  .form-group input[type= "text"] {
+    width: 95%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
   
   .form-label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
+    text-align: left;
   }
   
   .form-input {
-    width: 100%;
+    width: 95%;
     padding: 0.75rem;
     border: 1px solid var(--medium-grey);
     border-radius: var(--border-radius);
