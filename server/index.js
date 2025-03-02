@@ -46,81 +46,6 @@ app.get('/calendar', async (req,res) =>{
     return res.json({calendar : response});
 })
 
-//Add a new Calendar Event
-// app.post('/addCalendar', async (req, res) => {
-//     const { title, date } = req.body; // Removed 'type'
-
-//     // Basic validation for required fields
-//     if (!title || !date) {
-//         return res.status(400).json({ error: 'Missing required fields: title or date' });
-//     }
-
-//     try {
-//         // Create new calendar entry with default type 'event'
-//         const newEntry = new calendarModel({
-//             title,
-//             date,
-//             created_at: new Date(),
-//             type: "event"  // Default type set to 'event'
-//         });
-
-//         // Save the entry to the database
-//         const savedEntry = await newEntry.save();
-//         res.status(201).json({ message: 'Calendar entry added successfully', entry: savedEntry });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
-
-
-// // Edit Calendar Event
-// app.put('/editCalendar/:id', async (req, res) => {
-//     const { id } = req.params;
-//     const { title, date } = req.body; // Removed 'description'
-
-//     try {
-//         const updatedEntry = await calendarModel.findByIdAndUpdate(id, {
-//             title,
-//             date,
-//             type: "event" // Default type set to 'event'
-//         }, { new: true });
-
-//         if (!updatedEntry) {
-//             return res.status(404).json({ error: 'Calendar entry not found' });
-//         }
-
-//         res.json({ message: 'Calendar entry updated successfully', entry: updatedEntry });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
-
-
-// // Delete Calendar Event
-// app.delete('/deleteCalendar/:id', async (req, res) => {
-//     const { id } = req.params;
-
-//     try {
-//         const deletedEntry = await calendarModel.findByIdAndDelete(id);
-
-//         if (!deletedEntry) {
-//             return res.status(404).json({ error: 'Calendar entry not found' });
-//         }
-
-//         res.json({ message: 'Calendar entry deleted successfully' });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
-
-module.exports = app;
-
-
-
-
 //Get all Pre-Registration
 // Get paginated Pre-Registration records
 app.get('/preregistration', async (req, res) => {
@@ -245,9 +170,6 @@ app.post('/addPreRegistration', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-
-
 
 
 // POST - Add a Booking
