@@ -26,7 +26,7 @@ function ManageAnnouncement() {
             const response = await fetch("http://localhost:3000/announcement");
             if (!response.ok) throw new Error("Failed to fetch announcements");
             const data = await response.json();
-            setAnnouncements(Array.isArray(data.announcement) ? data.announcement : []);
+            setAnnouncements(Array.isArray(data.announcements) ? data.announcements : []);
         } catch (error) {
             console.error("Error fetching announcements:", error);
             setAnnouncements([]);
@@ -45,8 +45,8 @@ function ManageAnnouncement() {
     
         try {
             const url = editingId
-                ? `http://localhost:3000/editAnnouncement/${editingId}`
-                : "http://localhost:3000/addAnnouncement";
+                ? `http://localhost:3000/announcement/edit/${editingId}`
+                : "http://localhost:3000/announcement/add";
             const method = editingId ? "PUT" : "POST";
     
             const response = await fetch(url, {
@@ -76,7 +76,7 @@ function ManageAnnouncement() {
 
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/deleteAnnouncement/${deleteId}`, {
+            const response = await fetch(`http://localhost:3000/announcement/delete/${deleteId}`, {
                 method: "DELETE",
             });
 
@@ -97,13 +97,13 @@ function ManageAnnouncement() {
         setShowDeleteModal(true);
     };
     
-    const handleEdit = (announcement) => {
-        setEditingId(announcement._id);
+    const handleEdit = (announcements) => {
+        setEditingId(announcements._id);
         setNewAnnouncement({ 
-            title: announcement.title, 
-            description: announcement.description, 
+            title: announcements.title, 
+            description: announcements.description, 
             image_url: null, 
-            preview: announcement.image_url ? `http://localhost:3000/announcement/${announcement.image_url}` : null 
+            preview: announcements.image_url ? `http://localhost:3000/announcement/${announcements.image_url}` : null 
         });
         setShowFormModal(true);
     };
@@ -145,19 +145,19 @@ function ManageAnnouncement() {
                     {/* Announcement List */}
                     <div className="announcements-grid">
                         {currentAnnouncements.length > 0 ? (
-                            currentAnnouncements.map((announcement) => {
-                                const imagePath = announcement.image_url
-                                ? `http://localhost:3000/announcement/${announcement.image_url}`
+                            currentAnnouncements.map((announcements) => {
+                                const imagePath = announcements.image_url
+                                ? `http://localhost:3000/announcement/${announcements.image_url}`
                                 : null;
-                                const formattedDate = new Date(announcement.created_at).toLocaleDateString();
+                                const formattedDate = new Date(announcements.created_at).toLocaleDateString();
 
                                 return (
-                                <div key={announcement._id} className="announcement-card">
+                                <div key={announcements._id} className="announcement-card">
                                     <div className="card-image-container">
                                     {imagePath ? (
                                         <img 
                                             src={imagePath} 
-                                            alt={announcement.title} 
+                                            alt={announcements.title} 
                                             className="card-image" 
                                         />
                                     ) : (
@@ -168,18 +168,18 @@ function ManageAnnouncement() {
                                     )}
                                     </div>
                                     <div className="card-content">
-                                        <h4 className="card-title">{announcement.title}</h4>
+                                        <h4 className="card-title">{announcements.title}</h4>
                                         <p className="announcement-date">
                                             <i className="fa fa-calendar"></i> {formattedDate}
                                         </p>
                                         <div className="card-description-container">
-                                            <p className="card-description">{announcement.description}</p>
+                                            <p className="card-description">{announcements.description}</p>
                                         </div>
                                         <div className="card-actions">
-                                            <button onClick={() => handleEdit(announcement)} className="edit-btn">
+                                            <button onClick={() => handleEdit(announcements)} className="edit-btn">
                                                 <i className="fa fa-pencil"></i> Edit
                                             </button>
-                                            <button onClick={() => openDeleteModal(announcement._id)} className="delete-btn">
+                                            <button onClick={() => openDeleteModal(announcements._id)} className="delete-btn">
                                                 <i className="fa fa-trash"></i> Delete
                                             </button>
                                         </div>
