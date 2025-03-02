@@ -29,7 +29,7 @@ function Homepage() {
     formData.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:3000/upload-image", {
+      const response = await fetch("http://localhost:3000/homepage/upload-image", {
         method: "POST",
         body: formData,
       });
@@ -43,7 +43,7 @@ function Homepage() {
 
   const handleDelete = async (filename) => {
     try {
-      const response = await fetch(`http://localhost:3000/delete-image/${filename}`, {
+      const response = await fetch(`http://localhost:3000/homepage/delete-image/${filename}`, {
         method: "DELETE",
       });
       if (response.ok) {
