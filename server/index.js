@@ -5,9 +5,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
-const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
 
 const userModel = require('./models/user.js')
@@ -36,21 +34,6 @@ app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 app.use("/homepage", homepageRoutes);
 app.use("/announcement", announcementRoutes);
 app.use("/announcement", express.static(path.join(__dirname, "announcement")));
-
-const storageAnnouncement = multer.diskStorage({
-    destination: "./announcement/",
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
-
-const uploadAnnouncement = multer({ storage : storageAnnouncement});
-  
-//Get all Announcements
-// app.get('/announcement', async (req,res) =>{
-//     const response = await announcementModel.find();
-//     return res.json({announcement : response});
-// })
 
 //Get all Calendar
 app.get('/calendar', async (req,res) =>{
@@ -277,100 +260,9 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// // POST - Add new announcement with image
-// app.post("/addAnnouncement", uploadAnnouncement.single("image"), async (req, res) => {
-//     try {
-//         const { title, description } = req.body;
-//         const image_url = req.file ? req.file.filename : null; // Match schema field name
-
-//         const newAnnouncement = new announcementModel({ title, description, image_url });
-//         await newAnnouncement.save();
-        
-//         res.status(201).json({ message: "Announcement added successfully", newAnnouncement });
-//     } catch (error) {
-//         console.error("Error adding announcement:", error);
-//         res.status(500).json({ error: "Failed to add announcement" });
-//     }
-// });
-
-// // PUT - Edit an existing announcement (image optional)
-// app.put("/editAnnouncement/:id", uploadAnnouncement.single("image"), async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const { title, description } = req.body;
-
-//         // Find existing announcement
-//         const existingAnnouncement = await announcementModel.findById(id);
-//         if (!existingAnnouncement) {
-//             return res.status(404).json({ error: "Announcement not found" });
-//         }
-
-//         // Keep existing image if no new file is uploaded
-//         let image_url = existingAnnouncement.image_url;
-//         if (req.file) {
-//             image_url = req.file.filename;
-
-//             // Delete old image if it exists
-//             if (existingAnnouncement.image_url) {
-//                 const oldImagePath = path.join(__dirname, "announcement", existingAnnouncement.image_url);
-//                 fs.unlink(oldImagePath, (err) => {
-//                     if (err) console.error("Error deleting old image:", err);
-//                 });
-//             }
-//         }
-
-//         // Update announcement
-//         const updatedAnnouncement = await announcementModel.findByIdAndUpdate(
-//             id,
-//             { title, description, image_url },
-//             { new: true }
-//         );
-
-//         res.status(200).json({
-//             message: "Announcement updated successfully",
-//             announcement: updatedAnnouncement,
-//         });
-//     } catch (error) {
-//         console.error("Error updating announcement:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// });
-
-
-// // DELETE - Remove an announcement and its image
-// app.delete("/deleteAnnouncement/:id", async (req, res) => {
-//     try {
-//         const { id } = req.params;
-
-//         // Find the announcement to delete
-//         const announcement = await announcementModel.findById(id);
-//         if (!announcement) {
-//             return res.status(404).json({ error: "Announcement not found" });
-//         }
-
-//         // Delete the associated image if it exists
-//         if (announcement.image_url) {
-//             const imagePath = path.join(__dirname, "announcement", announcement.image_url);
-//             fs.unlink(imagePath, (err) => {
-//                 if (err) console.error("Error deleting image:", err);
-//             });
-//         }
-
-//         // Delete the announcement from MongoDB
-//         await announcementModel.findByIdAndDelete(id);
-
-//         res.status(200).json({ message: "Announcement deleted successfully" });
-//     } catch (error) {
-//         console.error("Error deleting announcement:", error);
-//         res.status(500).json({ error: "Server error" });
-//     }
-// });
-
-
 
 
 const authenticate = require('./middleware/authMiddleware'); // Import middleware
-// const { default: Announcement } = require('../teamweb/src/Viewer/Announcement/Announcement.jsx');
 
 app.get('/admin-homepage', authenticate, (req, res) => {
     res.json({ message: "Welcome to the Admin Homepage!" });
