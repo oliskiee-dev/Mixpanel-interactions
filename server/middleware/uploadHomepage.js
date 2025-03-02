@@ -4,7 +4,7 @@ const path = require("path");
 // Set storage engine
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, "homepage")); // Make sure this directory exists
+        cb(null, path.join(__dirname, "../homepage")); // Make sure this directory exists
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
