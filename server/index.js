@@ -43,25 +43,20 @@ app.get('/calendar', async (req,res) =>{
 
 //Add a new Calendar Event
 app.post('/addCalendar', async (req, res) => {
-    const { title, date, description, type } = req.body;
+    const { title, date } = req.body; // Removed 'type'
 
     // Basic validation for required fields
-    if (!title || !date || !description || !type) {
-        return res.status(400).json({ error: 'Missing required fields: title, date, description, or type' });
-    }
-
-    // Validate that the type is either "event" or "holiday"
-    if (!['event', 'holiday'].includes(type)) {
-        return res.status(400).json({ error: 'Invalid type. It should be either "event" or "holiday".' });
+    if (!title || !date) {
+        return res.status(400).json({ error: 'Missing required fields: title or date' });
     }
 
     try {
-        // Create new calendar entry with the current time as created_at
+        // Create new calendar entry with default type 'event'
         const newEntry = new calendarModel({
             title,
             date,
-            created_at: new Date(),  // Automatically set created_at to now
-            type,  // Set the type ("event" or "holiday")
+            created_at: new Date(),
+            type: "event"  // Default type set to 'event'
         });
 
         // Save the entry to the database
@@ -73,17 +68,17 @@ app.post('/addCalendar', async (req, res) => {
     }
 });
 
+
 // Edit Calendar Event
 app.put('/editCalendar/:id', async (req, res) => {
     const { id } = req.params;
-    const { title, date, description, type } = req.body;
+    const { title, date } = req.body; // Removed 'description'
 
     try {
         const updatedEntry = await calendarModel.findByIdAndUpdate(id, {
             title,
             date,
-            description,
-            type,
+            type: "event" // Default type set to 'event'
         }, { new: true });
 
         if (!updatedEntry) {
@@ -96,6 +91,7 @@ app.put('/editCalendar/:id', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // Delete Calendar Event
 app.delete('/deleteCalendar/:id', async (req, res) => {
