@@ -12,7 +12,9 @@ const fs = require('fs');
 
 const userModel = require('./models/user.js')
 
-const homepageModel = require('./models/Homepage.js')
+// const homepageModel = require('./models/Homepage.js')
+const homepageRoutes = require("./routes/homepageRoutes");
+
 const announcementModel = require('./models/Announcement.js')
 const calendarModel = require('./models/Calendar.js')
 const preRegistrationModel = require('./models/PreRegistration.js')
@@ -29,14 +31,18 @@ app.use(cors())
 connectDB()
 
 
+app.use("/homepage", express.static(path.join(__dirname, "homepage")));
+app.use("/homepage", homepageRoutes);
+
+
 // Image Upload Setup
 // Multer Storage Setup
-const storageHomepage = multer.diskStorage({
-    destination: "./homepage/",
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
+// const storageHomepage = multer.diskStorage({
+//     destination: "./homepage/",
+//     filename: (req, file, cb) => {
+//         cb(null, `${Date.now()}-${file.originalname}`);
+//     }
+// });
 
 const storageAnnouncement = multer.diskStorage({
     destination: "./announcement/",
@@ -45,65 +51,65 @@ const storageAnnouncement = multer.diskStorage({
     }
 });
 
-const uploadHomepage = multer({ storage : storageHomepage});
+// const uploadHomepage = multer({ storage : storageHomepage});
 const uploadAnnouncement = multer({ storage : storageAnnouncement});
   
 
 // Upload Image
-app.post("/upload-image", uploadHomepage.single("image"), async (req, res) => {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+// app.post("/upload-image", uploadHomepage.single("image"), async (req, res) => {
+//     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    try {
-        const newImage = new homepageModel({
-            image_url: req.file.filename, // Save only filename
-            created_at: new Date(),
-        });
+//     try {
+//         const newImage = new homepageModel({
+//             image_url: req.file.filename, // Save only filename
+//             created_at: new Date(),
+//         });
 
-        await newImage.save();
-        res.status(201).json({ message: "Image uploaded successfully", image: newImage });
-    } catch (error) {
-        console.error("Error saving image:", error);
-        res.status(500).json({ message: "Error saving image to database" });
-    }
-});
+//         await newImage.save();
+//         res.status(201).json({ message: "Image uploaded successfully", image: newImage });
+//     } catch (error) {
+//         console.error("Error saving image:", error);
+//         res.status(500).json({ message: "Error saving image to database" });
+//     }
+// });
 
-// Delete Image
-app.delete("/delete-image/:filename", async (req, res) => {
-    try {
-        const { filename } = req.params;
+// // Delete Image
+// app.delete("/delete-image/:filename", async (req, res) => {
+//     try {
+//         const { filename } = req.params;
 
-        // Find and delete from MongoDB
-        const deletedImage = await homepageModel.findOneAndDelete({ image_url: filename });
+//         // Find and delete from MongoDB
+//         const deletedImage = await homepageModel.findOneAndDelete({ image_url: filename });
 
-        if (!deletedImage) {
-            return res.status(404).json({ message: "Image not found in database" });
-        }
+//         if (!deletedImage) {
+//             return res.status(404).json({ message: "Image not found in database" });
+//         }
 
-        // Delete from server storage
-        const filePath = path.join(__dirname, "homepage", filename);
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.error("Error deleting file:", err);
-                return res.status(500).json({ message: "Failed to delete file from server" });
-            }
-            res.json({ message: "Image deleted successfully" });
-        });
-    } catch (error) {
-        console.error("Error deleting image:", error);
-        res.status(500).json({ message: "Error deleting image" });
-    }
-});
+//         // Delete from server storage
+//         const filePath = path.join(__dirname, "homepage", filename);
+//         fs.unlink(filePath, (err) => {
+//             if (err) {
+//                 console.error("Error deleting file:", err);
+//                 return res.status(500).json({ message: "Failed to delete file from server" });
+//             }
+//             res.json({ message: "Image deleted successfully" });
+//         });
+//     } catch (error) {
+//         console.error("Error deleting image:", error);
+//         res.status(500).json({ message: "Error deleting image" });
+//     }
+// });
 
-//==========VIEWER CODE==============
-// Get all images
-router.get("/images", async (req, res) => {
-    try {
-      const images = await homepageModel.find();
-      res.json(images);
-    } catch (error) {
-      res.status(500).json({ message: "Error retrieving images" });
-    }
-  });
+// //==========VIEWER CODE==============
+// // Get all images
+// router.get("/images", async (req, res) => {
+//     try {
+//       const images = await homepageModel.find();
+//       res.json(images);
+//     } catch (error) {
+//       res.status(500).json({ message: "Error retrieving images" });
+//     }
+//   });
 
 //Get all Announcements
 app.get('/announcement', async (req,res) =>{
@@ -456,8 +462,8 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 //     }
 // });
 
-app.use("/homepage", router);
-app.use("/homepage", express.static(path.join(__dirname, "homepage")));
+// app.use("/homepage", router);
+// app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 
 app.use("/announcement", router);
 app.use("/announcement", express.static(path.join(__dirname, "announcement")));
