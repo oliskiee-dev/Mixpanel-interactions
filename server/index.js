@@ -73,6 +73,51 @@ app.post('/addCalendar', async (req, res) => {
     }
 });
 
+// Edit Calendar Event
+app.put('/editCalendar/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, date, description, type } = req.body;
+
+    try {
+        const updatedEntry = await calendarModel.findByIdAndUpdate(id, {
+            title,
+            date,
+            description,
+            type,
+        }, { new: true });
+
+        if (!updatedEntry) {
+            return res.status(404).json({ error: 'Calendar entry not found' });
+        }
+
+        res.json({ message: 'Calendar entry updated successfully', entry: updatedEntry });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Delete Calendar Event
+app.delete('/deleteCalendar/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedEntry = await calendarModel.findByIdAndDelete(id);
+
+        if (!deletedEntry) {
+            return res.status(404).json({ error: 'Calendar entry not found' });
+        }
+
+        res.json({ message: 'Calendar entry deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+module.exports = app;
+
+
 
 
 //Get all Pre-Registration
