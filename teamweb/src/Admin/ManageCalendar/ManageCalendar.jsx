@@ -2,43 +2,68 @@ import React, { useState, useEffect } from 'react';
 import './ManageCalendar.css';
 import AdminHeader from '../Component/AdminHeader.jsx';
 
-// Initial data setup
-const initialHolidays = [
-  { date: '2025-05-01', name: 'International Workers\' Day' },
-  { date: '2025-05-30', name: 'Memorial Day' },
-  { date: '2025-06-12', name: 'National Day' },
-  { date: '2025-07-04', name: 'Independence Day' },
-  { date: '2025-09-01', name: 'Labor Day' },
-  { date: '2025-11-27', name: 'Thanksgiving' },
-  { date: '2025-12-25', name: 'Christmas Day' }
-];
-
-const initialEvents = [
-  { date: '2025-02-27', name: 'Tine\'s Birthday' },
-  { date: '2025-08-10', name: 'Music Fest' },
-  { date: '2025-09-30', name: 'Charity Run' },
-  { date: '2025-11-22', name: 'Tech Expo' }
-];
-
 // Main Calendar component
 const ManageCalendar = () => {
-  const [currentYear, setCurrentYear] = useState(2025);
-  const [events, setEvents] = useState(initialEvents);
-  const [holidays, setHolidays] = useState(initialHolidays);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [events, setEvents] = useState([]);
+  const [holidays, setHolidays] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(null);
+  const [currentHoliday, setCurrentHoliday] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newEventDate, setNewEventDate] = useState('');
   const [newEventName, setNewEventName] = useState('');
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [action, setAction] = useState('add'); // 'add' or 'edit'
   const [notification, setNotification] = useState(null);
+  const [tooltip, setTooltip] = useState({ visible: false, text: "", x: 0, y: 0 });
+  // Add today's date for reference
+  const [today, setToday] = useState('');
 
+  useEffect(() => {
+    // Set today's date in ISO format (YYYY-MM-DD)
+    setToday(new Date().toISOString().split('T')[0]);
+    
+    const fetchCalendarData = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/calendar'); // Adjust API URL if needed
+        if (!response.ok) throw new Error('Failed to fetch data');
+
+        const data = await response.json();
+        
+        // Extract events and holidays from the calendar data
+        const eventsData = data.calendar ? data.calendar.filter(item => item.type === "event") : [];
+        const holidaysData = data.calendar ? data.calendar.filter(item => item.type === "holiday") : [];
+        
+        // Format data to match the existing structure
+        const formattedEvents = eventsData.map(item => ({
+          id: item._id,
+          date: item.date.slice(0, 10),
+          name: item.title
+        }));
+        
+        const formattedHolidays = holidaysData.map(item => ({
+          id: item._id,
+          date: item.date.slice(0, 10),
+          name: item.title
+        }));
+        
+        setEvents(formattedEvents);
+        setHolidays(formattedHolidays);
+      } catch (error) {
+        console.error('Error fetching calendar data:', error);
+        setNotification({ message: 'Failed to load calendar data.', isError: true });
+      }
+    };
+
+    fetchCalendarData();
+  }, []);
+  
   // Navigation functions
   const prevYear = () => setCurrentYear(currentYear - 1);
   const nextYear = () => setCurrentYear(currentYear + 1);
 
   // Modal handling
   const openAddModal = (date) => {
+    setCurrentEvent(null); // Ensure currentEvent is null for add mode
     setNewEventDate(date);
     setNewEventName('');
     setAction('add');
@@ -46,6 +71,12 @@ const ManageCalendar = () => {
   };
 
   const openEditModal = (event) => {
+    if (!event || !event.id) {
+      // If no valid event data, fall back to add mode
+      openAddModal(event?.date || new Date().toISOString().split('T')[0]);
+      return;
+    }
+    
     setCurrentEvent(event);
     setNewEventDate(event.date);
     setNewEventName(event.name);
@@ -60,271 +91,312 @@ const ManageCalendar = () => {
     setCurrentEvent(null);
   };
 
+  // Tooltip handling
+  const handleMouseEnter = (event, text) => {
+    const rect = event.target.getBoundingClientRect();
+    setTooltip({
+      visible: true,
+      text,
+      x: rect.left + window.scrollX + rect.width / 2,
+      y: rect.top + window.scrollY - 30,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip({ visible: false, text: "", x: 0, y: 0 });
+  };
+
   // Event management
-  const addEvent = () => {
+  const addEvent = async () => {
     if (newEventName.trim() === '') return;
-    
-    const newEvent = {
-      date: newEventDate,
-      name: newEventName.trim()
-    };
-    
-    setEvents([...events, newEvent]);
-    closeModal();
-    showNotification('Event added successfully!');
+  
+    const newEvent = { date: newEventDate, title: newEventName.trim(), type: "event" };
+  
+    try {
+      const response = await fetch('http://localhost:3000/addCalendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEvent),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to add event: ${errorText}`);
+      }
+  
+      const responseData = await response.json();
+      
+      setEvents([...events, {
+        id: responseData.id,
+        date: newEventDate,
+        name: newEventName.trim()
+      }]);
+  
+      closeModal();
+      showNotification('Event added successfully!');
+    } catch (error) {
+      console.error('Error adding event:', error);
+      showNotification('Failed to add event.', true);
+    }
   };
-
-  const updateEvent = () => {
+  
+  const updateEvent = async () => {
     if (newEventName.trim() === '' || !currentEvent) return;
-    
-    const updatedEvents = events.map(event => 
-      event === currentEvent ? { ...event, date: newEventDate, name: newEventName } : event
-    );
-    
-    setEvents(updatedEvents);
-    closeModal();
-    showNotification('Event updated successfully!');
+  
+    try {
+      const response = await fetch(`http://localhost:3000/editCalendar/${currentEvent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          date: newEventDate, 
+          title: newEventName,
+          type: "event"
+        }),
+      });
+  
+      if (!response.ok) throw new Error('Failed to update event');
+  
+      const updatedEvents = events.map((event) =>
+        event.id === currentEvent.id ? { ...event, date: newEventDate, name: newEventName } : event
+      );
+  
+      setEvents(updatedEvents);
+      closeModal();
+      showNotification('Event updated successfully!');
+    } catch (error) {
+      console.error('Error updating event:', error);
+      showNotification('Failed to update event.', true);
+    }
   };
-
-  const deleteEvent = (eventToDelete) => {
-    const updatedEvents = events.filter(event => event !== eventToDelete);
-    setEvents(updatedEvents);
-    showNotification('Event deleted successfully!');
+  
+  const deleteEvent = async (eventToDelete) => {
+    if (!eventToDelete?.id) {
+      console.error('Error: Missing event ID', eventToDelete);
+      return;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:3000/deleteCalendar/${eventToDelete.id}`, {
+        method: 'DELETE',
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to delete event: ${errorText}`);
+      }
+  
+      // Remove the deleted event from state
+      const updatedEvents = events.filter((event) => event.id !== eventToDelete.id);
+      setEvents(updatedEvents);
+      closeModal(); // Close modal if deleting from the edit modal
+      showNotification('Event deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      showNotification('Failed to delete event.', true);
+    }
   };
 
   // Notification handling
   const showNotification = (message, isError = false) => {
-    setNotification({
-      message,
-      isError
-    });
-    
+    setNotification({ message, isError });
+
     setTimeout(() => {
       setNotification(null);
     }, 3000);
   };
 
   // Calendar generation functions
-  const getMonthData = (year, month) => {
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-    
-    const monthData = [];
-    
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      monthData.push(null);
-    }
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-      monthData.push(day);
-    }
-    
-    return monthData;
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+  const getEventOrHoliday = (dateStr) => {
+    const event = events.find(item => item.date === dateStr);
+    const holiday = holidays.find(item => item.date === dateStr);
+    return { event, holiday };
   };
 
-  const isDateHighlighted = (year, month, day) => {
-    if (!day) return false;
-    
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return events.some(event => event.date === dateStr) || holidays.some(holiday => holiday.date === dateStr);
-  };
-
-  const getHighlightType = (year, month, day) => {
-    if (!day) return null;
-    
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    
-    if (events.some(event => event.date === dateStr)) {
-      return 'event';
-    }
-    
-    if (holidays.some(holiday => holiday.date === dateStr)) {
-      return 'holiday';
-    }
-    
-    return null;
-  };
-
-  const formatDateForDisplay = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  };
-
-  const getCurrentEvent = (year, month, day) => {
-    if (!day) return null;
-    
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return events.find(event => event.date === dateStr);
-  };
-
-  const getCurrentHoliday = (year, month, day) => {
-    if (!day) return null;
-    
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return holidays.find(holiday => holiday.date === dateStr);
+  const formatDate = (year, month, day) => {
+    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   };
 
   const isToday = (year, month, day) => {
     if (!day) return false;
-    
-    const today = new Date();
-    return today.getFullYear() === year && 
-           today.getMonth() === month && 
-           today.getDate() === day;
+    const dateStr = formatDate(year, month, day);
+    return dateStr === today;
   };
 
-  // Month names
+  // Month and day names
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June', 
+    'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
-
-  // Day names
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
 
   return (
     <div>
-    <AdminHeader/>
-    <div className = "admin-calendar-container">
-      <div className = "admin-calendar-header">
-        {/* Header and navigation */}
+      <AdminHeader/>
+      <div className="calendar-container admin-calendar">
         <div className="calendar-header">
-          <button 
-            onClick={prevYear}
-            className="nav-button"
-          >
-            ❮ Prev Year
-          </button>
-          <h1 className="year-display">{currentYear}</h1>
-          <button 
-            onClick={nextYear}
-            className="nav-button"
-          >
-            Next Year ❯
-          </button>
+          <button onClick={prevYear}>❮ Prev Year</button>
+          <h2>{currentYear}</h2>
+          <button onClick={nextYear}>Next Year ❯</button>
         </div>
 
-        {/* Current event/holiday display
-        <div className="current-display">
-          <h2>Current Event: {events.length > 0 ? events[0].name : 'None'}</h2>
-        </div>
-        <div className="current-display holiday">
-          <h2>Current Holiday: {
-            holidays.length > 0 && new Date().getMonth() === new Date(holidays[0].date).getMonth() 
-              ? holidays[0].name 
-              : 'No Class Day'
-          }</h2>
-        </div> */}
+        {/* Current event/holiday display */}
+        {currentEvent && (
+          <div className="current-event">
+            <h3>Current Event: {currentEvent.name}</h3>
+          </div>
+        )}
+
+        {currentHoliday && (
+          <div className="current-holiday">
+            <h3>Current Holiday: {currentHoliday.name}</h3>
+          </div>
+        )}
 
         {/* Calendar grid */}
-        <div className="months-grid">
-          {monthNames.map((monthName, monthIndex) => (
-            <div key={monthName} className="month-card">
+        <div className="full-year-calendar">
+          {monthNames.map((monthName, monthIndex) => {
+            const daysInMonth = getDaysInMonth(currentYear, monthIndex);
+            const firstDay = getFirstDayOfMonth(currentYear, monthIndex);
+            
+            return (
+              <div key={monthName} className="calendar-month">
                 <h3>{monthName} {currentYear}</h3>
-              <div className="days-grid">
-                {dayNames.map(day => (
-                  <div key={day} className="day-name">
-                    {day}
-                  </div>
-                ))}
-                
-                {getMonthData(currentYear, monthIndex).map((day, index) => {
-                  const highlightType = getHighlightType(currentYear, monthIndex, day);
-                  const today = isToday(currentYear, monthIndex, day);
-                  
-                  return (
-                    <div 
-                      key={index}
-                      className={`day-cell 
-                        ${!day ? 'empty-cell' : ''} 
-                        ${highlightType === 'event' ? 'event-cell' : ''} 
-                        ${highlightType === 'holiday' ? 'holiday-cell' : ''}
-                        ${today ? 'today' : ''}
-                      `}
-                      onClick={() => {
-                        if (!day) return;
-                        
-                        const currentEvent = getCurrentEvent(currentYear, monthIndex, day);
-                        const currentHoliday = getCurrentHoliday(currentYear, monthIndex, day);
-                        
-                        if (currentEvent) {
-                          openEditModal(currentEvent);
-                        } else if (!currentHoliday) {
-                          const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                          openAddModal(dateStr);
-                        }
-                      }}
-                    >
-                      {day}
-                    </div>
-                  );
-                })}
+                <table>
+                  <thead>
+                    <tr>
+                      {dayNames.map(day => (
+                        <th key={day}>{day}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: 6 }).map((_, week) => (
+                      <tr key={week}>
+                        {Array.from({ length: 7 }).map((_, day) => {
+                          const dateNumber = week * 7 + day - firstDay + 1;
+                          const isValidDate = dateNumber > 0 && dateNumber <= daysInMonth;
+                          const dateStr = isValidDate ? formatDate(currentYear, monthIndex, dateNumber) : "";
+                          const { event, holiday } = getEventOrHoliday(dateStr);
+                          const isTodayDate = dateStr === today;
+                          
+                          let className = '';
+                          if (isTodayDate) className = 'today';
+                          else if (event) className = 'event-day';
+                          else if (holiday) className = 'holiday-day';
+                          
+                          const tooltipText = (event?.name && holiday?.name) 
+                            ? `${event.name} & ${holiday.name}` 
+                            : event?.name || holiday?.name || '';
+                          
+                          return (
+                            <td
+                              key={day}
+                              className={className}
+                              onClick={() => {
+                                if (!isValidDate) return;
+                                
+                                if (event) {
+                                  openEditModal(event);
+                                } else if (!holiday) {
+                                  openAddModal(dateStr);
+                                }
+                              }}
+                              onMouseEnter={(e) => tooltipText && handleMouseEnter(e, tooltipText)}
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {isValidDate ? dateNumber : ""}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
 
         {/* Upcoming events section */}
-        <div className="events-list-section">
-            <div>
-          <h2 className="section-title">Upcoming Events</h2>
-          <div className="list-card">
-            {events.length === 0 ? (
-              <div className="list-item">
-                <p>No events scheduled</p>
-              </div>
-            ) : (
-              events.map((event, index) => (
-                <div key={index} className="list-item">
-                  <div className="flex items-center">
-                    <div className="item-indicator event-indicator"></div>
-                    <div className="item-details">
-                      <p className="item-date">{event.date.split('-')[2]} {monthNames[parseInt(event.date.split('-')[1]) - 1]}</p>
-                      <p className="item-name">{event.name}</p>
-                    </div>
-                  </div>
-                  <div className="item-actions">
-                    <button 
-                      onClick={() => openEditModal(event)}
-                      className="edit-button"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => deleteEvent(event)}
-                      className="delete-button"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+        <div className="events-section">
+          <h3>Upcoming Events</h3>
+          {events.length === 0 ? (
+            <div className="empty-message">No events scheduled</div>
+          ) : (
+            <ul>
+              {events
+                .filter(event => {
+                  const eventDate = new Date(event.date);
+                  return eventDate >= new Date() && eventDate.getFullYear() === currentYear;
+                })
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .map((event, index) => {
+                  const dateObj = new Date(event.date);
+                  const monthName = monthNames[dateObj.getMonth()];
+                  const day = dateObj.getDate();
+                  
+                  return (
+                    <li key={index} className="event-item">
+                      <div className="event-info">
+                        <span className="event-date">{monthName} {day}</span>
+                        <span className="event-name">{event.name}</span>
+                      </div>
+                      <div className="item-actions">
+                        <button 
+                          onClick={() => openEditModal(event)}
+                          className="edit-button"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => deleteEvent(event)}
+                          className="delete-button"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          )}
         </div>
-    </div>
 
         {/* Upcoming holidays section */}
-        <div className="holiday-list-section">
-          <h2 className="section-title">Upcoming Holidays</h2>
-          <div className="list-card">
-            {holidays.map((holiday, index) => (
-              <div key={index} className="list-item">
-                <div className="flex items-center">
-                  <div className="item-indicator holiday-indicator"></div>
-                  <div className="item-details">
-                    <p className="item-date">{holiday.date.split('-')[2]} {monthNames[parseInt(holiday.date.split('-')[1]) - 1]}</p>
-                    <p className="item-name">{holiday.name}</p>
-                  </div>
-                </div>
-                <div className="fixed-label">Fixed</div>
-              </div>
-            ))}
-          </div>
+        <div className="events-section">
+          <h3>Upcoming Holidays</h3>
+          {holidays.length === 0 ? (
+            <div className="empty-message">No holidays scheduled</div>
+          ) : (
+            <ul>
+              {holidays
+                .filter(holiday => {
+                  const holidayDate = new Date(holiday.date);
+                  return holidayDate >= new Date() && holidayDate.getFullYear() === currentYear;
+                })
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .map((holiday, index) => {
+                  const dateObj = new Date(holiday.date);
+                  const monthName = monthNames[dateObj.getMonth()];
+                  const day = dateObj.getDate();
+                  
+                  return (
+                    <li key={index} className="holiday-item">
+                      <div className="holiday-info">
+                        <span className="holiday-date">{monthName} {day}</span>
+                        <span className="holiday-name">{holiday.name}</span>
+                      </div>
+                      <div className="fixed-label">Fixed</div>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          )}
         </div>
 
         {/* Modal for adding/editing events */}
@@ -364,6 +436,15 @@ const ManageCalendar = () => {
                   Cancel
                 </button>
                 
+                {action === 'edit' && currentEvent && (
+                  <button 
+                    onClick={() => deleteEvent(currentEvent)}
+                    className="delete-button"
+                  >
+                    Delete Event
+                  </button>
+                )}
+                
                 <button 
                   onClick={action === 'add' ? addEvent : updateEvent}
                   className="submit-button"
@@ -375,14 +456,27 @@ const ManageCalendar = () => {
           </div>
         )}
 
+        {/* Tooltip */}
+        {tooltip.visible && (
+          <div
+            className="tooltip visible"
+            style={{
+              position: "absolute",
+              left: `${tooltip.x}px`,
+              top: `${tooltip.y}px`,
+            }}
+          >
+            {tooltip.text}
+          </div>
+        )}
+
         {/* Notification */}
         {notification && (
-          <div className={`notification ${notification.isError ? 'error' : ''}`}>
+          <div className={`notification ${notification.isError ? 'error' : 'success'}`}>
             {notification.message}
           </div>
         )}
       </div>
-    </div>
     </div>
   );
 };
