@@ -13,10 +13,12 @@ const userModel = require('./models/user.js')
 // const homepageModel = require('./models/Homepage.js')
 const homepageRoutes = require("./routes/homepageRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
+const calendarRoutes = require("./routes/calendarRoutes");
 
 // const announcementModel = require('./models/Announcement.js')
-const calendarModel = require('./models/Calendar.js')
-const preRegistrationModel = require('./models/PreRegistration.js')
+//const calendarModel = require('./models/Calendar.js');
+const preRegistrationModel = require('./models/PreRegistration.js');
+
 
 dotenv.config(); 
 const cors = require('cors')
@@ -32,8 +34,11 @@ connectDB()
 
 app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 app.use("/homepage", homepageRoutes);
+
 app.use("/announcement", announcementRoutes);
 app.use("/announcement", express.static(path.join(__dirname, "announcement")));
+
+app.use("/calendar", calendarRoutes); 
 
 //Get all Calendar
 app.get('/calendar', async (req,res) =>{
@@ -42,74 +47,74 @@ app.get('/calendar', async (req,res) =>{
 })
 
 //Add a new Calendar Event
-app.post('/addCalendar', async (req, res) => {
-    const { title, date } = req.body; // Removed 'type'
+// app.post('/addCalendar', async (req, res) => {
+//     const { title, date } = req.body; // Removed 'type'
 
-    // Basic validation for required fields
-    if (!title || !date) {
-        return res.status(400).json({ error: 'Missing required fields: title or date' });
-    }
+//     // Basic validation for required fields
+//     if (!title || !date) {
+//         return res.status(400).json({ error: 'Missing required fields: title or date' });
+//     }
 
-    try {
-        // Create new calendar entry with default type 'event'
-        const newEntry = new calendarModel({
-            title,
-            date,
-            created_at: new Date(),
-            type: "event"  // Default type set to 'event'
-        });
+//     try {
+//         // Create new calendar entry with default type 'event'
+//         const newEntry = new calendarModel({
+//             title,
+//             date,
+//             created_at: new Date(),
+//             type: "event"  // Default type set to 'event'
+//         });
 
-        // Save the entry to the database
-        const savedEntry = await newEntry.save();
-        res.status(201).json({ message: 'Calendar entry added successfully', entry: savedEntry });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-
-
-// Edit Calendar Event
-app.put('/editCalendar/:id', async (req, res) => {
-    const { id } = req.params;
-    const { title, date } = req.body; // Removed 'description'
-
-    try {
-        const updatedEntry = await calendarModel.findByIdAndUpdate(id, {
-            title,
-            date,
-            type: "event" // Default type set to 'event'
-        }, { new: true });
-
-        if (!updatedEntry) {
-            return res.status(404).json({ error: 'Calendar entry not found' });
-        }
-
-        res.json({ message: 'Calendar entry updated successfully', entry: updatedEntry });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+//         // Save the entry to the database
+//         const savedEntry = await newEntry.save();
+//         res.status(201).json({ message: 'Calendar entry added successfully', entry: savedEntry });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
 
-// Delete Calendar Event
-app.delete('/deleteCalendar/:id', async (req, res) => {
-    const { id } = req.params;
+// // Edit Calendar Event
+// app.put('/editCalendar/:id', async (req, res) => {
+//     const { id } = req.params;
+//     const { title, date } = req.body; // Removed 'description'
 
-    try {
-        const deletedEntry = await calendarModel.findByIdAndDelete(id);
+//     try {
+//         const updatedEntry = await calendarModel.findByIdAndUpdate(id, {
+//             title,
+//             date,
+//             type: "event" // Default type set to 'event'
+//         }, { new: true });
 
-        if (!deletedEntry) {
-            return res.status(404).json({ error: 'Calendar entry not found' });
-        }
+//         if (!updatedEntry) {
+//             return res.status(404).json({ error: 'Calendar entry not found' });
+//         }
 
-        res.json({ message: 'Calendar entry deleted successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+//         res.json({ message: 'Calendar entry updated successfully', entry: updatedEntry });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
+
+
+// // Delete Calendar Event
+// app.delete('/deleteCalendar/:id', async (req, res) => {
+//     const { id } = req.params;
+
+//     try {
+//         const deletedEntry = await calendarModel.findByIdAndDelete(id);
+
+//         if (!deletedEntry) {
+//             return res.status(404).json({ error: 'Calendar entry not found' });
+//         }
+
+//         res.json({ message: 'Calendar entry deleted successfully' });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
 module.exports = app;
 
