@@ -501,6 +501,9 @@ const ManageCalendar = () => {
   const [tooltip, setTooltip] = useState({ visible: false, text: "", x: 0, y: 0 });
   // Add today's date for reference
   const [today, setToday] = useState('');
+  // Add confirmation modal state
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
 
   // Static holidays data (month is 0-indexed: January = 0, December = 11)
   const staticHolidays = [
@@ -687,12 +690,21 @@ const ManageCalendar = () => {
     }
   };
   
-  const deleteEvent = async (eventToDelete) => {
+  // Show confirmation dialog before deleting
+  const confirmDelete = (eventToDelete) => {
     if (!eventToDelete?.id) {
       console.error('Error: Missing event ID', eventToDelete);
       return;
     }
+    
+    setEventToDelete(eventToDelete);
+    setIsConfirmationOpen(true);
+  };
   
+  // Proceed with deletion after confirmation
+  const performDelete = async () => {
+    if (!eventToDelete?.id) return;
+    
     try {
       const response = await fetch(`http://localhost:3000/calendar/delete/${eventToDelete.id}`, {
         method: 'DELETE',
@@ -707,11 +719,21 @@ const ManageCalendar = () => {
       const updatedEvents = events.filter((event) => event.id !== eventToDelete.id);
       setEvents(updatedEvents);
       closeModal(); // Close modal if deleting from the edit modal
+      setIsConfirmationOpen(false); // Close confirmation dialog
+      setEventToDelete(null);
       showNotification('Event deleted successfully!');
     } catch (error) {
       console.error('Error deleting event:', error);
       showNotification('Failed to delete event.', true);
+      setIsConfirmationOpen(false);
+      setEventToDelete(null);
     }
+  };
+  
+  // Cancel deletion
+  const cancelDelete = () => {
+    setIsConfirmationOpen(false);
+    setEventToDelete(null);
   };
 
   // Notification handling
@@ -895,7 +917,7 @@ const ManageCalendar = () => {
                           Edit
                         </button>
                         <button 
-                          onClick={() => deleteEvent(event)}
+                          onClick={() => confirmDelete(event)}
                           className="delete-button"
                         >
                           Delete
@@ -974,7 +996,7 @@ const ManageCalendar = () => {
                 
                 {action === 'edit' && currentEvent && (
                   <button 
-                    onClick={() => deleteEvent(currentEvent)}
+                    onClick={() => confirmDelete(currentEvent)}
                     className="delete-button"
                   >
                     Delete Event
@@ -986,6 +1008,43 @@ const ManageCalendar = () => {
                   className="submit-button"
                 >
                   {action === 'add' ? 'Add Event' : 'Update Event'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Confirmation Dialog for Delete */}
+        {isConfirmationOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content confirmation-modal">
+              <h2 className="modal-header warning">Confirm Deletion</h2>
+              
+              <div className="confirmation-message">
+                <p>Are you sure you want to delete this event?</p>
+                <p className="warning-text">This action cannot be undone.</p>
+                
+                {eventToDelete && (
+                  <div className="event-to-delete">
+                    <p><strong>Event:</strong> {eventToDelete.name}</p>
+                    <p><strong>Date:</strong> {new Date(eventToDelete.date).toLocaleDateString()}</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="modal-actions">
+                <button 
+                  onClick={cancelDelete}
+                  className="cancel-button"
+                >
+                  Cancel
+                </button>
+                
+                <button 
+                  onClick={performDelete}
+                  className="delete-button confirm-delete"
+                >
+                  Yes, Delete Event
                 </button>
               </div>
             </div>
