@@ -113,7 +113,7 @@ const ManageCalendar = () => {
     const newEvent = { date: newEventDate, title: newEventName.trim(), type: "event" };
   
     try {
-      const response = await fetch('http://localhost:3000/addCalendar', {
+      const response = await fetch('http://localhost:3000/calendar/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newEvent),
@@ -144,7 +144,7 @@ const ManageCalendar = () => {
     if (newEventName.trim() === '' || !currentEvent) return;
   
     try {
-      const response = await fetch(`http://localhost:3000/editCalendar/${currentEvent.id}`, {
+      const response = await fetch(`http://localhost:3000/calendar/edit/${currentEvent.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -176,7 +176,7 @@ const ManageCalendar = () => {
     }
   
     try {
-      const response = await fetch(`http://localhost:3000/deleteCalendar/${eventToDelete.id}`, {
+      const response = await fetch(`http://localhost:3000/calendar/delete/${eventToDelete.id}`, {
         method: 'DELETE',
       });
   
