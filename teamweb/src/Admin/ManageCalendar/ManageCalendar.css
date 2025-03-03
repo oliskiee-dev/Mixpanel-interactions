@@ -8,10 +8,6 @@
   overflow-x: hidden;
 }
 
-.admin-calendar {
-  margin-top: 20px;
-}
-
 /* Calendar Header and Navigation */
 .calendar-header {
   display: flex;

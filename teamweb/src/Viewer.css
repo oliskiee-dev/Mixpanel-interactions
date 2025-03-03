@@ -1,229 +1,200 @@
-/* Ensure the main section is properly aligned */
+/* Main Section Alignment */
 .main-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 50px; /* Space between text and image */
-    padding: 50px;
-  }
-  
-  /* Welcome Section */
-  .welcome-section {
-    text-align: right;
-    flex: 1;
-  }
-  
-  
-  .welcome-text {
-    font-size: 50px;
-    font-weight: bold;
-  }
-  
-  .welcome-small {
-    font-size: 18px;
-    font-weight: normal;
-  }
-  
-  .teamian-text {
-    font-family: "Times New Roman", serif;
-    font-size: 60px;
-    font-weight: bold;
-  }
-  
-  .web-text {
-    font-family: "Arial", sans-serif;
-    font-size: 60px;
-    font-weight: bold;
-  }
-  /* News Content Styling */
-.news-content {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-    padding: 10px 15px;
-    border-radius: 5px;
-  }
-  
-  .news-content h3 {
-    font-size: 22px;
-    font-weight: bold;
-    color: white; /* White text for better contrast */
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Adds depth */
-    text-transform: uppercase;
-  }
-  
-  
-  /* Image Alignment */
- /* School Image Container */
-.school-image-container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 800px; /* Limits the size */
-    width: 100%;
-  }
-  
-  /* School Image - Larger and Responsive */
-  .school-image {
-    width: 100%;
-    max-width: 700px; /* Adjust this for desired size */
-    height: auto;
-    object-fit: cover; /* Ensures it scales nicely */
-    border-radius: 10px; /* Optional for smooth edges */
-  }
-  
-  
-  /* Explore Button */
-  .explore-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #2b4dad;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 5px;
-    text-decoration: none;
-    margin-top: 10px;
-  }
-  
-  .explore-btn:hover {
-    background-color: #1a357d;
-  }
-  
-  /* Latest News Section */
-  .latest-news {
-    text-align: center;
-    margin: 50px auto;
-    position: relative;
-  }
-  
-  .latest-news h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: left;
-    padding-left: 50px;
-    border-bottom: 3px solid #2b4dad;
-    display: inline-block;
-  }
-  
-  .news-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    position: relative;
-  }
-  
-  .news-item {
-    width: 500px; /* Set a fixed width */
-    height: 300px; /* Set a fixed height */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: #f5f5f5;
-    border-radius: 10px;
-  }
-  
-  .news-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures images resize properly */
-    border-radius: 10px;
-  }
-  
-  .prev-btn, .next-btn {
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 24px;
-    cursor: pointer;
-    border-radius: 50%;
-  }
-  
-  .prev-btn:hover, .next-btn:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-  }
-  
-  
-  /* News Image - Stays inside the container */
-  .news-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the area without stretching */
-    border-radius: 10px;
-  }
-  
-  
-  .news-image {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px; /* Space between text and image */
+  padding: 50px;
+  flex-wrap: wrap; /* Ensure responsiveness */
+}
 
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .main-container {
-      flex-direction: column;
-      text-align: center;
-    }
-  
-    .school-image-container {
-      order: -1; /* Move image on top in mobile */
-    }
-  
-    .welcome-section {
-      text-align: center;
-    }
-  
-    /* Style for the slideshow container */
+/* Welcome Section */
+.welcome-section {
+  text-align: right;
+  flex: 1;
+  min-width: 300px;
+}
+
+.welcome-text {
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.welcome-small {
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.teamian-text, .web-text {
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.teamian-text {
+  font-family: "Times New Roman", serif;
+}
+
+.web-text {
+  font-family: "Arial", sans-serif;
+}
+
+/* Image Alignment */
+.school-image-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+.school-image {
+  width: 100%;
+  max-width: 700px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Explore Button */
+.explore-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #2b4dad;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+.explore-btn:hover {
+  background-color: #1a357d;
+}
+
+/* Latest News Section */
+.latest-news {
+  text-align: center;
+  margin: 50px auto;
+  position: relative;
+}
+
+.latest-news h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: left;
+  padding-left: 50px;
+  border-bottom: 3px solid #2b4dad;
+}
+
+/* News Container */
 .news-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    width: 100%;
-    max-width: 600px; /* Adjust as needed */
-    margin: auto;
-  }
-  
-  /* Style for the buttons */
-  .prev-btn,
-  .next-btn {
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 30px; /* Make arrows larger */
-    padding: 10px 15px;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    transition: background 0.3s ease;
-  }
-  
-  /* Hover effect */
-  .prev-btn:hover,
-  .next-btn:hover {
-    background: rgba(0, 0, 0, 0.8);
-  }
-  
-  /* Positioning */
-  .prev-btn {
-    left: 0;
-  }
-  
-  .next-btn {
-    right: 0;
-  }
-  
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.news-item {
+  width: 500px;
+  height: 300px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  border: 2px solid #2b4dad; /* Border for visibility */
+}
+
+.news-item.active {
+  transform: scale(1.2); /* Increased zoom for active item */
+  z-index: 10;
+  opacity: 1;
+}
+
+.news-item.prev, .news-item.next {
+  transform: scale(0.8); /* Smaller size for surrounding items */
+  opacity: 0.7;
+}
+
+.news-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* News Content Styling */
+.news-content {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.news-content h3 {
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+  text-transform: uppercase;
+}
+
+/* Navigation Buttons */
+.prev-btn, .next-btn {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  transition: background 0.3s;
+}
+
+.prev-btn {
+  left: 10px;
+}
+
+.next-btn {
+  right: 10px;
+}
+
+.prev-btn:hover, .next-btn:hover {
+  background-color: #2b4dad;
+}
+
+/* Carousel Dots */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  margin: 0 5px;
+  background-color: #bbb;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dot.active {
+  background-color: #2b4dad;
+}
