@@ -141,14 +141,36 @@ function SchoolInfo() {
                 <div className="about-content">
                     <div className="about-text">
                         <p>
-                            Team Mission Christian School was established with a vision to provide high-quality education rooted in Christian values.
-                            Founded by a dedicated group of educators and faith-driven individuals, the school aimed to create a learning environment 
-                            that nurtures both academic excellence and spiritual growth.
+                            Vision
+
+                            TMCS envisions to produce graduates instilled with Godly character and values, intellectual competence and proficient skills who will become leaders of the nations.
+                        </p>
+                        <p>  
+                            Mission 
+
+                            To provide quality education by nurturing and empowering the child's intelligence for the glory of God.
+
+                          
                         </p>
                         <p>
-                            Our mission is to empower students with knowledge, skills, and values that prepare them for higher education and meaningful lives
-                            as responsible citizens and leaders in their communities. We foster a supportive environment where every student can discover
-                            and develop their God-given talents and purpose.
+                        Philisophy 
+
+                            TMCS is a non-stock, non-profit Christian School and the educational arm of Team Mission Philippines Inc.
+                            We believe that God is the central figure in the School's Curriculum and education
+                            We believe in the partnership of the parents and the school that God has given the parents the primary responsbility to educate their children and the second responsibility to educate the children and the second responsibility to the school and its teachers.
+                            We believe in the correct balance of tlove and discipline which is anchored in Proverbs 22:6, "Train up a child in the way he should go, and when he is old, we will not depart from it."
+                        </p>
+                        <p>
+                        CORE VALUES <br />
+
+                        Love for God <br />
+                        Integrity <br />
+                        Unity <br />
+                        Accountability <br />
+                        Relationship <br />
+                        Fear of God <br />
+                        Discipline <br />
+                        Obedience 
                         </p>
                     </div>
                     <div className="about-image">
