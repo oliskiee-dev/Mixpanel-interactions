@@ -209,16 +209,19 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        // Find the user by username
         const user = await userModel.findOne({ username });
         if (!user) {
             return res.status(400).json({ error: "Incorrect Credentials" });
         }
 
-        // Directly compare the plain-text password with the stored password
-        if (password !== user.password) {
-            return res.status(400).json({ error: "The password is incorrect" });
+        // Compare the provided password with the hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: "Incorrect Credentials" });
         }
 
+        // Generate JWT token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ message: "Success", token });
@@ -227,6 +230,7 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 
