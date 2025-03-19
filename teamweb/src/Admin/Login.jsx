@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router"; // For navigation
 import { FaUser, FaExclamationCircle } from "react-icons/fa"; // Import error icon
 import "./Login.css";
-import TeamLogo from "../assets/images/TeamLogo.jpg";
+import TeamLogo from "../assets/images/TeamLogo.png";
 
 function Login() {
     const [formData, setFormData] = useState({ username: "", password: "" });
