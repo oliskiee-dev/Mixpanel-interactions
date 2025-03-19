@@ -242,12 +242,17 @@ app.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        // Check if the username already exists
         const existingUser = await userModel.findOne({ username });
-        if (existingUser) return res.status(400).json({ error: "Username already exists" });
+        if (existingUser) {
+            return res.status(400).json({ error: "Username already exists" });
+        }
 
+        // Hash the password (even if it's the same, the hash will be different)
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Save new user with a unique username but possibly the same password
         const newUser = new userModel({ username, password: hashedPassword });
         await newUser.save();
 
@@ -256,6 +261,7 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 // app.use("/announcement", router);
 // app.use("/announcement", express.static(path.join(__dirname, "announcement")));
