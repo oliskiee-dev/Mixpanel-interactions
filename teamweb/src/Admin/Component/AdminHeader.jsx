@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router"; // Import useNavigate for navigation
 import "./AdminHeader.css"; // Import CSS
-import TeamLogo from '../../assets/images/TeamLogo.jpg';
+import TeamLogo from '../../assets/images/TeamLogo.png';
 
 const AdminHeader = () => {
   const [activeTab, setActiveTab] = useState("home");
