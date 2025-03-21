@@ -20,9 +20,10 @@ function ConfirmRegistration() {
         // Keep the data in sessionStorage when going back to edit
         window.location.href = '/preregistration?edit=true';
     };
-
     const handleConfirm = async () => {
         if (!formData) return;
+    
+        console.log("Raw Date of Birth from formData:", formData.dateOfBirth); // Check raw input
     
         const gradeLevel = formData.yearLevel;
         const isSeniorHigh = gradeLevel === "11" || gradeLevel === "12";
@@ -30,17 +31,19 @@ function ConfirmRegistration() {
         const preRegistrationData = {
             name: `${formData.firstName} ${formData.lastName}`,
             phone_number: formData.mobileNumber,
-            age: new Date().getFullYear() - new Date(formData.dateOfBirth).getFullYear(), // Calculate age
-            grade_level: gradeLevel, // Required
-            strand: isSeniorHigh ? formData.strand || "" : "", // Strand only if Grade 11 or 12
+            age: new Date().getFullYear() - new Date(formData.dateOfBirth).getFullYear(),
+            birthdate: new Date(formData.dateOfBirth).toISOString(),
+            gender: formData.gender,
+            grade_level: gradeLevel,
+            strand: isSeniorHigh ? formData.strand || "" : "",
             email: formData.email,
             nationality: formData.nationality,
             parent_guardian_name: `${formData.parentFirstName} ${formData.parentLastName}`,
             parent_guardian_number: formData.parentMobileNumber,
-            isNewStudent: formData.isNewStudent?.toLowerCase() === "new" ? "new" : "old", // Ensure 'new' or 'old'
-            status: "pending" // Default status
+            isNewStudent: formData.isNewStudent?.toLowerCase() === "new" ? "new" : "old",
+            status: "pending"
         };
-    
+        console.log("Pre-registration data to be sent:", preRegistrationData);
         try {
             const response = await fetch("http://localhost:3000/addPreRegistration", {
                 method: "POST",
@@ -53,10 +56,8 @@ function ConfirmRegistration() {
             const result = await response.json();
     
             if (response.ok) {
-                // Store success status and clear form data
                 sessionStorage.setItem("registrationSuccess", "true");
                 sessionStorage.removeItem("preRegFormData");
-                // Redirect to success page
                 window.location.href = "/success";
             } else {
                 alert(`Error: ${result.error || "Something went wrong"}`);
@@ -66,6 +67,8 @@ function ConfirmRegistration() {
             alert("Failed to submit registration. Please try again.");
         }
     };
+    
+    
     
     
     

@@ -152,8 +152,8 @@ function PreRegistration() {
                     <label htmlFor="gender">GENDER</label>
                         <select id="gender" name="gender" value={formData.gender} onChange={handleChange}>
                             <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
                         </select>
                         {formErrors.gender && <div className="error">{formErrors.gender}</div>}
                     </div>
