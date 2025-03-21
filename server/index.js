@@ -75,6 +75,23 @@ app.get('/preregistration', async (req, res) => {
             filterQuery.isNewStudent = req.query.type;
         }
 
+        // Determine how to sort based on active filters
+        let sortObject = { createdAt: -1 }; // Default sort by most recent
+        
+        if (req.query.search) {
+            // If searching by name, prioritize name matching
+            sortObject = { name: 1 };
+        } else if (req.query.grade) {
+            // If filtering by grade, use special handling below
+            sortObject = { grade_level: 1, name: 1 };
+        } else if (req.query.strand) {
+            // If filtering by strand, sort by strand then name
+            sortObject = { strand: 1, name: 1 };
+        } else if (req.query.type) {
+            // If filtering by student type, sort by type then name
+            sortObject = { isNewStudent: 1, name: 1 };
+        }
+
         // Use aggregation for proper grade level sorting
         if (req.query.grade || (Object.keys(sortObject).includes('grade_level'))) {
             const aggregationPipeline = [
@@ -119,20 +136,6 @@ app.get('/preregistration', async (req, res) => {
                 currentPage: page,
                 preregistration: records,
             });
-        }
-
-        // Determine how to sort based on active filters
-        let sortObject = { createdAt: -1 }; // Default sort by most recent
-        
-        if (req.query.search) {
-            // If searching by name, prioritize name matching
-            sortObject = { name: 1 };
-        } else if (req.query.strand) {
-            // If filtering by strand, sort by strand then name
-            sortObject = { strand: 1, name: 1 };
-        } else if (req.query.type) {
-            // If filtering by student type, sort by type then name
-            sortObject = { isNewStudent: 1, name: 1 };
         }
 
         // Execute query with filters and sort for non-grade related sorts
