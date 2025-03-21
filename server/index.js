@@ -52,9 +52,6 @@ app.get('/preregistration', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        const sortBy = req.query.sortBy || 'createdAt';
-        const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
-
         // Build filter query
         let filterQuery = {};
         
@@ -78,12 +75,24 @@ app.get('/preregistration', async (req, res) => {
             filterQuery.isNewStudent = req.query.type;
         }
 
-        // Handle special sorting for age (based on birthdate)
-        const actualSortBy = sortBy === "age" ? "birthdate" : sortBy;
-        const actualSortOrder = sortBy === "age" ? -sortOrder : sortOrder;
+        // Determine how to sort based on active filters
+        let sortObject = { createdAt: -1 }; // Default sort by most recent
         
-        const sortObject = { [actualSortBy]: actualSortOrder };
+        if (req.query.search) {
+            // If searching by name, prioritize name matching
+            sortObject = { name: 1 };
+        } else if (req.query.grade) {
+            // If filtering by grade, sort by grade then name
+            sortObject = { grade_level: 1, name: 1 };
+        } else if (req.query.strand) {
+            // If filtering by strand, sort by strand then name
+            sortObject = { strand: 1, name: 1 };
+        } else if (req.query.type) {
+            // If filtering by student type, sort by type then name
+            sortObject = { isNewStudent: 1, name: 1 };
+        }
 
+        // Execute query with filters and sort
         const records = await preRegistrationModel.find(filterQuery)
             .sort(sortObject)
             .skip(skip)
