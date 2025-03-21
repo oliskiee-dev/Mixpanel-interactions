@@ -83,6 +83,8 @@ app.post('/addPreRegistration', async (req, res) => {
         name, 
         phone_number, 
         age, 
+        gender,
+        birthdate,
         strand, // Optional
         grade_level, // Required
         email, 
@@ -96,12 +98,18 @@ app.post('/addPreRegistration', async (req, res) => {
         isNewStudent // ✅ Required (new/old)
     } = req.body;
 
-    // Check if grade_level and isNewStudent are missing
+    // Check if required fields are missing
     if (!grade_level) {
         return res.status(400).json({ error: "Grade level is required." });
     }
     if (!isNewStudent || !['new', 'old'].includes(isNewStudent.toLowerCase())) {
         return res.status(400).json({ error: "isNewStudent must be 'new' or 'old'." });
+    }
+    if (!gender || !['male', 'female', 'other'].includes(gender.toLowerCase())) {
+        return res.status(400).json({ error: "Gender must be 'male', 'female', or 'other'." });
+    }
+    if (!birthdate || isNaN(Date.parse(birthdate))) {
+        return res.status(400).json({ error: "Invalid birthdate format." });
     }
 
     // Convert status to lowercase if provided
@@ -128,6 +136,8 @@ app.post('/addPreRegistration', async (req, res) => {
                     name,
                     phone_number,
                     age,
+                    gender,
+                    birthdate: new Date(birthdate), // Store as Date
                     strand: strand || null, // Optional
                     grade_level, // Required
                     nationality,
@@ -147,6 +157,8 @@ app.post('/addPreRegistration', async (req, res) => {
                 name,
                 phone_number,
                 age,
+                gender,
+                birthdate: new Date(birthdate), // Store as Date
                 strand: strand || null, // Optional
                 grade_level, // Required
                 email,
@@ -170,6 +182,7 @@ app.post('/addPreRegistration', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 // POST - Add a Booking
