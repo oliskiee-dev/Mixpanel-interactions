@@ -48,29 +48,22 @@ app.get('/calendar', async (req,res) =>{
 // Get paginated Pre-Registration records
 app.get('/preregistration', async (req, res) => {
     try {
-        // Get pagination params (default: page 1, limit 10)
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        // Get sorting parameters
-        let sortBy = req.query.sortBy || 'createdAt'; // Default sorting field
-        const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1; // Default ascending
+        const sortBy = req.query.sortBy || 'createdAt';
+        const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
 
-        let sortQuery = { [sortBy]: sortOrder };
+        // Adjust sorting for age (sort by birthdate in descending order)
+        const actualSortBy = sortBy === "age" ? "birthdate" : sortBy;
+        const actualSortOrder = sortBy === "age" ? -sortOrder : sortOrder;
 
-        // Special sorting case for age (derived from birthdate)
-        if (sortBy === "age") {
-            sortQuery = { birthdate: sortOrder }; // Sorting by birthdate indirectly sorts age
-        }
-
-        // Fetch sorted records BEFORE pagination
         const records = await preRegistrationModel.find()
-            .sort(sortQuery)
+            .sort({ [actualSortBy]: actualSortOrder })
             .skip(skip)
             .limit(limit);
 
-        // Count total records for pagination info
         const totalRecords = await preRegistrationModel.countDocuments();
 
         res.json({
