@@ -1,143 +1,165 @@
-/* General Header Styles */
-.header {
+/* Header Styles */
+.main-header {
   display: flex;
   flex-direction: column;
   width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 100;
 }
 
-/* Top Section */
-.top-bar {
-  background-color: #2c3ea9; /* Blue background */
+/* Top Bar */
+.main-top-bar {
+  background: linear-gradient(to right, #1d2c7b, #2c3ea9);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 12px 24px;
+  height: 70px;
 }
 
-/* Logo */
-.logo {
+/* Logo and School Name */
+.main-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.main-logo {
   width: 40px;
   height: 40px;
+  object-fit: contain;
 }
 
-/* Search Bar */
-.search {
-  position: relative;
+.school-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  display: block;
 }
 
-.search input {
-  padding: 5px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 150px;
+/* Header Controls */
+.header-controls {
+  display: flex;
+  align-items: center;
 }
 
-.clear-btn {
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: none;
-  cursor: pointer;
+/* Navigation Menu */
+.main-nav {
+  background-color: #f5f5f7;
+  transition: all 0.3s ease;
 }
 
-/* Top Navigation Bar (Desktop) */
-.nav {
+.nav-container {
   display: flex;
   justify-content: center;
-  background: #d3d3d3; /* Light gray */
-  padding: 10px;
-  gap: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-.nav a {
+.main-nav a {
   text-decoration: none;
-  color: #000;
-  background: transparent;
-  padding: 10px 15px;
-  margin: 0 5px;
-  border-radius: 5px;
+  color: #333;
+  padding: 15px 20px;
+  position: relative;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
-.nav a.active {
-  background: #1d2c7b; /* Darker blue for active tab */
-  color: white;
+.main-nav a:hover {
+  color: #1d2c7b;
+  background-color: rgba(29, 44, 123, 0.05);
 }
 
-/* Hamburger Icon (Mobile) */
-.nav-toggle-btn {
-  display: none;
-  background-color: #2c3ea9;
-  color: white;
-  padding: 10px;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
+.main-nav a.active {
+  color: #1d2c7b;
+  font-weight: 600;
 }
 
-/* Bottom Navigation Bar (Mobile) */
-.bottom-nav {
-  display: none; /* Hide by default */
-  justify-content: space-around;
-  align-items: center;
-  position: fixed;
+.main-nav a.active::after {
+  content: '';
+  position: absolute;
   bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #2c3ea9;
-  padding: 10px 0;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background-color: #1d2c7b;
+  border-radius: 3px 3px 0 0;
 }
 
-.nav-item {
+/* Mobile Menu Toggle */
+.menu-toggle {
+  display: none;
   background: transparent;
+  color: white;
   border: none;
-  padding: 10px;
+  font-size: 1.5rem;
   cursor: pointer;
+  padding: 5px;
 }
 
-.nav-item img {
-  width: 24px;
-  height: 24px;
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .nav-container {
+    padding: 0 10px;
+  }
+  
+  .main-nav a {
+    padding: 15px 15px;
+  }
 }
 
-.nav-item.active img {
-  filter: brightness(0) saturate(100%) invert(49%) sepia(80%) saturate(410%) hue-rotate(165deg) brightness(95%) contrast(99%);
-}
-
-/* Add hover effect */
-.nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-}
-
-/* Responsive Styles for Mobile Devices */
 @media (max-width: 768px) {
-  /* Hide top nav on mobile by default */
-  .nav {
-      display: none;
+  .school-name {
+    font-size: 1.2rem;
   }
+  
+  .menu-toggle {
+    display: block;
+  }
+  
+  .main-nav {
+    display: none;
+    background-color: white;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .main-nav.show {
+    display: block;
+  }
+  
+  .nav-container {
+    flex-direction: column;
+    padding: 0;
+  }
+  
+  .main-nav a {
+    padding: 15px 24px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .main-nav a.active::after {
+    display: none;
+  }
+  
+  .main-nav a.active {
+    background-color: rgba(29, 44, 123, 0.1);
+  }
+}
 
-  /* Show bottom nav on mobile */
-  .bottom-nav {
-      display: flex;
+@media (max-width: 480px) {
+  .main-top-bar {
+    padding: 12px 16px;
   }
-
-  /* Display hamburger menu */
-  .nav-toggle-btn {
-      display: block;
+  
+  .school-name {
+    font-size: 1rem;
   }
-
-  /* Show navigation when hamburger menu is clicked */
-  .nav.show {
-      display: flex; /* Show top nav */
-      flex-direction: column;
-      align-items: center;
-  }
-
-  .nav-item img {
-      width: 30px;
-      height: 30px;
-  }
-} 
+}

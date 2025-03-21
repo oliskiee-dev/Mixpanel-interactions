@@ -1,133 +1,197 @@
+/* Footer Styles */
 .footer {
-    background-color: #1d2c7b; /* Dark Blue */
-    color: white;
-    padding: 30px 50px;
-    display: flex;
+  background-color: #1d2c7b;
+  color: white;
+  padding: 60px 0 30px;
+  width: 100%;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+/* Top Section */
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+/* Brand Section */
+.footer-brand {
+  flex: 1;
+  min-width: 280px;
+}
+
+.footer-brand h2 {
+  font-size: 28px;
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.footer-brand span {
+  font-weight: 300;
+}
+
+.tagline {
+  font-size: 16px;
+  margin: 0 0 20px;
+  font-weight: 500;
+}
+
+.footer-contact-info {
+  margin-top: 25px;
+}
+
+.footer-contact-info p {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+  font-size: 15px;
+  gap: 10px;
+}
+
+.footer-contact-info svg {
+  flex-shrink: 0;
+}
+
+/* Links Container */
+.footer-links-container {
+  display: flex;
+  flex: 2;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.footer-links-column {
+  min-width: 180px;
+}
+
+.footer-links-column h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-links-column h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #3498db;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-links a {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.footer-links a:hover {
+  color: white;
+  transform: translateX(3px);
+}
+
+/* Bottom Section */
+.footer-bottom {
+  text-align: center;
+  padding-top: 20px;
+}
+
+.footer-divider {
+  border: none;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin-bottom: 20px;
+}
+
+.footer-bottom p {
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .footer-top {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .footer-brand {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .footer-contact-info p {
+    justify-content: center;
+  }
+  
+  .footer-links-container {
+    justify-content: space-around;
+  }
+  
+  .footer-links-column h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .footer-links-column {
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 40px 0 20px;
+  }
+  
+  .footer-container {
+    padding: 0 20px;
+  }
+  
+  .footer-links-container {
     flex-direction: column;
     align-items: center;
+    gap: 30px;
   }
   
-  /* Top Row: Branding & Links */
-  .footer-top {
-    display: flex;
-    justify-content: space-between;
+  .footer-links-column {
     width: 100%;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    max-width: 300px;
   }
-  
-  /* Branding Section (Left) */
-  .footer-brand {
-    text-align: left;
-    flex: 1;
-  }
-  
+}
+
+@media (max-width: 480px) {
   .footer-brand h2 {
     font-size: 24px;
-    margin: 0;
   }
   
-  .footer-brand span {
-    font-weight: bold;
-  }
-  
-  .footer-brand p {
-    margin-top: 5px;
+  .footer-contact-info p {
     font-size: 14px;
   }
   
-  /* Links Section (Right) */
-  .footer-links {
-    flex: 2;
-    display: flex;
-    justify-content: flex-end; /* Align items to the right */
-    text-align: left;
-    gap: 100px; /* Ensures no space between items */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-  }
-  
-  .footer-links div {
-    display: flex;
-    flex-direction: column;
+  .footer-links-column h3 {
+    font-size: 16px;
   }
   
   .footer-links a {
-    color: white;
-    text-decoration: none;
     font-size: 14px;
-    margin-bottom: 5px;
   }
-  
-  .footer-links a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Footer Contact Section */
-  .footer-contact {
-    display: inline-flex; /* Allows inline behavior but still respects flex properties */
-    flex: none; /* Prevents it from growing or shrinking */
-    gap: 20px; /* Adds space between child elements */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-  }
-  
-  /* Footer Links and Contact on 925px or below */
-  @media (max-width: 925px) {
-    .footer-links {
-      justify-content: center; /* Center the links on smaller screens */
-      gap: 20px; /* Reduce gap */
-    }
-  }
-  
-  /* Footer Links and Contact on 940px screen width */
-  @media (max-width: 940px) {
-    .footer-contact {
-      flex-direction: row; /* Switch to a horizontal layout */
-      justify-content: center; /* Center the items */
-    }
-  
-    .footer-contact > * {
-      flex: 1 1 35%; /* Each item takes 45% of width (2 per row) */
-    }
-  }
-  
-  /* Footer Links stacking for small screens (510px or smaller) */
-  @media (max-width: 510px) {
-    .footer-links {
-      flex-direction: column; /* Stack items vertically */
-      gap: 10px; /* Adjust the gap between items */
-      justify-content: center; /* Center the content */
-      text-align: center; /* Center text */
-    }
-  }
-  
-  /* Footer Links and Contact on Mobile (768px) */
-  @media (max-width: 768px) {
-    .footer-top {
-      flex-direction: column; /* Stack items vertically on smaller screens */
-      align-items: center;
-    }
-  
-    .footer-links {
-      justify-content: center; /* Center the links on smaller screens */
-      gap: 20px; /* Reduce gap */
-    }
-  
-    .footer-contact {
-      justify-content: center; /* Center contact items */
-      gap: 10px; /* Adjust the gap for mobile */
-    }
-  
-    .footer-brand {
-      text-align: center; /* Center the branding on smaller screens */
-    }
-  }
-  
-  /* Footer Links and Contact on Mobile (600px) */
-  @media (max-width: 600px) {
-    .footer-contact {
-      justify-content: center; /* Center contact items */
-      gap: 10px; /* Adjust the gap for mobile */
-      flex-direction: column; /* Stack contact links vertically */
-      text-align: center; /* Center the text */
-    }
-  }
-  
+}
