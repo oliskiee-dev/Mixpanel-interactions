@@ -8,6 +8,8 @@ function Homepage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     fetchImages();
@@ -24,15 +26,25 @@ function Homepage() {
     }
   };
 
-  const handleUpload = async (event) => {
+  const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (!file) return;
+    
+    setSelectedFile(file);
+    
+    // Create preview URL
+    const previewURL = URL.createObjectURL(file);
+    setPreviewImage(previewURL);
+  };
+  
+  const handleUpload = async () => {
+    if (!selectedFile) return;
 
     setIsUploading(true);
     setUploadProgress(0);
     
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image", selectedFile);
 
     try {
       // Simulate upload progress
@@ -57,6 +69,8 @@ function Homepage() {
       setTimeout(() => {
         setIsUploading(false);
         setUploadProgress(0);
+        setPreviewImage(null);
+        setSelectedFile(null);
       }, 500);
       
       if (response.ok) {
@@ -66,6 +80,11 @@ function Homepage() {
       setIsUploading(false);
       console.error("Error uploading image:", error);
     }
+  };
+  
+  const cancelUpload = () => {
+    setPreviewImage(null);
+    setSelectedFile(null);
   };
 
   const confirmDelete = (image) => {
@@ -112,9 +131,23 @@ function Homepage() {
               <div className="upload-progress-bar" style={{ width: `${uploadProgress}%` }}></div>
               <span className="upload-progress-text">{uploadProgress}%</span>
             </div>
+          ) : previewImage ? (
+            <div className="image-preview-container">
+              <div className="preview-wrapper">
+                <img src={previewImage} alt="Preview" className="image-preview" />
+              </div>
+              <div className="preview-actions">
+                <button onClick={handleUpload} className="post-btn">
+                  <span className="post-icon">✓</span> Post Image
+                </button>
+                <button onClick={cancelUpload} className="cancel-upload-btn">
+                  <span className="cancel-icon">✕</span> Cancel
+                </button>
+              </div>
+            </div>
           ) : (
             <label className="custom-file-upload">
-              <input type="file" accept="image/*" onChange={handleUpload} />
+              <input type="file" accept="image/*" onChange={handleFileSelect} />
               <span className="upload-icon">📷</span> Choose Image
             </label>
           )}
