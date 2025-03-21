@@ -62,7 +62,7 @@ app.get('/preregistration', async (req, res) => {
         
         // Add grade filter
         if (req.query.grade) {
-            filterQuery.grade_level = req.query.grade_level;
+            filterQuery.grade_level = req.query.grade;
         }
         
         // Add strand filter
@@ -75,15 +75,58 @@ app.get('/preregistration', async (req, res) => {
             filterQuery.isNewStudent = req.query.type;
         }
 
+        // Use aggregation for proper grade level sorting
+        if (req.query.grade || (Object.keys(sortObject).includes('grade_level'))) {
+            const aggregationPipeline = [
+                { $match: filterQuery },
+                {
+                    $addFields: {
+                        gradeOrder: {
+                            $switch: {
+                                branches: [
+                                    { case: { $eq: ["$grade_level", "Nursery"] }, then: -3 },
+                                    { case: { $eq: ["$grade_level", "Kinder 1"] }, then: -2 },
+                                    { case: { $eq: ["$grade_level", "Kinder 2"] }, then: -1 },
+                                    { case: { $eq: ["$grade_level", "1"] }, then: 1 },
+                                    { case: { $eq: ["$grade_level", "2"] }, then: 2 },
+                                    { case: { $eq: ["$grade_level", "3"] }, then: 3 },
+                                    { case: { $eq: ["$grade_level", "4"] }, then: 4 },
+                                    { case: { $eq: ["$grade_level", "5"] }, then: 5 },
+                                    { case: { $eq: ["$grade_level", "6"] }, then: 6 },
+                                    { case: { $eq: ["$grade_level", "7"] }, then: 7 },
+                                    { case: { $eq: ["$grade_level", "8"] }, then: 8 },
+                                    { case: { $eq: ["$grade_level", "9"] }, then: 9 },
+                                    { case: { $eq: ["$grade_level", "10"] }, then: 10 },
+                                    { case: { $eq: ["$grade_level", "11"] }, then: 11 },
+                                    { case: { $eq: ["$grade_level", "12"] }, then: 12 },
+                                ],
+                                default: 100 // Put unknown grades at the end
+                            }
+                        }
+                    }
+                },
+                { $sort: { gradeOrder: 1, name: 1 } },
+                { $skip: skip },
+                { $limit: limit }
+            ];
+
+            const records = await preRegistrationModel.aggregate(aggregationPipeline);
+            const totalRecords = await preRegistrationModel.countDocuments(filterQuery);
+
+            return res.json({
+                totalRecords,
+                totalPages: Math.ceil(totalRecords / limit),
+                currentPage: page,
+                preregistration: records,
+            });
+        }
+
         // Determine how to sort based on active filters
         let sortObject = { createdAt: -1 }; // Default sort by most recent
         
         if (req.query.search) {
             // If searching by name, prioritize name matching
             sortObject = { name: 1 };
-        } else if (req.query.grade) {
-            // If filtering by grade, sort by grade then name
-            sortObject = { grade_level: 1, name: 1 };
         } else if (req.query.strand) {
             // If filtering by strand, sort by strand then name
             sortObject = { strand: 1, name: 1 };
@@ -92,7 +135,7 @@ app.get('/preregistration', async (req, res) => {
             sortObject = { isNewStudent: 1, name: 1 };
         }
 
-        // Execute query with filters and sort
+        // Execute query with filters and sort for non-grade related sorts
         const records = await preRegistrationModel.find(filterQuery)
             .sort(sortObject)
             .skip(skip)
