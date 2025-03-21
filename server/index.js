@@ -62,7 +62,7 @@ app.get('/preregistration', async (req, res) => {
         
         // Add grade filter
         if (req.query.grade) {
-            filterQuery.grade_level = { $regex: `Grade ${req.query.grade}`, $options: 'i' };
+            filterQuery.grade_level = req.query.grade_level;
         }
         
         // Add strand filter
