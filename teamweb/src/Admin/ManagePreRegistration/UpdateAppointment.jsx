@@ -1,168 +1,114 @@
-import React, { useState } from 'react';
-import AdminHeader from '../Component/AdminHeader.jsx'
-import './Appointment.css';
+import React, { useState } from "react";
+import "./UpdateAppointment.css";
 
-function UpdateAppointment(){
-    const [appointmentData, setAppointmentData] = useState({
-           email: "",
-           appointmentDate: "",
-           appointmentTime: "",
-           appointmentReason: "",
-           status: "pending"
-       });
-       const [appointmentErrors, setAppointmentErrors] = useState({});
-       const [appointmentSuccess, setAppointmentSuccess] = useState(false);
-   
-       const handleAppointmentChange = (e) => {
-           setAppointmentData({
-               ...appointmentData,
-               [e.target.name]: e.target.value
-           });
-           setAppointmentErrors({
-               ...appointmentErrors,
-               [e.target.name]: ""
-           });
-       };
-   
-       const validateAppointment = (data) => {
-           let errors = {};
-           if (!data.email.trim()) errors.email = "Email is required";
-           else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = "Invalid email format";
-           if (!data.appointmentDate) errors.appointmentDate = "Appointment Date is required";
-           if (!data.appointmentTime) errors.appointmentTime = "Appointment Time is required";
-           if (!data.appointmentReason?.trim()) errors.appointmentReason = "Purpose of Visit is required";
-           return errors;
-       };
-   
-       const handleSubmit = async (e) => {
-           e.preventDefault();
-           const errors = validateAppointment(appointmentData);
-           setAppointmentErrors(errors);
-       
-           if (Object.keys(errors).length === 0) {
-               try {
-                   const response = await fetch('http://localhost:3000/addBooking', {
-                       method: 'POST',
-                       headers: {
-                           'Content-Type': 'application/json',
-                       },
-                       body: JSON.stringify({
-                           email: appointmentData.email,
-                           appointment_date: appointmentData.appointmentDate,
-                           preferred_time: appointmentData.appointmentTime,
-                           purpose_of_visit: appointmentData.appointmentReason,
-                       }),
-                   });
-       
-                   const result = await response.json();
-       
-                   if (response.ok) {
-                       setAppointmentSuccess(true);
-                   } else {
-                       alert(result.error || 'Failed to book appointment. Please try again.');
-                   }
-               } catch (error) {
-                   console.error('Error submitting appointment:', error);
-                   alert('Failed to connect to the server. Please try again.');
-               }
-           }
-       };
-       
-   
-       return (
-           <>
-               <div className="appointment-main-container">
-                   {appointmentSuccess ? (
-                       <div className="appointment-success-wrapper">
-                           <div className="appointment-success-card">
-                               <div className="appointment-success-checkmark">✓</div>
-                               <h1 className="appointment-success-heading">Appointment Booked Successfully!</h1>
-                               <p>You will receive an appointment confirmation email at {appointmentData.email}.</p>
-                               <br />
-                               <br />
-                               <a href="/" className="appointment-success-home-btn">Return to Homepage</a>
-                           </div>
-                       </div>
-                   ) : (
-                       <div className="appointment-section">
-                           <div className="appointment-title">Book an Appointment</div>
-                           <form onSubmit={handleSubmit} className="appointment-form">
-                               <div className="appointment-form-group">
-                                   <label htmlFor="email">Email <span className="appointment-required">*</span></label>
-                                   <input 
-                                       type="email" 
-                                       id="email" 
-                                       name="email"
-                                       value={appointmentData.email}
-                                       onChange={handleAppointmentChange}
-                                       required
-                                   />
-                                   {appointmentErrors.email && 
-                                       <div className="appointment-error">{appointmentErrors.email}</div>}
-                               </div>
-                               <div className="appointment-form-group">
-                                   <label htmlFor="appointmentDate">Preferred Date <span className="appointment-required">*</span></label>
-                                   <input 
-                                       type="date" 
-                                       id="appointmentDate" 
-                                       name="appointmentDate"
-                                       value={appointmentData.appointmentDate}
-                                       onChange={handleAppointmentChange}
-                                       min={new Date().toISOString().split('T')[0]}
-                                       required
-                                   />
-                                   {appointmentErrors.appointmentDate && 
-                                       <div className="appointment-error">{appointmentErrors.appointmentDate}</div>}
-                               </div>
-                               <div className="appointment-form-group">
-                                   <label htmlFor="appointmentTime">Preferred Time <span className="appointment-required">*</span></label>
-                                   <select 
-                                       id="appointmentTime" 
-                                       name="appointmentTime"
-                                       value={appointmentData.appointmentTime}
-                                       onChange={handleAppointmentChange}
-                                       required
-                                   >
-                                       <option value="">Select Time</option>
-                                       <option value="9:00">9:00 AM</option>
-                                       <option value="10:00">10:00 AM</option>
-                                       <option value="11:00">11:00 AM</option>
-                                       <option value="13:00">1:00 PM</option>
-                                       <option value="14:00">2:00 PM</option>
-                                       <option value="15:00">3:00 PM</option>
-                                   </select>
-                                   {appointmentErrors.appointmentTime && 
-                                       <div className="appointment-error">{appointmentErrors.appointmentTime}</div>}
-                               </div>
-                               <div className="appointment-form-group">
-                                   <label htmlFor="appointmentReason">Purpose of Visit <span className="appointment-required">*</span></label>
-                                   <textarea 
-                                       id="appointmentReason" 
-                                       name="appointmentReason"
-                                       value={appointmentData.appointmentReason}
-                                       onChange={handleAppointmentChange}
-                                       rows="4"
-                                       placeholder="Please describe the reason for your appointment"
-                                       required
-                                   ></textarea>
-                                   {appointmentErrors.appointmentReason && 
-                                       <div className="appointment-error">{appointmentErrors.appointmentReason}</div>}
-                               </div>
-                               <div className="appointment-btn-group">
-                                   <button 
-                                       type="submit"
-                                       className="appointment-submit-btn"
-                                   >
-                                       Save Edit
-                                   </button>
-                               </div>
-                           </form>
-                       </div>
-                   )}
-               </div>
-           </>
-       );
-   }
-   
+const UpdateAppointment = () => {
+  const [unavailableDates, setUnavailableDates] = useState([]);
+  const [appointments, setAppointments] = useState({});
+  const [selectedDate, setSelectedDate] = useState("");
+
+  const toggleUnavailableDate = (date) => {
+    if (unavailableDates.includes(date)) {
+      setUnavailableDates((prev) => prev.filter((d) => d !== date));
+    } else {
+      setUnavailableDates((prev) => [...prev, date]);
+    }
+  };
+
+  const toggleAppointment = (date, time) => {
+    if (unavailableDates.includes(date)) return; // Prevent toggling for unavailable dates
+
+    setAppointments((prev) => {
+      const updated = { ...prev };
+      if (!updated[date]) {
+        updated[date] = {};
+      }
+      updated[date] = {
+        ...updated[date],
+        [time]: !updated[date][time], // Toggle only the specific time slot
+      };
+      return updated;
+    });
+  };
+
+  const generateTimeSlots = () => {
+    // Only specific time slots are included
+    return ["9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
+  };
+
+  const formatDate = (date) => {
+    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
+  };
+
+  const timeSlots = generateTimeSlots();
+
+  return (
+    <div className="appointment-container">
+      <h1 className="appointment-title">Update Appointment</h1>
+
+      <div className="admin-control">
+        <h3 className="control-title">Admin Controls</h3>
+        <div className="control-input">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+          <button
+            className="toggle-button"
+            onClick={() => toggleUnavailableDate(selectedDate)}
+          >
+            {unavailableDates.includes(selectedDate)
+              ? "Mark as Available"
+              : "Mark as Unavailable"}
+          </button>
+        </div>
+      </div>
+
+      <div className="appointment-grid">
+        {Array.from({ length: 8 }).map((_, index) => {
+          const date = new Date();
+          date.setDate(date.getDate() + index);
+          const formattedDate = date.toISOString().split("T")[0];
+          const isUnavailable = unavailableDates.includes(formattedDate);
+
+          return (
+            <div
+              key={formattedDate}
+              className={`appointment-card ${
+                isUnavailable ? "unavailable-card" : ""
+              }`}
+            >
+              <h3 className="appointment-date">{formatDate(date)}</h3>
+              {isUnavailable ? (
+                <p className="unavailable-message">Not Available</p>
+              ) : (
+                <ul className="appointment-time-list">
+                  {timeSlots.map((time) => (
+                    <li key={time} className="appointment-time-item">
+                      <span className="time-text">{time}</span>
+                      <button
+                        className={`time-button ${
+                          appointments[formattedDate]?.[time]
+                            ? "time-button-booked"
+                            : "time-button-available"
+                        }`}
+                        onClick={() => toggleAppointment(formattedDate, time)}
+                      >
+                        {appointments[formattedDate]?.[time]
+                          ? "Booked"
+                          : "Available"}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export default UpdateAppointment;
