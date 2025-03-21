@@ -108,7 +108,7 @@ app.post('/addPreRegistration', async (req, res) => {
     if (!gender || !['Male', 'Female'].includes(gender)) {
         return res.status(400).json({ error: "Gender must be 'Male' or 'Female'." });
     }
-    if (!birthdate || isNaN(Date.parse(String(birthdate)))) {
+    if (!birthdate) {
         return res.status(400).json({ error: "Invalid birthdate format." });
     }
     
