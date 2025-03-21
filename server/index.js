@@ -18,6 +18,8 @@ const calendarRoutes = require("./routes/calendarRoutes");
 const preRegistrationModel = require('./models/PreRegistration.js');
 const bookModel = require("./models/Book.js");
 
+const { sendApprovalEmail } = require('./service/emailService.js');
+
 dotenv.config(); 
 const cors = require('cors')
 
@@ -292,8 +294,20 @@ app.put('/preRegistrationStatus/:id', async (req, res) => {
             return res.status(404).json({ error: "Pre-registration record not found" });
         }
         
+        // Send approval email if status is changed to approved
+        if (updateData.status === 'approved') {
+            try {
+                await sendApprovalEmail(updatedRecord);
+                console.log(`Approval email sent to ${updatedRecord.email}`);
+            } catch (emailError) {
+                console.error('Failed to send approval email:', emailError);
+                // Continue with the response even if email fails
+            }
+        }
+        
         res.json({
             message: "Pre-registration updated successfully",
+            emailSent: updateData.status === 'approved',
             preregistration: updatedRecord
         });
     } catch (error) {
