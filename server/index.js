@@ -312,14 +312,26 @@ app.put("/editBookingAvailability/:id", async (req, res) => {
     }
 });
 
+const mongoose = require("mongoose");
+
 app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req, res) => {
     try {
-        const { documentId, day, timeSlotId } = req.params;
+        let { documentId, day, timeSlotId } = req.params;
 
+        // Trim extra spaces or newlines from IDs
+        documentId = documentId.trim();
+        timeSlotId = timeSlotId.trim();
+
+        // Validate ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(documentId) || !mongoose.Types.ObjectId.isValid(timeSlotId)) {
+            return res.status(400).json({ error: "Invalid ID format" });
+        }
+
+        // Remove specific time slot
         const updatedBooking = await bookModel.findByIdAndUpdate(
             documentId,
-            { $pull: { [`availability.${day}`]: { _id: timeSlotId } } }, // Removes the time slot
-            { new: true } // Return updated document
+            { $pull: { [`availability.${day}`]: { _id: timeSlotId } } }, 
+            { new: true }
         );
 
         if (!updatedBooking) {
