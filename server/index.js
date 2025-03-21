@@ -108,9 +108,10 @@ app.post('/addPreRegistration', async (req, res) => {
     if (!gender || !['Male', 'Female'].includes(gender)) {
         return res.status(400).json({ error: "Gender must be 'Male' or 'Female'." });
     }
-    if (!birthdate || isNaN(Date.parse(birthdate))) {
+    if (!birthdate || isNaN(Date.parse(String(birthdate)))) {
         return res.status(400).json({ error: "Invalid birthdate format." });
     }
+    
 
     // Validate status against allowed values
     const validStatuses = ['pending', 'approved', 'rejected'];
