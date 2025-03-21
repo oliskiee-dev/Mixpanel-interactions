@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import './ManagePreRegistration.css';
 
-//href="/update-appointment"
-//href="/update-preregistration"
-//href="/view-report"
-
 function UpdatePreRegistration(){
     const [formData, setFormData] = useState({
             firstName: "",

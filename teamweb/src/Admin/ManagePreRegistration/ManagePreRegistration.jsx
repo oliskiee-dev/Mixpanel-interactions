@@ -593,7 +593,7 @@ function ManagePreRegistration() {
             </div>
             {activeTab === "table" && renderTable()}
             {activeTab === "appointment" && <UpdateAppointment />}
-            {activeTab === "pre-reg" && <UpdatePreRegistration />}
+            {/* {activeTab === "pre-reg" && <UpdatePreRegistration />} */}
             
             <div>
                 <button
