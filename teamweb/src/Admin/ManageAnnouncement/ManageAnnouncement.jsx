@@ -15,39 +15,60 @@ function ManageAnnouncement() {
     const [showFormModal, setShowFormModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const announcementsPerPage = 6;
+    const baseUrl = "http://localhost:3000";
 
     useEffect(() => {
         fetchAnnouncements();
     }, []);
     
     const fetchAnnouncements = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const response = await fetch("http://localhost:3000/announcement");
+            const response = await fetch(`${baseUrl}/announcement`);
             if (!response.ok) throw new Error("Failed to fetch announcements");
             const data = await response.json();
             setAnnouncements(Array.isArray(data.announcements) ? data.announcements : []);
         } catch (error) {
             console.error("Error fetching announcements:", error);
+            setError("Failed to load announcements. Please try again later.");
             setAnnouncements([]);
+        } finally {
+            setLoading(false);
         }
     };
     
     const handleCreateOrUpdateAnnouncement = async (event) => {
         event.preventDefault();
+
+        // Validate inputs
+        if (!newAnnouncement.title.trim() || !newAnnouncement.description.trim()) {
+            alert("Title and description are required.");
+            return;
+        }
     
         const formData = new FormData();
-        formData.append("title", newAnnouncement.title);
-        formData.append("description", newAnnouncement.description);
+        formData.append("title", newAnnouncement.title.trim());
+        formData.append("description", newAnnouncement.description.trim());
         if (newAnnouncement.image_url) {
             formData.append("image", newAnnouncement.image_url);
         }
     
         try {
             const url = editingId
-                ? `http://localhost:3000/announcement/edit/${editingId}`
-                : "http://localhost:3000/announcement/add";
+                ? `${baseUrl}/announcement/edit/${editingId}`
+                : `${baseUrl}/announcement/add`;
             const method = editingId ? "PUT" : "POST";
+            
+            // Show loading state
+            const submitBtn = document.querySelector('.submit-button');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = editingId ? "Updating..." : "Posting...";
+            }
     
             const response = await fetch(url, {
                 method,
@@ -57,14 +78,24 @@ function ManageAnnouncement() {
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("Error response:", errorText);
+                throw new Error("Failed to save announcement");
             }
     
-            if (response.ok) {
-                resetForm();
-                fetchAnnouncements();
-            }
+            resetForm();
+            fetchAnnouncements();
+            
+            // Show success toast
+            showToast(editingId ? "Announcement updated successfully!" : "Announcement posted successfully!");
         } catch (error) {
             console.error("Error submitting announcement:", error);
+            alert(error.message || "Failed to save. Please try again.");
+        } finally {
+            // Reset button state
+            const submitBtn = document.querySelector('.submit-button');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = editingId ? "Update Announcement" : "Post Announcement";
+            }
         }
     };
     
@@ -76,19 +107,35 @@ function ManageAnnouncement() {
 
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/announcement/delete/${deleteId}`, {
+            const deleteBtn = document.querySelector('.delete-confirm-btn');
+            if (deleteBtn) {
+                deleteBtn.disabled = true;
+                deleteBtn.textContent = "Deleting...";
+            }
+            
+            const response = await fetch(`${baseUrl}/announcement/delete/${deleteId}`, {
                 method: "DELETE",
             });
 
-            if (response.ok) {
-                fetchAnnouncements();
-                setShowDeleteModal(false);
-                setDeleteId(null);
-            } else {
-                console.error("Failed to delete announcement:", await response.text());
+            if (!response.ok) {
+                throw new Error("Failed to delete announcement");
             }
+
+            fetchAnnouncements();
+            setShowDeleteModal(false);
+            setDeleteId(null);
+            
+            // Show success toast
+            showToast("Announcement deleted successfully!");
         } catch (error) {
             console.error("Error deleting announcement:", error);
+            alert(error.message || "Failed to delete. Please try again.");
+        } finally {
+            const deleteBtn = document.querySelector('.delete-confirm-btn');
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = "Yes, Delete";
+            }
         }
     };
     
@@ -97,13 +144,13 @@ function ManageAnnouncement() {
         setShowDeleteModal(true);
     };
     
-    const handleEdit = (announcements) => {
-        setEditingId(announcements._id);
+    const handleEdit = (announcement) => {
+        setEditingId(announcement._id);
         setNewAnnouncement({ 
-            title: announcements.title, 
-            description: announcements.description, 
+            title: announcement.title, 
+            description: announcement.description, 
             image_url: null, 
-            preview: announcements.image_url ? `http://localhost:3000/announcement/${announcements.image_url}` : null 
+            preview: announcement.image_url ? `${baseUrl}/announcement/${announcement.image_url}` : null 
         });
         setShowFormModal(true);
     };
@@ -111,6 +158,25 @@ function ManageAnnouncement() {
     const openAddModal = () => {
         resetForm();
         setShowFormModal(true);
+    };
+    
+    const showToast = (message) => {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        // Show and then hide after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }, 100);
     };
 
     // Pagination calculations
@@ -121,131 +187,246 @@ function ManageAnnouncement() {
 
     const paginate = (pageNum) => setPageNumber(pageNum);
 
+    const renderPagination = () => {
+        if (totalPages <= 1) return null;
+        
+        return (
+            <div className="pagination">
+                <button 
+                    className="page-nav" 
+                    onClick={() => paginate(Math.max(1, pageNumber - 1))}
+                    disabled={pageNumber === 1}
+                    aria-label="Previous page"
+                >
+                    <i className="fa fa-chevron-left"></i>
+                </button>
+                
+                {totalPages <= 5 ? (
+                    // Show all pages if there are 5 or fewer
+                    Array.from({ length: totalPages }, (_, i) => (
+                        <button 
+                            key={i + 1} 
+                            className={`page-button ${pageNumber === i + 1 ? "active" : ""}`} 
+                            onClick={() => paginate(i + 1)}
+                            aria-label={`Page ${i + 1}`}
+                            aria-current={pageNumber === i + 1 ? 'page' : null}
+                        >
+                            {i + 1}
+                        </button>
+                    ))
+                ) : (
+                    // Logic for showing limited pages with ellipsis
+                    <>
+                        <button 
+                            className={`page-button ${pageNumber === 1 ? "active" : ""}`}
+                            onClick={() => paginate(1)}
+                            aria-label="Page 1"
+                            aria-current={pageNumber === 1 ? 'page' : null}
+                        >
+                            1
+                        </button>
+                        
+                        {pageNumber > 3 && <span className="page-ellipsis">...</span>}
+                        
+                        {pageNumber > 2 && pageNumber < totalPages && (
+                            Array.from(
+                                { length: Math.min(3, totalPages - 2) }, 
+                                (_, i) => {
+                                    let pageNum;
+                                    if (pageNumber <= 2) pageNum = i + 2;
+                                    else if (pageNumber >= totalPages - 1) pageNum = totalPages - 3 + i;
+                                    else pageNum = pageNumber - 1 + i;
+                                    
+                                    // Don't render if it would show the first or last page (those are handled separately)
+                                    if (pageNum === 1 || pageNum === totalPages) return null;
+                                    
+                                    return (
+                                        <button 
+                                            key={pageNum} 
+                                            className={`page-button ${pageNumber === pageNum ? "active" : ""}`}
+                                            onClick={() => paginate(pageNum)}
+                                            aria-label={`Page ${pageNum}`}
+                                            aria-current={pageNumber === pageNum ? 'page' : null}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                }
+                            ).filter(Boolean)
+                        )}
+                        
+                        {pageNumber < totalPages - 2 && <span className="page-ellipsis">...</span>}
+                        
+                        <button 
+                            className={`page-button ${pageNumber === totalPages ? "active" : ""}`}
+                            onClick={() => paginate(totalPages)}
+                            aria-label={`Page ${totalPages}`}
+                            aria-current={pageNumber === totalPages ? 'page' : null}
+                        >
+                            {totalPages}
+                        </button>
+                    </>
+                )}
+                
+                <button 
+                    className="page-nav" 
+                    onClick={() => paginate(Math.min(totalPages, pageNumber + 1))}
+                    disabled={pageNumber === totalPages}
+                    aria-label="Next page"
+                >
+                    <i className="fa fa-chevron-right"></i>
+                </button>
+            </div>
+        );
+    };
+
     return (
         <>
             <AdminHeader />
             <div className="admin-container">
                 <div className="announcement-header">
                     <div className="header-flex">
-                        <h2 className="announcement-title">Announcements</h2>
+                        <div className="header-title-container">
+                            <h2 className="announcement-title">Announcements</h2>
+                            <p className="announcement-subtitle">Manage school announcements and communications</p>
+                        </div>
                         <button 
                             className="add-post-btn"
                             onClick={openAddModal}
+                            aria-label="Add new announcement"
                         >
-                            + Add Post
+                            <i className="fa fa-plus-circle"></i> Add Post
                         </button>
                     </div>
-                    <p className="announcement-subtitle">Manage school announcements and communications</p>
                 </div>
 
                 {/* Announcement List Section */}
                 <div className="announcement-list-section">
-                    <h3 className="section-title">Current Announcements</h3>
-
-                    {/* Announcement List */}
-                    <div className="announcements-grid">
-                        {currentAnnouncements.length > 0 ? (
-                            currentAnnouncements.map((announcements) => {
-                                const imagePath = announcements.image_url
-                                ? `http://localhost:3000/announcement/${announcements.image_url}`
-                                : null;
-                                const formattedDate = new Date(announcements.created_at).toLocaleDateString();
-
-                                return (
-                                <div key={announcements._id} className="announcement-card">
-                                    <div className="card-image-container">
-                                    {imagePath ? (
-                                        <img 
-                                            src={imagePath} 
-                                            alt={announcements.title} 
-                                            className="card-image" 
-                                        />
-                                    ) : (
-                                        <div className="no-image-placeholder">
-                                            <i className="fa fa-image"></i>
-                                            <p>No Image</p>
-                                        </div>
-                                    )}
-                                    </div>
-                                    <div className="card-content">
-                                        <h4 className="card-title">{announcements.title}</h4>
-                                        <p className="announcement-date">
-                                            <i className="fa fa-calendar"></i> {formattedDate}
-                                        </p>
-                                        <div className="card-description-container">
-                                            <p className="card-description">{announcements.description}</p>
-                                        </div>
-                                        <div className="card-actions">
-                                            <button onClick={() => handleEdit(announcements)} className="edit-btn">
-                                                <i className="fa fa-pencil"></i> Edit
-                                            </button>
-                                            <button onClick={() => openDeleteModal(announcements._id)} className="delete-btn">
-                                                <i className="fa fa-trash"></i> Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                );
-                            })
-                        ) : (
-                            <div className="no-announcements">
-                                <i className="fa fa-info-circle"></i>
-                                <p>No announcements available.</p>
-                                <button 
-                                    className="create-first-btn"
-                                    onClick={openAddModal}
-                                >
-                                    Create your first announcement
-                                </button>
-                            </div>
-                        )}
+                    <div className="section-header">
+                        <h3 className="section-title">Current Announcements</h3>
+                        <div className="announcement-count">
+                            {announcements.length} {announcements.length === 1 ? 'announcement' : 'announcements'}
+                        </div>
                     </div>
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="pagination">
+                    {/* Loading and Error States */}
+                    {loading && (
+                        <div className="loading-container">
+                            <div className="loading-spinner"></div>
+                            <p>Loading announcements...</p>
+                        </div>
+                    )}
+                    
+                    {error && !loading && (
+                        <div className="error-container">
+                            <i className="fa fa-exclamation-circle"></i>
+                            <p>{error}</p>
                             <button 
-                                className="page-nav" 
-                                onClick={() => paginate(Math.max(1, pageNumber - 1))}
-                                disabled={pageNumber === 1}
+                                className="retry-btn"
+                                onClick={fetchAnnouncements}
                             >
-                                <i className="fa fa-chevron-left"></i>
-                            </button>
-                            {Array.from({ length: totalPages }, (_, i) => (
-                                <button 
-                                    key={i + 1} 
-                                    className={`page-button ${pageNumber === i + 1 ? "active" : ""}`} 
-                                    onClick={() => paginate(i + 1)}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
-                            <button 
-                                className="page-nav" 
-                                onClick={() => paginate(Math.min(totalPages, pageNumber + 1))}
-                                disabled={pageNumber === totalPages}
-                            >
-                                <i className="fa fa-chevron-right"></i>
+                                <i className="fa fa-refresh"></i> Retry
                             </button>
                         </div>
+                    )}
+
+                    {/* Announcement List */}
+                    {!loading && !error && (
+                        <>
+                            <div className="announcements-grid">
+                                {currentAnnouncements.length > 0 ? (
+                                    currentAnnouncements.map((announcement) => {
+                                        const imagePath = announcement.image_url
+                                            ? `${baseUrl}/announcement/${announcement.image_url}`
+                                            : null;
+                                        const formattedDate = new Date(announcement.created_at).toLocaleDateString(undefined, {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                        });
+
+                                        return (
+                                        <div key={announcement._id} className="announcement-card">
+                                            <div className="card-image-container">
+                                                {imagePath ? (
+                                                    <img 
+                                                        src={imagePath} 
+                                                        alt={announcement.title} 
+                                                        className="card-image" 
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    <div className="no-image-placeholder">
+                                                        <i className="fa fa-image"></i>
+                                                        <p>No Image</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="card-content">
+                                                <h4 className="card-title" title={announcement.title}>
+                                                    {announcement.title}
+                                                </h4>
+                                                <p className="announcement-date">
+                                                    <i className="fa fa-calendar"></i> {formattedDate}
+                                                </p>
+                                                <div className="card-description-container">
+                                                    <p className="card-description">{announcement.description}</p>
+                                                </div>
+                                                <div className="card-actions">
+                                                    <button 
+                                                        onClick={() => handleEdit(announcement)} 
+                                                        className="edit-btn"
+                                                        aria-label={`Edit ${announcement.title}`}
+                                                    >
+                                                        <i className="fa fa-pencil"></i> Edit
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => openDeleteModal(announcement._id)} 
+                                                        className="delete-btn"
+                                                        aria-label={`Delete ${announcement.title}`}
+                                                    >
+                                                        <i className="fa fa-trash"></i> Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="no-announcements">
+                                        <i className="fa fa-info-circle"></i>
+                                        <p>No announcements available.</p>
+                                        <button 
+                                            className="create-first-btn"
+                                            onClick={openAddModal}
+                                        >
+                                            Create your first announcement
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Pagination */}
+                            {renderPagination()}
+                        </>
                     )}
                 </div>
             </div>
 
             {/* Create/Edit Announcement Modal */}
             {showFormModal && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
+                <div className="modal-overlay" onClick={() => resetForm()}>
+                    <div className="modal-container" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h3>{editingId ? "Edit Announcement" : "Create New Announcement"}</h3>
-                            <button className="modal-close" onClick={resetForm}>
+                            <button className="modal-close" onClick={resetForm} aria-label="Close modal">
                                 <i className="fa fa-times"></i>
                             </button>
                         </div>
                         <div className="modal-body">
                             <form onSubmit={handleCreateOrUpdateAnnouncement}>
                                 <div className="form-group">
-                                    <label htmlFor="announcement-title">Title</label>
+                                    <label htmlFor="announcement-title">Title <span className="required">*</span></label>
                                     <input
                                         id="announcement-title"
                                         type="text"
@@ -255,10 +436,11 @@ function ManageAnnouncement() {
                                         maxLength={100}
                                         required
                                     />
+                                    <small className="char-count">{newAnnouncement.title.length}/100 characters</small>
                                 </div>
 
                                 <div className="form-group">
-                                    <label htmlFor="announcement-description">Description</label>
+                                    <label htmlFor="announcement-description">Description <span className="required">*</span></label>
                                     <textarea
                                         id="announcement-description"
                                         placeholder="Enter announcement details"
@@ -272,20 +454,41 @@ function ManageAnnouncement() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="custom-file-upload">
-                                        <input 
-                                            type="file" 
-                                            onChange={(e) => setNewAnnouncement(prev => ({ 
-                                                ...prev, 
-                                                image_url: e.target.files[0], 
-                                                preview: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : prev.preview 
-                                            }))} 
-                                            accept="image/*" 
-                                        />
-                                        <i className="fa fa-cloud-upload"></i> Upload Image
-                                    </label>
+                                    <label>Image (Optional)</label>
+                                    <div className="file-upload-container">
+                                        <label className="custom-file-upload">
+                                            <input 
+                                                type="file" 
+                                                onChange={(e) => {
+                                                    if (e.target.files && e.target.files[0]) {
+                                                        const file = e.target.files[0];
+                                                        // Validate file type
+                                                        if (!file.type.match('image.*')) {
+                                                            alert('Please select an image file (JPEG, PNG, etc.)');
+                                                            return;
+                                                        }
+                                                        // Validate file size (5MB limit)
+                                                        if (file.size > 5 * 1024 * 1024) {
+                                                            alert('File size exceeds 5MB limit.');
+                                                            return;
+                                                        }
+                                                        setNewAnnouncement(prev => ({ 
+                                                            ...prev, 
+                                                            image_url: file, 
+                                                            preview: URL.createObjectURL(file) 
+                                                        }));
+                                                    }
+                                                }} 
+                                                accept="image/*" 
+                                            />
+                                            <i className="fa fa-cloud-upload"></i> Upload Image
+                                        </label>
+                                        <div className="file-info">
+                                            <p>Recommended: JPEG or PNG, max 5MB</p>
+                                        </div>
+                                    </div>
 
-                                    {(newAnnouncement.preview || newAnnouncement.image_url) && (
+                                    {newAnnouncement.preview && (
                                         <div className="preview-container">
                                             <img 
                                                 src={newAnnouncement.preview} 
@@ -295,9 +498,14 @@ function ManageAnnouncement() {
                                             <button 
                                                 type="button"
                                                 className="remove-image-btn"
-                                                onClick={() => setNewAnnouncement(prev => ({ ...prev, image_url: null, preview: null }))}
+                                                onClick={() => setNewAnnouncement(prev => ({ 
+                                                    ...prev, 
+                                                    image_url: null, 
+                                                    preview: null 
+                                                }))}
+                                                aria-label="Remove image"
                                             >
-                                                Remove Image
+                                                <i className="fa fa-times"></i> Remove
                                             </button>
                                         </div>
                                     )}
@@ -305,6 +513,7 @@ function ManageAnnouncement() {
 
                                 <div className="modal-footer">
                                     <button type="submit" className="submit-button">
+                                        <i className={editingId ? "fa fa-save" : "fa fa-paper-plane"}></i> 
                                         {editingId ? "Update Announcement" : "Post Announcement"}
                                     </button>
                                     <button 
@@ -312,7 +521,7 @@ function ManageAnnouncement() {
                                         onClick={resetForm}
                                         className="cancel-button"
                                     >
-                                        Cancel
+                                        <i className="fa fa-times"></i> Cancel
                                     </button>
                                 </div>
                             </form>
@@ -323,11 +532,15 @@ function ManageAnnouncement() {
 
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
-                <div className="modal-overlay">
-                    <div className="modal-container delete-modal">
+                <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+                    <div className="modal-container delete-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h3>Confirm Deletion</h3>
-                            <button className="modal-close" onClick={() => setShowDeleteModal(false)}>
+                            <button 
+                                className="modal-close" 
+                                onClick={() => setShowDeleteModal(false)}
+                                aria-label="Close modal"
+                            >
                                 <i className="fa fa-times"></i>
                             </button>
                         </div>
@@ -340,13 +553,13 @@ function ManageAnnouncement() {
                         </div>
                         <div className="modal-footer">
                             <button onClick={handleDelete} className="delete-confirm-btn">
-                                Yes, Delete
+                                <i className="fa fa-trash"></i> Yes, Delete
                             </button>
                             <button 
                                 onClick={() => setShowDeleteModal(false)} 
                                 className="delete-cancel-btn"
                             >
-                                Cancel
+                                <i className="fa fa-times"></i> Cancel
                             </button>
                         </div>
                     </div>
