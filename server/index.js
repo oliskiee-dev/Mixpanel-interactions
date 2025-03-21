@@ -55,16 +55,41 @@ app.get('/preregistration', async (req, res) => {
         const sortBy = req.query.sortBy || 'createdAt';
         const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
 
-        // Adjust sorting for age (sort by birthdate in descending order)
+        // Build filter query
+        let filterQuery = {};
+        
+        // Add search filter for name (case-insensitive)
+        if (req.query.search) {
+            filterQuery.name = { $regex: req.query.search, $options: 'i' };
+        }
+        
+        // Add grade filter
+        if (req.query.grade) {
+            filterQuery.grade_level = { $regex: `Grade ${req.query.grade}`, $options: 'i' };
+        }
+        
+        // Add strand filter
+        if (req.query.strand) {
+            filterQuery.strand = req.query.strand;
+        }
+        
+        // Add type filter
+        if (req.query.type) {
+            filterQuery.isNewStudent = req.query.type;
+        }
+
+        // Handle special sorting for age (based on birthdate)
         const actualSortBy = sortBy === "age" ? "birthdate" : sortBy;
         const actualSortOrder = sortBy === "age" ? -sortOrder : sortOrder;
+        
+        const sortObject = { [actualSortBy]: actualSortOrder };
 
-        const records = await preRegistrationModel.find()
-            .sort({ [actualSortBy]: actualSortOrder })
+        const records = await preRegistrationModel.find(filterQuery)
+            .sort(sortObject)
             .skip(skip)
             .limit(limit);
 
-        const totalRecords = await preRegistrationModel.countDocuments();
+        const totalRecords = await preRegistrationModel.countDocuments(filterQuery);
 
         res.json({
             totalRecords,
@@ -78,7 +103,6 @@ app.get('/preregistration', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 
 
