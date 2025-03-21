@@ -312,19 +312,35 @@ app.put("/editBookingAvailability/:id", async (req, res) => {
     }
 });
 
-app.delete("/deleteBookingAvailability/:id", async (req, res) => {
+app.delete("/deleteBookingAvailability/:documentId/:timeSlotId", async (req, res) => {
     try {
-        const deletedAvailability = await bookModel.findByIdAndDelete(req.params.id);
+        const { documentId, timeSlotId } = req.params;
 
-        if (!deletedAvailability) {
-            return res.status(404).json({ error: "Availability not found" });
+        // Find the document first
+        const booking = await bookModel.findById(documentId);
+        if (!booking) {
+            return res.status(404).json({ error: "Booking availability not found." });
         }
 
-        res.json({ message: "Availability deleted" });
+        // Iterate over each day and filter out the specific time slot
+        let updatedAvailability = { ...booking.availability };
+        for (let day in updatedAvailability) {
+            updatedAvailability[day] = updatedAvailability[day].filter(slot => slot._id.toString() !== timeSlotId);
+        }
+
+        // Update the document
+        const updatedBooking = await bookModel.findByIdAndUpdate(
+            documentId,
+            { availability: updatedAvailability },
+            { new: true }
+        );
+
+        res.json({ message: "Time slot deleted successfully", data: updatedBooking });
     } catch (error) {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 // app.use("/announcement", router);
 // app.use("/announcement", express.static(path.join(__dirname, "announcement")));
