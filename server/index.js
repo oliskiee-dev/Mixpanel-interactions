@@ -262,6 +262,45 @@ app.post('/addPreRegistration', async (req, res) => {
     }
 });
 
+// Add this route to your server file
+// PUT - Update a pre-registration record (status or other fields)
+app.put('/preRegistrationStatus/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+        
+        // Validate status if it's being updated
+        if (updateData.status) {
+            const validStatuses = ['pending', 'approved', 'rejected'];
+            if (!validStatuses.includes(updateData.status.toLowerCase())) {
+                return res.status(400).json({ 
+                    error: `Invalid status value. Allowed values: ${validStatuses.join(', ')}` 
+                });
+            }
+            // Ensure status is lowercase in the database
+            updateData.status = updateData.status.toLowerCase();
+        }
+        
+        // Find and update the pre-registration record
+        const updatedRecord = await preRegistrationModel.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true } // Return the updated document
+        );
+        
+        if (!updatedRecord) {
+            return res.status(404).json({ error: "Pre-registration record not found" });
+        }
+        
+        res.json({
+            message: "Pre-registration updated successfully",
+            preregistration: updatedRecord
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
 
 
 
