@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const path = require('path');
+const mongoose = require("mongoose");
 
 
 const userModel = require('./models/user.js')
@@ -312,8 +313,6 @@ app.put("/editBookingAvailability/:id", async (req, res) => {
     }
 });
 
-const mongoose = require("mongoose");
-
 app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req, res) => {
     try {
         let { documentId, day, timeSlotId } = req.params;
@@ -327,15 +326,26 @@ app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req
             return res.status(400).json({ error: "Invalid ID format" });
         }
 
-        // Remove specific time slot
+        // Debug: Log the existing document before deletion
+        const existingBooking = await bookModel.findById(documentId);
+        console.log("Before Deletion:", existingBooking);
+
+        if (!existingBooking) {
+            return res.status(404).json({ error: "Booking availability not found" });
+        }
+
+        // Remove specific time slot from the array
         const updatedBooking = await bookModel.findByIdAndUpdate(
             documentId,
-            { $pull: { [`availability.${day}`]: { _id: timeSlotId } } }, 
+            { $pull: { [`availability.${day}`]: { _id: new mongoose.Types.ObjectId(timeSlotId) } } }, 
             { new: true }
         );
 
+        // Debug: Log the document after deletion
+        console.log("After Deletion:", updatedBooking);
+
         if (!updatedBooking) {
-            return res.status(404).json({ error: "Booking availability not found" });
+            return res.status(404).json({ error: "Failed to delete time slot" });
         }
 
         res.json({ message: "Time slot deleted successfully", data: updatedBooking });
@@ -344,6 +354,7 @@ app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 
