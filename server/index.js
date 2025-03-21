@@ -132,7 +132,7 @@ app.post('/addPreRegistration', async (req, res) => {
                     phone_number,
                     age,
                     gender,
-                    birthdate: birthdate, // Store as Date
+                    birthdate: birthdate||null, // Store as Date
                     strand: strand || null, // Optional
                     grade_level, // Required
                     nationality,
@@ -153,7 +153,7 @@ app.post('/addPreRegistration', async (req, res) => {
                 phone_number,
                 age,
                 gender,
-                birthdate: birthdate, // Store as Date
+                birthdate: birthdate ||null, // Store as Date
                 strand: strand || null, // Optional
                 grade_level, // Required
                 email,
