@@ -66,7 +66,14 @@ function Appointment() {
             }
         }
     };
-    
+
+    // Calculate the min and max dates
+    const today = new Date();
+    const sevenDaysAhead = new Date();
+    sevenDaysAhead.setDate(today.getDate() + 7);
+
+    const minDate = today.toISOString().split('T')[0];
+    const maxDate = sevenDaysAhead.toISOString().split('T')[0];
 
     return (
         <>
@@ -107,7 +114,8 @@ function Appointment() {
                                     name="appointmentDate"
                                     value={appointmentData.appointmentDate}
                                     onChange={handleAppointmentChange}
-                                    min={new Date().toISOString().split('T')[0]}
+                                    min={minDate}
+                                    max={maxDate}
                                     required
                                 />
                                 {appointmentErrors.appointmentDate && 
@@ -152,7 +160,7 @@ function Appointment() {
                                     type="submit"
                                     className="appointment-submit-btn"
                                 >
-                                    Book Appointment
+                                    Book Appointmenttt
                                 </button>
                             </div>
                         </form>
