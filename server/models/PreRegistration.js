@@ -4,6 +4,12 @@ const preRegistrationSchema = new mongoose.Schema({
     name: String,
     phone_number: Number,
     age: Number,
+    gender: { 
+        type: String, 
+        enum: ['male', 'female'], 
+        required: true
+     },
+    birthdate: { type: Date, required: true }, // Added birthdate
     strand: { type: String, default: null }, // Optional strand
     grade_level: { type: String, required: true }, // Required
     email: { type: String, unique: true },
@@ -12,7 +18,7 @@ const preRegistrationSchema = new mongoose.Schema({
     parent_guardian_number: Number,
     isNewStudent: { 
         type: String, 
-        enum: ['new', 'old'], // Only "yes" or "no" allowed
+        enum: ['new', 'old'], // Only "new" or "old" allowed
         required: true 
     },
     status: {
