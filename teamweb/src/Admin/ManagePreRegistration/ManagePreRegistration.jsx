@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from '../Component/AdminHeader.jsx';
 import UpdateAppointment from './UpdateAppointment';
-import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send } from 'lucide-react';
 import './ManagePreRegistration.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ManagePreRegistration() {
     // State management
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [processingStatus, setProcessingStatus] = useState(null);
     
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +47,6 @@ function ManagePreRegistration() {
             // Add filters to query parameters if they exist
             if (searchTerm) queryParams.append('search', searchTerm);
             if (selectedGrade) queryParams.append('grade', selectedGrade);
-            console.log("Current Selected Grade: " + selectedGrade);
             if (selectedStrand) queryParams.append('strand', selectedStrand);
             if (selectedType) queryParams.append('type', selectedType);
             
@@ -97,9 +99,14 @@ function ManagePreRegistration() {
 
     const handleStatusChange = async (studentId, currentStatus) => {
         try {
-            const newStatus = currentStatus === "Approved" ? "Pending" : "Approved";
+            // Set the student ID being processed
+            setProcessingStatus(studentId);
             
-            const response = await fetch(`http://localhost:3000/preregistration/${studentId}/status`, {
+            // The lowercase value to send to the server
+            const newStatus = currentStatus === "approved" ? "pending" : "approved";
+            
+            // Update API endpoint to match server code
+            const response = await fetch(`http://localhost:3000/preRegistrationStatus/${studentId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -111,23 +118,36 @@ function ManagePreRegistration() {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             
-            if (newStatus === "Approved") {
+            const data = await response.json();
+            
+            // Show notification if email was sent (when approving)
+            if (newStatus === "approved" && data.emailSent) {
                 const student = students.find(s => s._id === studentId);
                 if (student) {
-                    sendEmail(student.email, student.name);
+                    toast.success(
+                        <div>
+                            <p><strong>Approval email sent</strong></p>
+                            <p>Notification sent to {student.email}</p>
+                        </div>, 
+                        {
+                            icon: <Send size={16} />,
+                            position: "top-right",
+                            autoClose: 5000,
+                        }
+                    );
                 }
             }
             
             fetchStudentData();
         } catch (err) {
             console.error('Failed to update status:', err);
-            alert('Failed to update status. Please try again.');
+            toast.error('Failed to update status. Please try again.', {
+                position: "top-right",
+                autoClose: 5000,
+            });
+        } finally {
+            setProcessingStatus(null);
         }
-    };
-
-    const sendEmail = (email, name) => {
-        console.log(`Sending email to ${email} for ${name}...`);
-        alert(`Approval email sent to ${email}`);
     };
 
     const toggleRow = (index) => {
@@ -255,11 +275,16 @@ function ManagePreRegistration() {
                                                 <button
                                                     className={`btn-status ${student.status?.toLowerCase() || 'pending'}`}
                                                     onClick={() => handleStatusChange(student._id, student.status)}
+                                                    disabled={processingStatus === student._id}
                                                 >
-                                                    {student.status === "Approved" ? 
-                                                        <><CheckCircle size={14} /> Approved</> : 
+                                                    {processingStatus === student._id ? (
+                                                        // Show loading indicator while processing
+                                                        <span className="status-loading"></span>
+                                                    ) : student.status === "approved" ? (
+                                                        <><CheckCircle size={14} /> Approved</>
+                                                    ) : (
                                                         <><AlertCircle size={14} /> Pending</>
-                                                    }
+                                                    )}
                                                 </button>
                                             </td>
                                         </tr>
@@ -407,6 +432,9 @@ function ManagePreRegistration() {
                 
                 {activeTab === "appointment" && <UpdateAppointment />}
             </div>
+            
+            {/* Toast notifications container */}
+            <ToastContainer />
         </div>
     );
 }
