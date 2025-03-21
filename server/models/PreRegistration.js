@@ -6,7 +6,7 @@ const preRegistrationSchema = new mongoose.Schema({
     age: Number,
     gender: { 
         type: String, 
-        enum: ['male', 'female'], 
+        enum: ['Male', 'Female'], 
         required: true
      },
     birthdate: { type: Date, required: true }, // Added birthdate

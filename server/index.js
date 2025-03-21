@@ -102,24 +102,19 @@ app.post('/addPreRegistration', async (req, res) => {
     if (!grade_level) {
         return res.status(400).json({ error: "Grade level is required." });
     }
-    if (!isNewStudent || !['new', 'old'].includes(isNewStudent.toLowerCase())) {
+    if (!isNewStudent || !['new', 'old'].includes(isNewStudent)) {
         return res.status(400).json({ error: "isNewStudent must be 'new' or 'old'." });
     }
-    if (!gender || !['male', 'female', 'other'].includes(gender.toLowerCase())) {
-        return res.status(400).json({ error: "Gender must be 'male', 'female', or 'other'." });
+    if (!gender || !['Male', 'Female'].includes(gender)) {
+        return res.status(400).json({ error: "Gender must be 'Male' or 'Female'." });
     }
     if (!birthdate || isNaN(Date.parse(birthdate))) {
         return res.status(400).json({ error: "Invalid birthdate format." });
     }
 
-    // Convert status to lowercase if provided
-    if (status) {
-        status = status.toLowerCase();
-    }
-
     // Validate status against allowed values
     const validStatuses = ['pending', 'approved', 'rejected'];
-    if (status && !validStatuses.includes(status)) {
+    if (status && !validStatuses.includes(status.toLowerCase())) {
         return res.status(400).json({ error: `Invalid status value. Allowed values: ${validStatuses.join(', ')}` });
     }
 
@@ -143,8 +138,8 @@ app.post('/addPreRegistration', async (req, res) => {
                     nationality,
                     parent_guardian_name,
                     parent_guardian_number,
-                    isNewStudent: isNewStudent.toLowerCase(), // Ensure lowercase for consistency
-                    status: status || 'pending', // Default to 'pending' if not provided
+                    isNewStudent, // Already validated
+                    status: status ? status.toLowerCase() : 'pending', // Default to 'pending' if not provided
                     appointment_date: appointment_date || null, // Optional
                     preferred_time: preferred_time || null, // Optional
                     purpose_of_visit: purpose_of_visit || null // Optional
@@ -165,8 +160,8 @@ app.post('/addPreRegistration', async (req, res) => {
                 nationality,
                 parent_guardian_name,
                 parent_guardian_number,
-                isNewStudent: isNewStudent.toLowerCase(), // Ensure lowercase for consistency
-                status: status || 'pending', // Default to 'pending' if not provided
+                isNewStudent, // Already validated
+                status: status ? status.toLowerCase() : 'pending', // Default to 'pending' if not provided
                 appointment_date: appointment_date || null, // Optional
                 preferred_time: preferred_time || null, // Optional
                 purpose_of_visit: purpose_of_visit || null // Optional
@@ -182,6 +177,7 @@ app.post('/addPreRegistration', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 
 
