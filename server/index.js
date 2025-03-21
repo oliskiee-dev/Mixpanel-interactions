@@ -1,6 +1,5 @@
 const express = require('express')
 const connectDB = require('./db.js')
-const mongoose = require('mongoose');
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -18,7 +17,7 @@ const calendarRoutes = require("./routes/calendarRoutes");
 // const announcementModel = require('./models/Announcement.js')
 //const calendarModel = require('./models/Calendar.js');
 const preRegistrationModel = require('./models/PreRegistration.js');
-
+const bookModel = require("./models/Book.js");
 
 dotenv.config(); 
 const cors = require('cors')
@@ -275,6 +274,57 @@ app.post('/register', async (req, res) => {
     }
 });
 
+//ADD BOOKING AVAILABILITY
+app.get("/bookingAvailability", async (req, res) => {
+    try {
+        const availabilityData = await bookModel.find();
+        res.json(availabilityData);
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+app.post("/addBookingAvailability", async (req, res) => {
+    try {
+        const { availability } = req.body;
+
+        const newAvailability = new bookModel({ availability });
+        await newAvailability.save();
+
+        res.status(201).json({ message: "Availability added", data: newAvailability });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+app.put("/editBookingAvailability/:id", async (req, res) => {
+    try {
+        const { availability } = req.body;
+        const updatedAvailability = await bookModel.findByIdAndUpdate(req.params.id, { availability }, { new: true });
+
+        if (!updatedAvailability) {
+            return res.status(404).json({ error: "Availability not found" });
+        }
+
+        res.json({ message: "Availability updated", data: updatedAvailability });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+app.delete("/deleteBookingAvailability/:id", async (req, res) => {
+    try {
+        const deletedAvailability = await bookModel.findByIdAndDelete(req.params.id);
+
+        if (!deletedAvailability) {
+            return res.status(404).json({ error: "Availability not found" });
+        }
+
+        res.json({ message: "Availability deleted" });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
 
 // app.use("/announcement", router);
 // app.use("/announcement", express.static(path.join(__dirname, "announcement")));
