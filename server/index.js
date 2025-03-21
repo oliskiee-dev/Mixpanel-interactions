@@ -54,12 +54,19 @@ app.get('/preregistration', async (req, res) => {
         const skip = (page - 1) * limit;
 
         // Get sorting parameters
-        const sortBy = req.query.sortBy || 'createdAt'; // Default sorting field
+        let sortBy = req.query.sortBy || 'createdAt'; // Default sorting field
         const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1; // Default ascending
 
-        // Fetch records with pagination and sorting
+        let sortQuery = { [sortBy]: sortOrder };
+
+        // Special sorting case for age (derived from birthdate)
+        if (sortBy === "age") {
+            sortQuery = { birthdate: sortOrder }; // Sorting by birthdate indirectly sorts age
+        }
+
+        // Fetch sorted records BEFORE pagination
         const records = await preRegistrationModel.find()
-            .sort({ [sortBy]: sortOrder })
+            .sort(sortQuery)
             .skip(skip)
             .limit(limit);
 
@@ -78,6 +85,7 @@ app.get('/preregistration', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 
