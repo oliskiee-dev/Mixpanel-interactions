@@ -82,8 +82,8 @@
 
 .search-container {
     position: relative;
-    flex: 1;
-    min-width: 280px;
+    flex: 0 1 280px; /* Fixed width to prevent excessive growth */
+    min-width: 240px;
 }
 
 .search-icon {
@@ -114,6 +114,7 @@
     align-items: center;
     gap: 0.75rem;
     color: #6b7280;
+    flex-wrap: wrap;
 }
 
 .filter-select {
@@ -315,6 +316,33 @@
     color: #1f2937;
 }
 
+/* Active filters */
+.active-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.clear-filters-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #1a3a7e;
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-filters-btn:hover {
+    background-color: #e5e7eb;
+}
+
 /* ======= Pagination ======= */
 .pagination {
     display: flex;
@@ -394,18 +422,42 @@
 }
 
 /* ======= Responsive Design ======= */
-@media (max-width: 768px) {
-    .content-container {
-        padding: 0 1rem;
-    }
-    
+@media (max-width: 992px) {
     .filters-container {
         flex-direction: column;
         align-items: stretch;
     }
     
+    .search-container {
+        flex: 1;
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-select {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-container {
+        padding: 0 1rem;
+    }
+    
     .filter-group {
         flex-wrap: wrap;
+    }
+    
+    .filter-select {
+        flex: 0 0 calc(50% - 0.375rem);
+        min-width: 0;
     }
     
     .data-table th, 
@@ -418,5 +470,12 @@
         flex-direction: column;
         gap: 1rem;
         align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-select {
+        flex: 0 0 100%;
+        margin-bottom: 0.5rem;
     }
 }

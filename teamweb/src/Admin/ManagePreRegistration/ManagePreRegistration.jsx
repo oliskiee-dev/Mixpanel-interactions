@@ -29,12 +29,28 @@ function ManagePreRegistration() {
     // Fetch data on component mount or when pagination/filters change
     useEffect(() => {
         fetchStudentData();
-    }, [currentPage, limit]);
+    }, [currentPage, limit, searchTerm, selectedGrade, selectedStrand, selectedType]);
 
     const fetchStudentData = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3000/preregistration?page=${currentPage}&limit=${limit}`);
+            
+            // Construct query parameters based on active filters
+            let queryParams = new URLSearchParams({
+                page: currentPage,
+                limit: limit
+            });
+            
+            // Add filters to query parameters if they exist
+            if (searchTerm) queryParams.append('search', searchTerm);
+            if (selectedGrade) queryParams.append('grade', selectedGrade);
+            console.log("Current Selected Grade: " + selectedGrade);
+            if (selectedStrand) queryParams.append('strand', selectedStrand);
+            if (selectedType) queryParams.append('type', selectedType);
+            
+            const response = await fetch(
+                `http://localhost:3000/preregistration?${queryParams.toString()}`
+            );
             
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -60,26 +76,30 @@ function ManagePreRegistration() {
     };
 
     const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value.toLowerCase());
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); // Reset to first page when search changes
     };
 
     const handleGradeChange = (e) => {
         setSelectedGrade(e.target.value);
+        setCurrentPage(1); // Reset to first page when filter changes
     };
 
     const handleStrandChange = (e) => {
         setSelectedStrand(e.target.value);
+        setCurrentPage(1); // Reset to first page when filter changes
     };
 
     const handleTypeChange = (e) => {
         setSelectedType(e.target.value);
+        setCurrentPage(1); // Reset to first page when filter changes
     };
 
     const handleStatusChange = async (studentId, currentStatus) => {
         try {
             const newStatus = currentStatus === "Approved" ? "Pending" : "Approved";
             
-            const response = await fetch(`/preregistration/${studentId}/status`, {
+            const response = await fetch(`http://localhost:3000/preregistration/${studentId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,20 +133,21 @@ function ManagePreRegistration() {
     const toggleRow = (index) => {
         setExpandedRow(expandedRow === index ? null : index);
     };
-
-    // Filter students based on search and filter criteria
-    const filteredStudents = students.filter((student) => {
-        const matchesName = student.name?.toLowerCase().includes(searchTerm) || false;
-        const matchesGrade =
-            selectedGrade === "" || student.grade_level?.toLowerCase() === `grade ${selectedGrade.toLowerCase()}` || false;
-        const matchesStrand =
-            selectedStrand === "" || student.strand?.toLowerCase() === selectedStrand.toLowerCase() || false;
-        const matchesType =
-            selectedType === "" || student.isNewStudent?.toLowerCase() === selectedType.toLowerCase() || false;
-
-        return matchesName && matchesGrade && matchesStrand && matchesType;
-    });
-
+    
+    // Display active filters summary
+    const getActiveFiltersText = () => {
+        const filters = [];
+        
+        if (searchTerm) filters.push(`Name: "${searchTerm}"`);
+        if (selectedGrade) filters.push(`Grade: ${selectedGrade}`);
+        if (selectedStrand) filters.push(`Strand: ${selectedStrand}`);
+        if (selectedType) filters.push(`Type: ${selectedType}`);
+        
+        return filters.length > 0 
+            ? `Filtered by: ${filters.join(', ')}` 
+            : 'Showing all records';
+    };
+    
     // Table renderer
     const renderTable = () => {
         if (loading) return (
@@ -147,12 +168,30 @@ function ManagePreRegistration() {
             <div className="empty-state">
                 <User size={48} />
                 <h3>No Records Found</h3>
-                <p>No student registration records are available.</p>
+                <p>No student registration records match your filter criteria.</p>
             </div>
         );
 
         return (
             <div className="data-table-container">
+                <div className="active-filters">
+                    <span>{getActiveFiltersText()}</span>
+                    {(searchTerm || selectedGrade || selectedStrand || selectedType) && (
+                        <button 
+                            className="clear-filters-btn"
+                            onClick={() => {
+                                setSearchTerm("");
+                                setSelectedGrade("");
+                                setSelectedStrand("");
+                                setSelectedType("");
+                                setCurrentPage(1);
+                            }}
+                        >
+                            Clear Filters
+                        </button>
+                    )}
+                </div>
+                
                 <div className="table-wrapper">
                     <table className="data-table">
                         <thead>
@@ -161,6 +200,7 @@ function ManagePreRegistration() {
                                 <th>Gender</th>
                                 <th>Type</th>
                                 <th>Date of Birth</th>
+                                <th>Age</th>
                                 <th>Grade Level</th>
                                 <th>Strand</th>
                                 <th>Email Address</th>
@@ -169,76 +209,96 @@ function ManagePreRegistration() {
                                 <th>Status</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            {filteredStudents.map((student, index) => (
-                                <React.Fragment key={student._id || index}>
-                                    <tr className={expandedRow === index ? 'row-expanded' : ''}>
-                                        <td className="cell-name">{student.name}</td>
-                                        <td className="cell-center">{student.gender}</td>
-                                        <td className="cell-center">{student.isNewStudent}</td>
-                                        <td className="cell-center">{student.date_of_birth}</td>
-                                        <td className="cell-center">{student.grade_level}</td>
-                                        <td className="cell-center">{student.strand}</td>
-                                        <td className="cell-email">
-                                            <div className="email-container">
-                                                <Mail size={14} />
-                                                <span>{student.email}</span>
-                                            </div>
-                                        </td>
-                                        <td className="cell-phone">
-                                            <div className="phone-container">
-                                                <Phone size={14} />
-                                                <span>{student.phone_number}</span>
-                                            </div>
-                                        </td>
-                                        <td className="cell-action">
-                                            <button
-                                                className="btn-details"
-                                                onClick={() => toggleRow(index)}
-                                            >
-                                                <Clock size={14} />
-                                                {expandedRow === index ? 'Hide' : 'View'}
-                                            </button>
-                                        </td>
-                                        <td className="cell-status">
-                                            <button
-                                                className={`btn-status ${student.status?.toLowerCase() || 'pending'}`}
-                                                onClick={() => handleStatusChange(student._id, student.status)}
-                                            >
-                                                {student.status === "Approved" ? 
-                                                    <><CheckCircle size={14} /> Approved</> : 
-                                                    <><AlertCircle size={14} /> Pending</>
-                                                }
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    {expandedRow === index && (
-                                        <tr className="details-row">
-                                            <td colSpan="10">
-                                                <div className="details-content">
-                                                    <div className="details-section">
-                                                        <h4>Appointment Information</h4>
-                                                        <div className="details-grid">
-                                                            <div className="details-item">
-                                                                <span className="details-label">Date:</span>
-                                                                <span className="details-value">{student.appointment_date || "Not scheduled"}</span>
-                                                            </div>
-                                                            <div className="details-item">
-                                                                <span className="details-label">Time:</span>
-                                                                <span className="details-value">{student.preferred_time || "Not specified"}</span>
-                                                            </div>
-                                                            <div className="details-item">
-                                                                <span className="details-label">Purpose:</span>
-                                                                <span className="details-value">{student.purpose_of_visit || "General inquiry"}</span>
+                            {students.map((student, index) => {
+                                const birthDate = new Date(student.birthdate);
+                                const age = new Date().getFullYear() - birthDate.getFullYear();
+                                return (
+                                    <React.Fragment key={student._id || index}>
+                                        <tr className={expandedRow === index ? 'row-expanded' : ''}>
+                                            <td className="cell-name">{student.name}</td>
+                                            <td className="cell-center">{student.gender}</td>
+                                            <td className="cell-center">{student.isNewStudent}</td>
+                                            <td className="cell-center">
+                                                {birthDate.toLocaleDateString("en-US", {
+                                                    year: "numeric",
+                                                    month: "long",
+                                                    day: "numeric",
+                                                })}
+                                            </td>
+                                            <td className="cell-center">{age}</td>
+                                            <td className="cell-center">{student.grade_level}</td>
+                                            <td className="cell-center">{student.strand || "N/A"}</td>
+                                            <td className="cell-email">
+                                                <div className="email-container">
+                                                    <Mail size={14} />
+                                                    <span>{student.email}</span>
+                                                </div>
+                                            </td>
+                                            <td className="cell-phone">
+                                                <div className="phone-container">
+                                                    <Phone size={14} />
+                                                    <span>{student.phone_number}</span>
+                                                </div>
+                                            </td>
+                                            <td className="cell-action">
+                                                <button
+                                                    className="btn-details"
+                                                    onClick={() => toggleRow(index)}
+                                                >
+                                                    <Clock size={14} />
+                                                    {expandedRow === index ? 'Hide' : 'View'}
+                                                </button>
+                                            </td>
+                                            <td className="cell-status">
+                                                <button
+                                                    className={`btn-status ${student.status?.toLowerCase() || 'pending'}`}
+                                                    onClick={() => handleStatusChange(student._id, student.status)}
+                                                >
+                                                    {student.status === "Approved" ? 
+                                                        <><CheckCircle size={14} /> Approved</> : 
+                                                        <><AlertCircle size={14} /> Pending</>
+                                                    }
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {expandedRow === index && (
+                                            <tr className="details-row">
+                                                <td colSpan="11">
+                                                    <div className="details-content">
+                                                        <div className="details-section">
+                                                            <h4>Appointment Information</h4>
+                                                            <div className="details-grid">
+                                                                <div className="details-item">
+                                                                    <span className="details-label">Date:</span>
+                                                                    <span className="details-value">
+                                                                        {student.appointment_date
+                                                                            ? new Date(student.appointment_date).toLocaleDateString("en-US", {
+                                                                                year: "numeric",
+                                                                                month: "long",
+                                                                                day: "numeric",
+                                                                            })
+                                                                            : "Not scheduled"}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="details-item">
+                                                                    <span className="details-label">Time:</span>
+                                                                    <span className="details-value">{student.preferred_time || "Not specified"}</span>
+                                                                </div>
+                                                                <div className="details-item">
+                                                                    <span className="details-label">Purpose:</span>
+                                                                    <span className="details-value">{student.purpose_of_visit || "Not specified"}</span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </React.Fragment>
-                            ))}
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
@@ -310,12 +370,23 @@ function ManagePreRegistration() {
                                 <Filter size={16} />
                                 <select value={selectedGrade} onChange={handleGradeChange} className="filter-select">
                                     <option value="">All Grades</option>
-                                    {[...Array(12)].map((_, i) => (
-                                        <option key={i} value={(i + 1).toString()}>
-                                            Grade {i + 1}
-                                        </option>
-                                    ))}
+                                    <option value="Nursery">Nursery</option>
+                                    <option value="Kinder 1">Kinder 1</option>
+                                    <option value="Kinder 2">Kinder 2</option>
+                                    <option value="1">Grade 1</option>
+                                    <option value="2">Grade 2</option>
+                                    <option value="3">Grade 3</option>
+                                    <option value="4">Grade 4</option>
+                                    <option value="5">Grade 5</option>
+                                    <option value="6">Grade 6</option>
+                                    <option value="7">Grade 7</option>
+                                    <option value="8">Grade 8</option>
+                                    <option value="9">Grade 9</option>
+                                    <option value="10">Grade 10</option>
+                                    <option value="11">Grade 11</option>
+                                    <option value="12">Grade 12</option>
                                 </select>
+
                                 <select value={selectedStrand} onChange={handleStrandChange} className="filter-select">
                                     <option value="">All Strands</option>
                                     <option value="ABM">ABM</option>
@@ -324,8 +395,8 @@ function ManagePreRegistration() {
                                 </select>
                                 <select value={selectedType} onChange={handleTypeChange} className="filter-select">
                                     <option value="">All Types</option>
-                                    <option value="NEW">New</option>
-                                    <option value="OLD">Old</option>
+                                    <option value="new">New</option>
+                                    <option value="old">Old</option>
                                 </select>
                             </div>
                         </div>

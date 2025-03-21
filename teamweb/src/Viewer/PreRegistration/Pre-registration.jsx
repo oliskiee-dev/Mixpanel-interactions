@@ -176,9 +176,9 @@ function PreRegistration() {
                             className="pre-reg-select"
                         >
                             <option value="">Select Grade Level</option>
-                            <option value="nursery">Nursery</option>
-                            <option value="kinder1">Kinder 1</option>
-                            <option value="kinder2">Kinder 2</option>
+                            <option value="Nursery">Nursery</option>
+                            <option value="Kinder1">Kinder 1</option>
+                            <option value="Kinder2">Kinder 2</option>
                             <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
@@ -208,9 +208,9 @@ function PreRegistration() {
                                 className="pre-reg-select"
                             >
                                 <option value="">Select Strand</option>
-                                <option value="abm">ABM (Accountancy, Business and Management)</option>
-                                <option value="stem">STEM (Science, Technology, Engineering and Mathematics)</option>
-                                <option value="humss">HUMSS (Humanities and Social Sciences)</option>
+                                <option value="ABM">ABM (Accountancy, Business and Management)</option>
+                                <option value="STEM">STEM (Science, Technology, Engineering and Mathematics)</option>
+                                <option value="HUMSS">HUMSS (Humanities and Social Sciences)</option>
                             </select>
                             {formErrors.strand && <div className="error">{formErrors.strand}</div>}
                         </div>
