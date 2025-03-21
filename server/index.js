@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const path = require('path');
-const mongoose = require("mongoose");
-
 
 const userModel = require('./models/user.js')
 
@@ -298,6 +296,7 @@ app.post("/addBookingAvailability", async (req, res) => {
     }
 });
 
+//This is considered delete too no need to add delete
 app.put("/editBookingAvailability/:id", async (req, res) => {
     try {
         const { availability } = req.body;
@@ -312,51 +311,6 @@ app.put("/editBookingAvailability/:id", async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req, res) => {
-    try {
-        let { documentId, day, timeSlotId } = req.params;
-
-        // Trim spaces/newlines from IDs
-        documentId = documentId.trim();
-        timeSlotId = timeSlotId.trim();
-
-        // Validate ID format
-        if (!mongoose.Types.ObjectId.isValid(documentId)) {
-            return res.status(400).json({ error: "Invalid documentId format" });
-        }
-
-        // Debug: Log existing document
-        const existingBooking = await bookModel.findById(documentId);
-        console.log("Before Deletion:", JSON.stringify(existingBooking, null, 2));
-
-        if (!existingBooking) {
-            return res.status(404).json({ error: "Booking availability not found" });
-        }
-
-        // Attempt to remove the specific time slot
-        const updatedBooking = await bookModel.findByIdAndUpdate(
-            documentId,
-            { $pull: { [`availability.${day}`]: { _id: timeSlotId } } }, // Ensure the key is dynamic
-            { new: true }
-        );
-
-        // Debug: Log updated document
-        console.log("After Deletion:", JSON.stringify(updatedBooking, null, 2));
-
-        if (!updatedBooking) {
-            return res.status(404).json({ error: "Failed to delete time slot" });
-        }
-
-        res.json({ message: "Time slot deleted successfully", data: updatedBooking });
-
-    } catch (error) {
-        console.error("Error deleting time slot:", error);
-        res.status(500).json({ error: "Server error" });
-    }
-});
-
-
 
 
 // app.use("/announcement", router);
