@@ -316,16 +316,21 @@ app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req
     try {
         const { documentId, day, timeSlotId } = req.params;
 
-        const updatedBooking = await bookModel.findByIdAndUpdate(
-            documentId,
-            { $pull: { [`availability.${day}`]: { _id: timeSlotId } } },
-            { new: true }
-        );
+        // Find the document first
+        const booking = await bookModel.findById(documentId);
+        if (!booking) {
+            return res.status(404).json({ error: "Booking availability not found" });
+        }
 
-        if (!updatedBooking) return res.status(404).json({ error: "Booking availability not found." });
+        // Filter out the time slot from the specified day
+        booking.availability[day] = booking.availability[day].filter(slot => slot._id.toString() !== timeSlotId);
 
-        res.json({ message: "Time slot deleted successfully", data: updatedBooking });
+        // Save the updated document
+        await booking.save();
+
+        res.json({ message: "Time slot deleted successfully", data: booking });
     } catch (error) {
+        console.error(error); // Log the actual error for debugging
         res.status(500).json({ error: "Server error" });
     }
 });
