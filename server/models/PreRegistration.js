@@ -9,7 +9,7 @@ const preRegistrationSchema = new mongoose.Schema({
         enum: ['Male', 'Female'], 
         required: true
      },
-    birthdate: { type: Date, required: true }, // Added birthdate
+    birthdate: { type: Date, default: null }, // Added birthdate
     strand: { type: String, default: null }, // Optional strand
     grade_level: { type: String, required: true }, // Required
     email: { type: String, unique: true },
