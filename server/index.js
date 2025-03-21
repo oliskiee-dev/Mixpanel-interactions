@@ -108,9 +108,9 @@ app.post('/addPreRegistration', async (req, res) => {
     if (!gender || !['Male', 'Female'].includes(gender)) {
         return res.status(400).json({ error: "Gender must be 'Male' or 'Female'." });
     }
-    // if (!birthdate || isNaN(Date.parse(birthdate))) {
-    //     return res.status(400).json({ error: "Invalid birthdate format." });
-    // }
+    if (!birthdate || isNaN(Date.parse(birthdate))) {
+        return res.status(400).json({ error: "Invalid birthdate format." });
+    }
 
     // Validate status against allowed values
     const validStatuses = ['pending', 'approved', 'rejected'];
@@ -132,7 +132,7 @@ app.post('/addPreRegistration', async (req, res) => {
                     phone_number,
                     age,
                     gender,
-                    birthdate: birthdate||null, // Store as Date
+                    birthdate: new Date(birthdate), // Store as Date
                     strand: strand || null, // Optional
                     grade_level, // Required
                     nationality,
@@ -153,7 +153,7 @@ app.post('/addPreRegistration', async (req, res) => {
                 phone_number,
                 age,
                 gender,
-                birthdate: birthdate ||null, // Store as Date
+                birthdate: new Date(birthdate), // Store as Date
                 strand: strand || null, // Optional
                 grade_level, // Required
                 email,
