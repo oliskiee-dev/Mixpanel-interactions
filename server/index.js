@@ -52,15 +52,30 @@ app.get('/preregistration', async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        const sortBy = req.query.sortBy || 'createdAt';
-        const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
-
-        // Adjust sorting for age (sort by birthdate in descending order)
-        const actualSortBy = sortBy === "age" ? "birthdate" : sortBy;
-        const actualSortOrder = sortBy === "age" ? -sortOrder : sortOrder;
+        // Parse the sort parameter for multi-column sorting
+        let sortOptions = {};
+        
+        if (req.query.sort) {
+            // The sort parameter should be in format "column1:order1,column2:order2"
+            const sortParams = req.query.sort.split(',');
+            
+            sortParams.forEach(param => {
+                const [column, order] = param.split(':');
+                
+                // Adjust sorting for age (which is actually birthdate)
+                const actualColumn = column === "age" ? "birthdate" : column;
+                const sortOrder = order === 'desc' ? -1 : 1;
+                const actualSortOrder = column === "age" ? -sortOrder : sortOrder;
+                
+                sortOptions[actualColumn] = actualSortOrder;
+            });
+        } else {
+            // Default sort if no sort parameter provided
+            sortOptions = { createdAt: 1 };
+        }
 
         const records = await preRegistrationModel.find()
-            .sort({ [actualSortBy]: actualSortOrder })
+            .sort(sortOptions)
             .skip(skip)
             .limit(limit);
 
