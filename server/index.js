@@ -313,48 +313,50 @@ app.put("/editBookingAvailability/:id", async (req, res) => {
     }
 });
 
+const mongoose = require("mongoose");
+
 app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req, res) => {
     try {
         let { documentId, day, timeSlotId } = req.params;
 
-        // Trim extra spaces or newlines from IDs
+        // Trim spaces/newlines from IDs
         documentId = documentId.trim();
         timeSlotId = timeSlotId.trim();
 
-        // Validate ObjectId format
-        if (!mongoose.Types.ObjectId.isValid(documentId) || !mongoose.Types.ObjectId.isValid(timeSlotId)) {
-            return res.status(400).json({ error: "Invalid ID format" });
+        // Validate ID format
+        if (!mongoose.Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ error: "Invalid documentId format" });
         }
 
-        // Debug: Log the existing document before deletion
+        // Debug: Log existing document
         const existingBooking = await bookModel.findById(documentId);
-        console.log("Before Deletion:", existingBooking);
+        console.log("Before Deletion:", JSON.stringify(existingBooking, null, 2));
 
         if (!existingBooking) {
             return res.status(404).json({ error: "Booking availability not found" });
         }
 
-        // Remove specific time slot from the array
+        // Attempt to remove the specific time slot
         const updatedBooking = await bookModel.findByIdAndUpdate(
             documentId,
-            { $pull: { [`availability.${day}`]: { _id: new mongoose.Types.ObjectId(timeSlotId) } } }, 
+            { $pull: { [`availability.${day}`]: { _id: timeSlotId } } }, // Ensure the key is dynamic
             { new: true }
         );
 
-        // Debug: Log the document after deletion
-        console.log("After Deletion:", updatedBooking);
+        // Debug: Log updated document
+        console.log("After Deletion:", JSON.stringify(updatedBooking, null, 2));
 
         if (!updatedBooking) {
             return res.status(404).json({ error: "Failed to delete time slot" });
         }
 
         res.json({ message: "Time slot deleted successfully", data: updatedBooking });
+
     } catch (error) {
         console.error("Error deleting time slot:", error);
         res.status(500).json({ error: "Server error" });
     }
 });
-
 
 
 
