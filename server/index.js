@@ -313,8 +313,6 @@ app.put("/editBookingAvailability/:id", async (req, res) => {
     }
 });
 
-const mongoose = require("mongoose");
-
 app.delete("/deleteBookingAvailability/:documentId/:day/:timeSlotId", async (req, res) => {
     try {
         let { documentId, day, timeSlotId } = req.params;
