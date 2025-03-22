@@ -218,3 +218,13 @@
     font-size: 1.4rem;
   }
 }
+
+.time-button-pending {
+  background-color: #ffc107;
+  color: black;
+}
+
+.time-button-approved {
+  background-color: #28a745;
+  color: white;
+}

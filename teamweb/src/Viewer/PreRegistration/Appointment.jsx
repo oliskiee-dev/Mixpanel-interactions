@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Appointment.css';
 
 function Appointment() {
@@ -11,6 +11,87 @@ function Appointment() {
     });
     const [appointmentErrors, setAppointmentErrors] = useState({});
     const [appointmentSuccess, setAppointmentSuccess] = useState(false);
+    const [availabilityData, setAvailabilityData] = useState(null);
+    const [availableTimes, setAvailableTimes] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch availability data on component mount
+    useEffect(() => {
+        fetchAvailabilityData();
+    }, []);
+
+    // Update available times when appointment date changes
+    useEffect(() => {
+        if (appointmentData.appointmentDate && availabilityData) {
+            updateAvailableTimes(appointmentData.appointmentDate);
+        }
+    }, [appointmentData.appointmentDate, availabilityData]);
+
+    const fetchAvailabilityData = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('http://localhost:3000/bookingAvailability');
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                setAvailabilityData(data[0]);
+            }
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching availability data:', error);
+            setLoading(false);
+        }
+    };
+
+    const updateAvailableTimes = (dateString) => {
+        if (!dateString || !availabilityData) return;
+
+        // Convert date string to day of week
+        const date = new Date(dateString);
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayOfWeek = daysOfWeek[date.getDay()];
+
+        // Get times for selected day
+        const times = availabilityData.availability[dayOfWeek] || [];
+        
+        // Extract start times from availability format "X:XX AM/PM - Y:YY AM/PM"
+        const startTimes = times.map(timeRange => {
+            const startTime = timeRange.split(' - ')[0];
+            return convertTo24HourFormat(startTime);
+        });
+
+        setAvailableTimes(startTimes);
+        
+        // Reset selected time if it's not available
+        if (appointmentData.appointmentTime && !startTimes.includes(appointmentData.appointmentTime)) {
+            setAppointmentData({
+                ...appointmentData,
+                appointmentTime: ""
+            });
+        }
+    };
+
+    // Helper to convert "X:XX AM/PM" to 24-hour format
+    const convertTo24HourFormat = (timeStr) => {
+        const [time, period] = timeStr.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        
+        if (period === 'PM' && hours !== 12) {
+            hours += 12;
+        } else if (period === 'AM' && hours === 12) {
+            hours = 0;
+        }
+        
+        return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    };
+
+    // Convert 24-hour format back to 12-hour format for display
+    const convertTo12HourFormat = (timeStr) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        return `${displayHours}:${minutes < 10 ? '0' + minutes : minutes} ${period}`;
+    };
 
     const handleAppointmentChange = (e) => {
         setAppointmentData({
@@ -69,11 +150,11 @@ function Appointment() {
 
     // Calculate the min and max dates
     const today = new Date();
-    const sevenDaysAhead = new Date();
-    sevenDaysAhead.setDate(today.getDate() + 7);
+    const sixDaysAhead = new Date();
+    sixDaysAhead.setDate(today.getDate() + 6); // +6 gives a total of 7 days including today
 
     const minDate = today.toISOString().split('T')[0];
-    const maxDate = sevenDaysAhead.toISOString().split('T')[0];
+    const maxDate = sixDaysAhead.toISOString().split('T')[0];
 
     return (
         <>
@@ -92,78 +173,89 @@ function Appointment() {
                 ) : (
                     <div className="appointment-section">
                         <div className="appointment-title">Book an Appointment</div>
-                        <form onSubmit={handleSubmit} className="appointment-form">
-                            <div className="appointment-form-group">
-                                <label htmlFor="email">Email <span className="appointment-required">*</span></label>
-                                <input 
-                                    type="email" 
-                                    id="email" 
-                                    name="email"
-                                    value={appointmentData.email}
-                                    onChange={handleAppointmentChange}
-                                    required
-                                />
-                                {appointmentErrors.email && 
-                                    <div className="appointment-error">{appointmentErrors.email}</div>}
-                            </div>
-                            <div className="appointment-form-group">
-                                <label htmlFor="appointmentDate">Preferred Date <span className="appointment-required">*</span></label>
-                                <input 
-                                    type="date" 
-                                    id="appointmentDate" 
-                                    name="appointmentDate"
-                                    value={appointmentData.appointmentDate}
-                                    onChange={handleAppointmentChange}
-                                    min={minDate}
-                                    max={maxDate}
-                                    required
-                                />
-                                {appointmentErrors.appointmentDate && 
-                                    <div className="appointment-error">{appointmentErrors.appointmentDate}</div>}
-                            </div>
-                            <div className="appointment-form-group">
-                                <label htmlFor="appointmentTime">Preferred Time <span className="appointment-required">*</span></label>
-                                <select 
-                                    id="appointmentTime" 
-                                    name="appointmentTime"
-                                    value={appointmentData.appointmentTime}
-                                    onChange={handleAppointmentChange}
-                                    required
-                                >
-                                    <option value="">Select Time</option>
-                                    <option value="9:00">9:00 AM</option>
-                                    <option value="10:00">10:00 AM</option>
-                                    <option value="11:00">11:00 AM</option>
-                                    <option value="13:00">1:00 PM</option>
-                                    <option value="14:00">2:00 PM</option>
-                                    <option value="15:00">3:00 PM</option>
-                                </select>
-                                {appointmentErrors.appointmentTime && 
-                                    <div className="appointment-error">{appointmentErrors.appointmentTime}</div>}
-                            </div>
-                            <div className="appointment-form-group">
-                                <label htmlFor="appointmentReason">Purpose of Visit <span className="appointment-required">*</span></label>
-                                <textarea 
-                                    id="appointmentReason" 
-                                    name="appointmentReason"
-                                    value={appointmentData.appointmentReason}
-                                    onChange={handleAppointmentChange}
-                                    rows="4"
-                                    placeholder="Please describe the reason for your appointment"
-                                    required
-                                ></textarea>
-                                {appointmentErrors.appointmentReason && 
-                                    <div className="appointment-error">{appointmentErrors.appointmentReason}</div>}
-                            </div>
-                            <div className="appointment-btn-group">
-                                <button 
-                                    type="submit"
-                                    className="appointment-submit-btn"
-                                >
-                                    Book Appointment
-                                </button>
-                            </div>
-                        </form>
+                        {loading ? (
+                            <div className="appointment-loading">Loading availability data...</div>
+                        ) : (
+                            <form onSubmit={handleSubmit} className="appointment-form">
+                                <div className="appointment-form-group">
+                                    <label htmlFor="email">Email <span className="appointment-required">*</span></label>
+                                    <input 
+                                        type="email" 
+                                        id="email" 
+                                        name="email"
+                                        value={appointmentData.email}
+                                        onChange={handleAppointmentChange}
+                                        required
+                                    />
+                                    {appointmentErrors.email && 
+                                        <div className="appointment-error">{appointmentErrors.email}</div>}
+                                </div>
+                                <div className="appointment-form-group">
+                                    <label htmlFor="appointmentDate">Preferred Date <span className="appointment-required">*</span></label>
+                                    <input 
+                                        type="date" 
+                                        id="appointmentDate" 
+                                        name="appointmentDate"
+                                        value={appointmentData.appointmentDate}
+                                        onChange={handleAppointmentChange}
+                                        min={minDate}
+                                        max={maxDate}
+                                        required
+                                    />
+                                    {appointmentErrors.appointmentDate && 
+                                        <div className="appointment-error">{appointmentErrors.appointmentDate}</div>}
+                                </div>
+                                <div className="appointment-form-group">
+                                    <label htmlFor="appointmentTime">Preferred Time <span className="appointment-required">*</span></label>
+                                    <select 
+                                        id="appointmentTime" 
+                                        name="appointmentTime"
+                                        value={appointmentData.appointmentTime}
+                                        onChange={handleAppointmentChange}
+                                        required
+                                        disabled={!appointmentData.appointmentDate || availableTimes.length === 0}
+                                    >
+                                        <option value="">Select Time</option>
+                                        {availableTimes.map(time => (
+                                            <option key={time} value={time}>
+                                                {convertTo12HourFormat(time)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {!appointmentData.appointmentDate && 
+                                        <div className="appointment-note">Please select a date first</div>}
+                                    {appointmentData.appointmentDate && availableTimes.length === 0 && 
+                                        <div className="appointment-note" style={{ color: "red" }}>
+                                        No available times for this date
+                                      </div>
+                                      }
+                                    {appointmentErrors.appointmentTime && 
+                                        <div className="appointment-error">{appointmentErrors.appointmentTime}</div>}
+                                </div>
+                                <div className="appointment-form-group">
+                                    <label htmlFor="appointmentReason">Purpose of Visit <span className="appointment-required">*</span></label>
+                                    <textarea 
+                                        id="appointmentReason" 
+                                        name="appointmentReason"
+                                        value={appointmentData.appointmentReason}
+                                        onChange={handleAppointmentChange}
+                                        rows="4"
+                                        placeholder="Please describe the reason for your appointment"
+                                        required
+                                    ></textarea>
+                                    {appointmentErrors.appointmentReason && 
+                                        <div className="appointment-error">{appointmentErrors.appointmentReason}</div>}
+                                </div>
+                                <div className="appointment-btn-group">
+                                    <button 
+                                        type="submit"
+                                        className="appointment-submit-btn"
+                                    >
+                                        Book Appointment
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 )}
             </div>
