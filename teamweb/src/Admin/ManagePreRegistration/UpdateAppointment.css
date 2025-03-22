@@ -1,155 +1,220 @@
 /* General Container */
 .appointment-container {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom right, #f0f8ff, #e6eeff);
-    min-height: 100vh;
-    padding: 20px;
-    text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 30px;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Title Styling */
+.appointment-title {
+  font-size: 2.2rem;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 15px;
+}
+
+/* Admin Control */
+.admin-control {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.control-title {
+  font-size: 1.3rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.control-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.date-picker {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #333;
+  width: 200px;
+}
+
+.toggle-button {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.toggle-button:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* Month Sections */
+.month-section {
+  margin-bottom: 40px;
+}
+
+.month-title {
+  font-size: 1.6rem;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: left;
+  padding-left: 10px;
+  border-left: 4px solid #3498db;
+}
+
+/* Grid Layout */
+.appointment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 10px;
+}
+
+/* Card Styling */
+.appointment-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px 15px;
+  transition: all 0.3s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.appointment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Unavailable Card */
+.unavailable-card {
+  background: #f5f5f5;
+  color: #999;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.unavailable-card:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Unavailable Message */
+.unavailable-message {
+  font-size: 1rem;
+  color: #999;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+/* Date Heading */
+.appointment-date {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Time List */
+.appointment-time-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.appointment-time-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 6px 0;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.appointment-time-item:last-child {
+  border-bottom: none;
+}
+
+/* Time Text */
+.time-text {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Buttons */
+.time-button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.time-button-booked {
+  background: #e74c3c;
+  color: white;
+}
+
+.time-button-booked:hover {
+  background: #c0392b;
+}
+
+.time-button-available {
+  background: #2ecc71;
+  color: white;
+}
+
+.time-button-available:hover {
+  background: #27ae60;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .appointment-container {
+    padding: 15px;
   }
   
-  /* Title Styling */
-  .appointment-title {
-    font-size: 2.5rem;
-    color: #003366;
-    margin-bottom: 20px;
-    font-weight: bold;
-  }
-  
-  /* Admin Control */
-  .admin-control {
-    margin-bottom: 20px;
-  }
-  
-  .control-title {
-    font-size: 1.5rem;
-    color: #003366;
-    margin-bottom: 10px;
+  .appointment-grid {
+    grid-template-columns: 1fr;
   }
   
   .control-input {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
   }
   
-  input[type="date"] {
-    padding: 5px;
-    border: 1px solid #cccccc;
-    border-radius: 5px;
+  .appointment-title {
+    font-size: 1.8rem;
   }
   
-  .toggle-button {
-    padding: 5px 15px;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 5px;
-    background: #007bff;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
+  .month-title {
+    font-size: 1.4rem;
   }
-  
-  .toggle-button:hover {
-    background: #0056b3;
-  }
-  
-  /* Grid Layout */
-  .appointment-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 10px;
-  }
-  
-  /* Card Styling */
-  .appointment-card {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .appointment-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Unavailable Card */
-  .unavailable-card {
-    background: #f5f5f5;
-    color: #999999;
-    pointer-events: none;
-    box-shadow: none;
-  }
-  
-  .unavailable-card:hover {
-    transform: none;
-    box-shadow: none;
-  }
-  
-  /* Unavailable Message */
-  .unavailable-message {
-    font-size: 1rem;
-    color: #999999;
-    margin-top: 10px;
-  }
-  
-  /* Date Heading */
-  .appointment-date {
-    font-size: 1.2rem;
-    color: #003366;
-    margin-bottom: 15px;
-    font-weight: bold;
-  }
-  
-  /* Time List */
-  .appointment-time-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .appointment-time-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  /* Time Text */
-  .time-text {
-    font-size: 0.9rem;
-    color: #333333;
-  }
-  
-  /* Buttons */
-  .time-button {
-    padding: 5px 10px;
-    border-radius: 5px;
-    border: none;
-    font-size: 0.9rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  
-  .time-button-booked {
-    background: #ff4d4d;
-    color: #ffffff;
-  }
-  
-  .time-button-booked:hover {
-    background: #e60000;
-  }
-  
-  .time-button-available {
-    background: #4caf50;
-    color: #ffffff;
-  }
-  
-  .time-button-available:hover {
-    background: #45a049;
-  }
-  
+}
