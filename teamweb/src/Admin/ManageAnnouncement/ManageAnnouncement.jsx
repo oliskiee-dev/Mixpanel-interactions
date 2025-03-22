@@ -283,22 +283,26 @@ function ManageAnnouncement() {
     return (
         <>
             <AdminHeader />
-            <div className="admin-container">
-                <div className="announcement-header">
-                    <div className="header-flex">
-                        <div className="header-title-container">
-                            <h2 className="announcement-title">Announcements</h2>
-                            <p className="announcement-subtitle">Manage school announcements and communications</p>
-                        </div>
-                        <button 
-                            className="add-post-btn"
-                            onClick={openAddModal}
-                            aria-label="Add new announcement"
-                        >
-                            <i className="fa fa-plus-circle"></i> Add Post
-                        </button>
-                    </div>
+            <div className="content-container">
+            <div className="page-header">
+                <h1>School Announcement Management</h1>
+                <p>Manage school announcements and communications</p>
                 </div>
+            </div>
+            <div className="admin-container">
+            <div className="announcement-header">
+            <div className="header-flex">
+                <div className="upload-label">Add New Post</div>
+                <button 
+                    className="add-post-btn"
+                    onClick={openAddModal}
+                    aria-label="Add new announcement"
+                >
+                    <i className="fa fa-plus-circle"></i> Create Post
+                </button>
+                <div className="format-info">All post types supported</div>
+            </div>
+</div>
 
                 {/* Announcement List Section */}
                 <div className="announcement-list-section">

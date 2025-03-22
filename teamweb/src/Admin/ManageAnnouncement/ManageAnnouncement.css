@@ -12,21 +12,36 @@
 .announcement-header {
     margin-bottom: 30px;
     padding-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .header-flex {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 1000px;
+    flex-direction: column;
 }
 
-.announcement-title {
-    color: #002366;
-    font-size: 28px;
-    font-weight: bold;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.add-post-btn {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    width: 200px;
+    margin: 0 auto; /* Center the button */
 }
 
 .announcement-subtitle {
@@ -51,7 +66,62 @@
 
 .add-post-btn:hover {
     background-color: #001845;
-    box-shadow: 0 2px 8px rgba(0, 35, 102, 0.3);
+    border-color: #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+.add-post-btn:active {
+    background-color: #e8e8e8;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.add-post-btn i {
+    color: #002366; /* Brand blue color for the icon */
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+/* Add a slight text shadow for better contrast */
+.add-post-btn {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header-flex {
+        justify-content: center;
+    }
+    
+    .add-post-btn {
+        width: 80%; /* Make button wider on mobile */
+        justify-content: center;
+        padding: 10px 20px;
+    }
+}
+
+/* Optional label text above button */
+.upload-label {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Accepted formats text */
+.format-info {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .add-post-btn {
+        width: 80%;
+        max-width: 250px;
+    }
 }
 
 /* Section Titles */

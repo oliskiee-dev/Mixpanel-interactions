@@ -237,7 +237,7 @@ function ManagePreRegistration() {
                                 return (
                                     <React.Fragment key={student._id || index}>
                                         <tr className={expandedRow === index ? 'row-expanded' : ''}>
-                                            <td className="cell-name">{student.name}</td>
+                                            <td className="cell-name" title={student.name}>{student.name}</td>
                                             <td className="cell-center">{student.gender}</td>
                                             <td className="cell-center">{student.isNewStudent}</td>
                                             <td className="cell-center">
@@ -250,13 +250,13 @@ function ManagePreRegistration() {
                                             <td className="cell-center">{age}</td>
                                             <td className="cell-center">{student.grade_level}</td>
                                             <td className="cell-center">{student.strand || "N/A"}</td>
-                                            <td className="cell-email">
+                                            <td className="cell-email" title={student.email}>
                                                 <div className="email-container">
                                                     <Mail size={14} />
                                                     <span>{student.email}</span>
                                                 </div>
                                             </td>
-                                            <td className="cell-phone">
+                                            <td className="cell-phone" title={student.phone_number}>
                                                 <div className="phone-container">
                                                     <Phone size={14} />
                                                     <span>{student.phone_number}</span>
@@ -272,21 +272,27 @@ function ManagePreRegistration() {
                                                 </button>
                                             </td>
                                             <td className="cell-status">
-                                                <button
-                                                    className={`btn-status ${student.status?.toLowerCase() || 'pending'}`}
-                                                    onClick={() => handleStatusChange(student._id, student.status)}
-                                                    disabled={processingStatus === student._id}
-                                                >
-                                                    {processingStatus === student._id ? (
-                                                        // Show loading indicator while processing
+                                            <button
+                                                className={`btn-status ${
+                                                    processingStatus === student._id 
+                                                        ? 'processing' 
+                                                        : student.status?.toLowerCase() || 'pending'
+                                                }`}
+                                                onClick={() => handleStatusChange(student._id, student.status)}
+                                                disabled={processingStatus === student._id}
+                                            >
+                                                {processingStatus === student._id ? (
+                                                    <>
                                                         <span className="status-loading"></span>
-                                                    ) : student.status === "approved" ? (
-                                                        <><CheckCircle size={14} /> Approved</>
-                                                    ) : (
-                                                        <><AlertCircle size={14} /> Pending</>
-                                                    )}
-                                                </button>
-                                            </td>
+                                                        Processing...
+                                                    </>
+                                                ) : student.status === "approved" ? (
+                                                    <><CheckCircle size={14} /> Approved</>
+                                                ) : (
+                                                    <><AlertCircle size={14} /> Pending</>
+                                                )}
+                                            </button>
+                                        </td>
                                         </tr>
                                         {expandedRow === index && (
                                             <tr className="details-row">

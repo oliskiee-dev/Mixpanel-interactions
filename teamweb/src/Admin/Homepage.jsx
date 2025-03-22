@@ -112,13 +112,13 @@ function Homepage() {
   return (
     <>
       <AdminHeader />
-
+      <div className="content-container">
+        <div className="page-header">
+            <h1>Manage Latest News</h1>
+            <p>Manage the images that appear in the news section</p>
+            </div>
+      </div>
       <div className="admin-container">
-        <div className="admin-header">
-          <h2 className="news-title">LATEST NEWS</h2>
-          <p className="subtitle">Manage the images that appear in the news section</p>
-        </div>
-
         {/* Upload Section */}
         <div className="upload-card">
           <div className="upload-header">

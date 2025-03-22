@@ -16,6 +16,7 @@ const UpdateAppointment = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [visibleDates, setVisibleDates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastSeventhDay, setLastSeventhDay] = useState("");
 
   useEffect(() => {
     // Generate only 7 days from today
@@ -54,6 +55,10 @@ const UpdateAppointment = () => {
         
         setUnavailableDates(unavailableDatesList);
       }
+      
+      // Check for a new 7th day and reset it to available if needed
+      checkAndResetSeventhDay();
+      
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching availability:", error);
@@ -73,6 +78,71 @@ const UpdateAppointment = () => {
     }
     
     setVisibleDates(dates);
+    
+    // Store the 7th day for comparison
+    const seventhDay = new Date();
+    seventhDay.setDate(today.getDate() + 6);
+    setLastSeventhDay(seventhDay.toISOString().split("T")[0]);
+  };
+
+  // New function to check if there's a new 7th day and reset it
+  const checkAndResetSeventhDay = async () => {
+    // Get the current 7th day
+    const today = new Date();
+    const seventhDay = new Date();
+    seventhDay.setDate(today.getDate() + 6);
+    const seventhDayFormatted = seventhDay.toISOString().split("T")[0];
+    
+    // Get the day of week for the 7th day
+    const dayOfWeek = seventhDay.toLocaleDateString('en-US', { weekday: 'long' });
+    
+    // If we have a stored last seventh day and it's different from current seventh day
+    // or if this is the first time we're setting up (no last seventh day stored)
+    if (lastSeventhDay !== seventhDayFormatted) {
+      console.log(`New 7th day detected: ${dayOfWeek} (${seventhDayFormatted})`);
+      
+      // Create a new availability object
+      const newAvailability = { ...availability };
+      
+      // Reset the availability for the 7th day to include all time slots
+      const allTimeSlots = generateTimeSlots().map(time => `${time} - ${getEndTime(time)}`);
+      newAvailability[dayOfWeek] = allTimeSlots;
+      
+      // Create a new unavailable dates array, removing the 7th day if it exists
+      const newUnavailableDates = unavailableDates.filter(date => date !== seventhDayFormatted);
+      
+      try {
+        // Only update if we have a booking ID
+        if (bookingId) {
+          // Format data for the API
+          const availabilityData = {
+            availability: newAvailability,
+            unavailableDates: newUnavailableDates
+          };
+          
+          // Update existing document
+          await fetch(`http://localhost:3000/editBookingAvailability/${bookingId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(availabilityData),
+          });
+          
+          // Update state
+          setAvailability(newAvailability);
+          setUnavailableDates(newUnavailableDates);
+          
+          console.log(`Reset availability for ${dayOfWeek} (${seventhDayFormatted})`);
+          console.log("New availability:", newAvailability);
+        }
+        
+        // Update the last seventh day
+        setLastSeventhDay(seventhDayFormatted);
+      } catch (error) {
+        console.error("Error resetting 7th day availability:", error);
+      }
+    }
   };
 
   const toggleUnavailableDate = async (date) => {
@@ -338,13 +408,14 @@ const UpdateAppointment = () => {
             {dates.map((date) => {
               const formattedDate = date.toISOString().split("T")[0];
               const isUnavailable = unavailableDates.includes(formattedDate);
+              const isSeventhDay = formattedDate === lastSeventhDay;
 
               return (
                 <div
                   key={formattedDate}
                   className={`appointment-card ${
                     isUnavailable ? "unavailable-card" : ""
-                  }`}
+                  } ${isSeventhDay ? "seventh-day-card" : ""}`}
                 >
                   <h3 className="appointment-date">{formatDate(date)}</h3>
                   <h4 className="appointment-day-of-week">{date.toLocaleDateString('en-US', { weekday: 'long' })}</h4>
