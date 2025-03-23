@@ -42,6 +42,7 @@ app.use("/booking", bookRoutes);
 
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
+// Update your login endpoint in server.js
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -58,10 +59,18 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ error: "Incorrect Credentials" });
         }
 
-        // Generate JWT token
+        // Generate JWT token - make sure the payload structure matches what your middleware expects
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.status(200).json({ message: "Success", token });
+        res.status(200).json({ 
+            message: "Success", 
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email || 'No email provided'
+            }
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
@@ -101,12 +110,12 @@ app.post('/forgot-password', async (req, res) => {
 });
 
 // Endpoint to reset password
-app.post('/reset-password', async (req, res) => {
-    const { password, token } = req.body;
+app.post('/reset-password', authenticate, async (req, res) => {
+    const { password } = req.body;
 
     try {
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        // User is already authenticated via middleware
+        const userId = req.user.id;
         
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
@@ -114,20 +123,16 @@ app.post('/reset-password', async (req, res) => {
         
         // Update user's password
         await userModel.findByIdAndUpdate(
-            decoded.id,
+            userId,
             { password: hashedPassword }
         );
         
         res.status(200).json({ message: "Password updated successfully" });
     } catch (error) {
         console.error(error);
-        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-            return res.status(401).json({ error: "Invalid or expired token" });
-        }
         res.status(500).json({ error: "Server error" });
     }
 });
-
 
 
 const authenticate = require('./middleware/authMiddleware'); // Import middleware
