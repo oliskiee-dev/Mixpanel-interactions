@@ -128,6 +128,14 @@ app.post('/reset-password', async (req, res) => {
     }
 });
 
+
+
+const authenticate = require('./middleware/authMiddleware'); // Import middleware
+
+app.get('/admin-homepage', authenticate, (req, res) => {
+    res.json({ message: "Welcome to the Admin Homepage!" });
+});
+
 // Endpoint to delete user account
 app.delete('/delete-account', authenticate, async (req, res) => {
     try {
@@ -146,14 +154,6 @@ app.delete('/delete-account', authenticate, async (req, res) => {
         console.error(error);
         res.status(500).json({ error: "Server error" });
     }
-});
-
-
-
-const authenticate = require('./middleware/authMiddleware'); // Import middleware
-
-app.get('/admin-homepage', authenticate, (req, res) => {
-    res.json({ message: "Welcome to the Admin Homepage!" });
 });
 
 
