@@ -1,4 +1,4 @@
-/* Base layout styles */
+Base layout styles
 .admin-container {
     width: 100%;
     max-width: 1200px;
@@ -360,7 +360,7 @@
 
 .card-actions {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     margin-top: auto;
 }
 
@@ -442,15 +442,14 @@
 }
 
 /* Pagination Styling */
-.pagination {
+.pagination-manage-announcement {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
     margin: 30px 0;
 }
 
-.page-button, .page-nav {
+.page-button-manage-announcement, .page-nav-manage-announcement {
     min-width: 40px;
     height: 40px;
     display: flex;
@@ -465,22 +464,22 @@
     transition: all 0.3s;
 }
 
-.page-button:hover, .page-nav:hover {
+.page-button-manage-announcement:hover, .page-nav-manage-announcement:hover {
     background-color: #f5f5f5;
     border-color: #ccc;
 }
 
-.page-button.active {
+.page-button-manage-announcement.active {
     background-color: #002366;
     color: white;
     border-color: #002366;
 }
 
-.page-nav {
+.page-nav-manage-announcement {
     background-color: #f5f5f5;
 }
 
-.page-nav:disabled {
+.page-nav-manage-announcement:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -519,7 +518,7 @@
 
 .modal-header {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
     padding: 20px 25px;
     border-bottom: 1px solid #e0e0e0;

@@ -13,6 +13,10 @@ function ManagePreRegistration() {
     const [error, setError] = useState(null);
     const [processingStatus, setProcessingStatus] = useState(null);
     
+    // Confirmation dialog states
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [studentToUpdate, setStudentToUpdate] = useState(null);
+    
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -97,16 +101,39 @@ function ManagePreRegistration() {
         setCurrentPage(1); // Reset to first page when filter changes
     };
 
-    const handleStatusChange = async (studentId, currentStatus) => {
+    // Open confirmation dialog before status change
+    const confirmStatusChange = (studentId, currentStatus) => {
+        const student = students.find(s => s._id === studentId);
+        setStudentToUpdate({
+            id: studentId,
+            currentStatus: currentStatus,
+            name: student?.name || "this student"
+        });
+        setShowConfirmation(true);
+    };
+    
+    // Cancel status change
+    const cancelStatusChange = () => {
+        setShowConfirmation(false);
+        setStudentToUpdate(null);
+    };
+
+    // Proceed with status change after confirmation
+    const handleStatusChange = async () => {
         try {
+            if (!studentToUpdate) return;
+            
+            // Close the confirmation dialog
+            setShowConfirmation(false);
+            
             // Set the student ID being processed
-            setProcessingStatus(studentId);
+            setProcessingStatus(studentToUpdate.id);
             
             // The lowercase value to send to the server
-            const newStatus = currentStatus === "approved" ? "pending" : "approved";
+            const newStatus = studentToUpdate.currentStatus === "approved" ? "pending" : "approved";
             
             // Update API endpoint to match server code
-            const response = await fetch(`http://localhost:3000/preregistration/status/${studentId}`, {
+            const response = await fetch(`http://localhost:3000/preregistration/status/${studentToUpdate.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -122,7 +149,7 @@ function ManagePreRegistration() {
             
             // Show notification if email was sent (when approving)
             if (newStatus === "approved" && data.emailSent) {
-                const student = students.find(s => s._id === studentId);
+                const student = students.find(s => s._id === studentToUpdate.id);
                 if (student) {
                     toast.success(
                         <div>
@@ -131,7 +158,7 @@ function ManagePreRegistration() {
                         </div>, 
                         {
                             icon: <Send size={16} />,
-                            position: "top-right",
+                            position: "top-center", // Changed from top-right to top-center
                             autoClose: 5000,
                         }
                     );
@@ -142,11 +169,12 @@ function ManagePreRegistration() {
         } catch (err) {
             console.error('Failed to update status:', err);
             toast.error('Failed to update status. Please try again.', {
-                position: "top-right",
+                position: "top-center", // Changed from top-right to top-center
                 autoClose: 5000,
             });
         } finally {
             setProcessingStatus(null);
+            setStudentToUpdate(null);
         }
     };
 
@@ -166,6 +194,43 @@ function ManagePreRegistration() {
         return filters.length > 0 
             ? `Filtered by: ${filters.join(', ')}` 
             : 'Showing all records';
+    };
+    
+    // Confirmation Dialog Component
+    const ConfirmationDialog = () => {
+        if (!showConfirmation) return null;
+        
+        const newStatus = studentToUpdate?.currentStatus === "approved" ? "Pending" : "Approved";
+        const actionText = studentToUpdate?.currentStatus === "approved" ? "change to Pending" : "approve";
+        
+        return (
+            <div className="confirmation-overlay">
+                <div className="confirmation-dialog">
+                    <div className="confirmation-header">
+                        <h3>Confirm Status Change</h3>
+                    </div>
+                    <div className="confirmation-content">
+                        <p>Are you sure you want to {actionText} the status for <strong>{studentToUpdate?.name}</strong>?</p>
+                        {studentToUpdate?.currentStatus !== "approved" && (
+                            <p>This will send an approval notification email to the student.</p>
+                        )}
+                    </div>
+                    <div className="confirmation-actions">
+                        <button className="btn-cancel" onClick={cancelStatusChange}>
+                            Cancel
+                        </button>
+                        <button 
+                            className={`btn-confirm ${studentToUpdate?.currentStatus === "approved" ? "pending" : "approved"}`}
+                            onClick={handleStatusChange}
+                        >
+                            {studentToUpdate?.currentStatus === "approved" ? 
+                                "Yes, Change to Pending" : 
+                                "Yes, Approve Student"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     };
     
     // Table renderer
@@ -278,7 +343,7 @@ function ManagePreRegistration() {
                                                         ? 'processing' 
                                                         : student.status?.toLowerCase() || 'pending'
                                                 }`}
-                                                onClick={() => handleStatusChange(student._id, student.status)}
+                                                onClick={() => confirmStatusChange(student._id, student.status)}
                                                 disabled={processingStatus === student._id}
                                             >
                                                 {processingStatus === student._id ? (
@@ -438,6 +503,9 @@ function ManagePreRegistration() {
                 
                 {activeTab === "appointment" && <UpdateAppointment />}
             </div>
+            
+            {/* Confirmation Dialog */}
+            <ConfirmationDialog />
             
             {/* Toast notifications container */}
             <ToastContainer />

@@ -191,22 +191,13 @@ function ManageAnnouncement() {
         if (totalPages <= 1) return null;
         
         return (
-            <div className="pagination">
-                <button 
-                    className="page-nav" 
-                    onClick={() => paginate(Math.max(1, pageNumber - 1))}
-                    disabled={pageNumber === 1}
-                    aria-label="Previous page"
-                >
-                    <i className="fa fa-chevron-left"></i>
-                </button>
-                
+            <div className="pagination-manage-announcement">                
                 {totalPages <= 5 ? (
                     // Show all pages if there are 5 or fewer
                     Array.from({ length: totalPages }, (_, i) => (
                         <button 
                             key={i + 1} 
-                            className={`page-button ${pageNumber === i + 1 ? "active" : ""}`} 
+                            className={`page-button-manage-announcement ${pageNumber === i + 1 ? "active" : ""}`} 
                             onClick={() => paginate(i + 1)}
                             aria-label={`Page ${i + 1}`}
                             aria-current={pageNumber === i + 1 ? 'page' : null}
@@ -218,7 +209,7 @@ function ManageAnnouncement() {
                     // Logic for showing limited pages with ellipsis
                     <>
                         <button 
-                            className={`page-button ${pageNumber === 1 ? "active" : ""}`}
+                            className={`page-button-manage-announcement ${pageNumber === 1 ? "active" : ""}`}
                             onClick={() => paginate(1)}
                             aria-label="Page 1"
                             aria-current={pageNumber === 1 ? 'page' : null}

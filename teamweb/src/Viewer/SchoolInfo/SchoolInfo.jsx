@@ -194,16 +194,16 @@ function SchoolInfo() {
                                     <div 
                                         key={index} 
                                         className={`core-value-item ${expandedValue === item.value ? 'expanded' : ''}`}
-                                        onClick={() => toggleExpandValue(item.value)}
+                                        // onClick={() => toggleExpandValue(item.value)}
                                     >
                                         <div className="core-value-header">
                                             <span className="core-value-icon">✦</span>
                                             <h4 className="core-value-name">{item.value}</h4>
                                             <span className="expand-icon">{expandedValue === item.value ? '−' : '+'}</span>
                                         </div>
-                                        {expandedValue === item.value && (
+                                        {/* {expandedValue === item.value && (
                                             <p className="core-value-description">{item.description}</p>
-                                        )}
+                                        )} */}
                                     </div>
                                 ))}
                             </div>

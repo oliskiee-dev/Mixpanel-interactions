@@ -13,39 +13,6 @@ body, html {
     padding: 0;
     box-sizing: border-box;
 }
-
-/* Title styling - explicitly positioned at the left */
-.announcement-header {
-    width: 100%;
-    padding: 0 0 10px 20px; /* Add left padding to match the page layout */
-    margin: 0;
-    box-sizing: border-box;
-    text-align: left;
-}
-
-.announcement-title {
-    color: #002366;
-    font-size: 28px; /* Increased size */
-    font-weight: bold;
-    text-transform: uppercase;
-    display: inline-block;
-    padding-bottom: 5px;
-    margin: 20px 0;
-    text-align: left;
-    position: relative;
-}
-
-/* Create extended underline */
-.announcement-title:after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 200%; /* Extends the line to double the text width */
-    height: 2px;
-    background-color: #002366;
-}
-
 /* Center the announcements list but keep the header left-aligned */
 .announcements-list {
     width: 100%;
@@ -61,6 +28,13 @@ body, html {
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden; /* This ensures the image doesn't overflow */
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.announcement-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
 }
 
 .announcement-image-container {
@@ -100,6 +74,15 @@ body, html {
     color: #333;
 }
 
+.read-more {
+    color: #002366;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: right;
+    font-style: italic;
+}
+
 .button-container {
     text-align: center;
     margin: 20px 0;
@@ -126,32 +109,192 @@ body, html {
     margin-top: auto;
 }
 
-/* Add these styles at the end of your existing CSS */
-
-.pagination {
+/* Pagination styles */
+.pagination-announcement {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 5px; /* Reduced gap between buttons */
     margin: 20px 0;
     padding: 20px 0;
+    width: 100%;
+    text-align: center;
 }
 
-.page-button {
-    padding: 8px 16px;
+
+.page-button-announcement {
+    padding: 8px 12px; /* Slightly smaller padding */
     border: 1px solid #002366;
     background-color: white;
     color: #002366;
     cursor: pointer;
     border-radius: 4px;
     transition: all 0.3s ease;
+    margin: 0 2px; /* Additional margin for spacing */
 }
 
-.page-button:hover {
+
+.page-button-announcement:hover {
     background-color: #002366;
     color: white;
 }
 
-.page-button.active {
+.page-button-announcement.active {
     background-color: #002366;
     color: white;
+}
+
+.pagination-container-announcement {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+
+/* ENHANCED POPUP STYLES - LARGER SIZE */
+.announcement-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8); /* Darker overlay for better contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 10px;
+}
+
+.announcement-popup {
+    background-color: white;
+    width: 95%; /* Nearly full width */
+    max-width: 1200px; /* Much larger maximum width */
+    height: 95vh; /* Almost full height of viewport */
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+}
+
+.close-popup {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    width: 40px; /* Larger button */
+    height: 40px; /* Larger button */
+    border-radius: 50%;
+    font-size: 20px; /* Larger X */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s ease;
+}
+
+.close-popup:hover {
+    background: #002366;
+}
+
+.popup-image-container {
+    width: 100%;
+    height: 400px; /* Larger image area */
+    overflow: hidden;
+}
+
+.popup-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.popup-content {
+    padding: 35px; /* More padding */
+    overflow-y: auto;
+    max-height: calc(95vh - 400px); /* Adjust based on new image height */
+}
+
+.popup-title {
+    color: #002366;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 32px; /* Larger title */
+    line-height: 1.2;
+}
+
+.popup-date {
+    color: #666;
+    font-size: 16px; /* Larger date text */
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.popup-description {
+    font-size: 18px; /* Larger description text */
+    line-height: 1.8;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.popup-full-content {
+    font-size: 18px; /* Larger content text */
+    line-height: 1.8;
+    color: #333;
+}
+
+/* Make sure images in the content are responsive */
+.popup-full-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 20px 0;
+}
+
+/* Enhanced responsive adjustments */
+@media (max-width: 1200px) {
+    .announcement-popup {
+        width: 95%;
+        max-width: 1000px;
+    }
+}
+
+@media (max-width: 768px) {
+    .popup-image-container {
+        height: 250px;
+    }
+    
+    .popup-content {
+        padding: 25px;
+        max-height: calc(95vh - 250px);
+    }
+    
+    .popup-title {
+        font-size: 26px;
+    }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+    .popup-image-container {
+        height: 200px;
+    }
+    
+    .popup-content {
+        padding: 20px;
+    }
+    
+    .popup-title {
+        font-size: 22px;
+    }
+    
+    .popup-description,
+    .popup-full-content {
+        font-size: 16px;
+        line-height: 1.6;
+    }
 }

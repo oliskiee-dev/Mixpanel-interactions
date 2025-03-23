@@ -6,6 +6,8 @@ import "./Announcement.css";
 function Announcement() {
     const [announcements, setAnnouncements] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const announcementsPerPage = 5; // Show 5 announcements per page
 
     useEffect(() => {
@@ -43,14 +45,41 @@ function Announcement() {
         setCurrentPage(pageNumber);
     };
 
+    const openPopup = (announcement) => {
+        setSelectedAnnouncement(announcement);
+        setIsPopupOpen(true);
+        // Prevent background scrolling when popup is open
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closePopup = () => {
+        setIsPopupOpen(false);
+        // Add a small delay before removing the selected announcement
+        // to allow for a smoother transition if you want to add animations
+        setTimeout(() => {
+            setSelectedAnnouncement(null);
+        }, 300);
+        // Restore scrolling when popup is closed
+        document.body.style.overflow = 'auto';
+    };
+
+    // Format date function
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
     return (
         <>
             <Header />
             <div className="announcement-main-container">
-                <div className="announcement-header">
-                    <h2 className="announcement-title">ANNOUNCEMENTS</h2>
-                </div>
-                
+                <br />
+                <br />
                 <div className="announcements-list">
                     {currentAnnouncements.length > 0 ? (
                         currentAnnouncements.map((announcement, index) => {
@@ -60,7 +89,11 @@ function Announcement() {
                             console.log("Rendering image from:", imagePath);
 
                             return (
-                                <div key={announcement._id} className="announcement-card">
+                                <div 
+                                    key={announcement._id} 
+                                    className="announcement-card"
+                                    onClick={() => openPopup(announcement)}
+                                >
                                     {imagePath && (
                                         <div className="announcement-image-container">
                                             <img 
@@ -72,10 +105,15 @@ function Announcement() {
                                     )}
                                     <div className="announcement-content">
                                         <span className="announcement-number">
-                                            ANNOUNCEMENT #{indexOfFirstAnnouncement + index + 1}
+                                            {/* ANNOUNCEMENT #{indexOfFirstAnnouncement + index + 1} */}
                                         </span>
                                         <h3>{announcement.title}</h3>
-                                        <p>{announcement.description}</p>
+                                        <p className="announcement-preview">
+                                            {announcement.description.length > 150 
+                                                ? `${announcement.description.substring(0, 150)}...` 
+                                                : announcement.description}
+                                        </p>
+                                        <div className="read-more">Click to read full announcement</div>
                                     </div>
                                 </div>
                             );
@@ -85,18 +123,59 @@ function Announcement() {
                     )}
                 </div>
 
+                {/* Enhanced Popup for full announcement */}
+                {isPopupOpen && selectedAnnouncement && (
+                    <div className="announcement-popup-overlay" onClick={closePopup}>
+                        <div className="announcement-popup" onClick={(e) => e.stopPropagation()}>
+                            <button className="close-popup" onClick={closePopup}>✕</button>
+                            {selectedAnnouncement.image_url && (
+                                <div className="popup-image-container">
+                                    <img 
+                                        src={`http://localhost:3000/announcement/${selectedAnnouncement.image_url}`} 
+                                        alt={selectedAnnouncement.title} 
+                                        className="popup-image"
+                                    />
+                                </div>
+                            )}
+                            <div className="popup-content">
+                                <h2 className="popup-title">{selectedAnnouncement.title}</h2>
+                                <div className="popup-date">
+                                    {formatDate(selectedAnnouncement.date || selectedAnnouncement.createdAt)}
+                                </div>
+                                <p className="popup-description">{selectedAnnouncement.description}</p>
+                                
+                                {/* Display any additional fields if available */}
+                                {selectedAnnouncement.content && (
+                                    <div className="popup-full-content" 
+                                         dangerouslySetInnerHTML={{ __html: selectedAnnouncement.content }}>
+                                    </div>
+                                )}
+                                
+                                {/* Additional metadata if available */}
+                                {selectedAnnouncement.author && (
+                                    <div className="popup-metadata">
+                                        <p><strong>Posted by:</strong> {selectedAnnouncement.author}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="pagination">
-                        {Array.from({ length: totalPages }, (_, i) => (
-                            <button
-                                key={i + 1}
-                                className={`page-button ${currentPage === i + 1 ? 'active' : ''}`}
-                                onClick={() => paginate(i + 1)}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
+                    <div className="pagination-container-announcement">
+                        <div className="pagination-announcement">
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <button
+                                    key={i + 1}
+                                    className={`page-button-announcement ${currentPage === i + 1 ? 'active' : ''}`}
+                                    onClick={() => paginate(i + 1)}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
