@@ -45,7 +45,7 @@ function ConfirmRegistration() {
         };
         console.log("Pre-registration data to be sent:", preRegistrationData);
         try {
-            const response = await fetch("http://localhost:3000/addPreRegistration", {
+            const response = await fetch("http://localhost:3000/preregistration/add", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -30,7 +30,7 @@ function Appointment() {
     const fetchAvailabilityData = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:3000/bookingAvailability');
+            const response = await fetch('http://localhost:3000/booking/bookingAvailability');
             const data = await response.json();
             
             if (data && data.length > 0) {
@@ -121,7 +121,7 @@ function Appointment() {
     
         if (Object.keys(errors).length === 0) {
             try {
-                const response = await fetch('http://localhost:3000/addBooking', {
+                const response = await fetch('http://localhost:3000/preregistration/addBooking', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

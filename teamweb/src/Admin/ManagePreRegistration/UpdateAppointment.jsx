@@ -28,7 +28,7 @@ const UpdateAppointment = () => {
   const fetchAvailability = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:3000/bookingAvailability');
+      const response = await fetch('http://localhost:3000/booking/bookingAvailability');
       const data = await response.json();
       
       if (data && data.length > 0) {
@@ -121,7 +121,7 @@ const UpdateAppointment = () => {
           };
           
           // Update existing document
-          await fetch(`http://localhost:3000/editBookingAvailability/${bookingId}`, {
+          await fetch(`http://localhost:3000/booking/editBookingAvailability/${bookingId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ const UpdateAppointment = () => {
       let response;
       if (bookingId) {
         // Update existing document
-        response = await fetch(`http://localhost:3000/editBookingAvailability/${bookingId}`, {
+        response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${bookingId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ const UpdateAppointment = () => {
         });
       } else {
         // Create new document
-        response = await fetch('http://localhost:3000/addBookingAvailability', {
+        response = await fetch('http://localhost:3000/booking/addBookingAvailability', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -263,7 +263,7 @@ const UpdateAppointment = () => {
       
       if (bookingId) {
         // Update existing document
-        response = await fetch(`http://localhost:3000/editBookingAvailability/${bookingId}`, {
+        response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${bookingId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -272,7 +272,7 @@ const UpdateAppointment = () => {
         });
       } else {
         // Create new document
-        response = await fetch('http://localhost:3000/addBookingAvailability', {
+        response = await fetch('http://localhost:3000/booking/addBookingAvailability', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

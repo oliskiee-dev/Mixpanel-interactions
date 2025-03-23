@@ -106,7 +106,7 @@ function ManagePreRegistration() {
             const newStatus = currentStatus === "approved" ? "pending" : "approved";
             
             // Update API endpoint to match server code
-            const response = await fetch(`http://localhost:3000/preRegistrationStatus/${studentId}`, {
+            const response = await fetch(`http://localhost:3000/preregistration/status/${studentId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
