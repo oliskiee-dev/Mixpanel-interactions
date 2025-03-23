@@ -38,12 +38,6 @@ app.use("/announcement", express.static(path.join(__dirname, "announcement")));
 app.use("/calendar", calendarRoutes); 
 app.use('/preregistration', preRegistrationRoutes);
 
-//Get all Calendar
-app.get('/calendar', async (req,res) =>{
-    const response = await calendarModel.find();
-    return res.json({calendar : response});
-})
-
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
 app.post('/login', async (req, res) => {
