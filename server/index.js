@@ -12,8 +12,9 @@ const homepageRoutes = require("./routes/homepageRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
 const calendarRoutes = require("./routes/calendarRoutes");
 const preRegistrationRoutes = require("./routes/preRegistrationRoutes");
+const bookRoutes = require("./routes/bookRoutes");
 
-const bookModel = require("./models/Book.js");
+//const bookModel = require("./models/Book.js");
 
 const { sendApprovalEmail } = require('./service/emailService.js'); //Just in case for future use
 
@@ -37,6 +38,7 @@ app.use("/announcement", express.static(path.join(__dirname, "announcement")));
 
 app.use("/calendar", calendarRoutes); 
 app.use('/preregistration', preRegistrationRoutes);
+app.use("/booking", bookRoutes);
 
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
@@ -161,43 +163,43 @@ app.post('/register', async (req, res) => {
 });
 
 //ADD BOOKING AVAILABILITY
-app.get("/bookingAvailability", async (req, res) => {
-    try {
-        const availabilityData = await bookModel.find();
-        res.json(availabilityData);
-    } catch (error) {
-        res.status(500).json({ error: "Server error" });
-    }
-});
+// app.get("/bookingAvailability", async (req, res) => {
+//     try {
+//         const availabilityData = await bookModel.find();
+//         res.json(availabilityData);
+//     } catch (error) {
+//         res.status(500).json({ error: "Server error" });
+//     }
+// });
 
-app.post("/addBookingAvailability", async (req, res) => {
-    try {
-        const { availability } = req.body;
+// app.post("/addBookingAvailability", async (req, res) => {
+//     try {
+//         const { availability } = req.body;
 
-        const newAvailability = new bookModel({ availability });
-        await newAvailability.save();
+//         const newAvailability = new bookModel({ availability });
+//         await newAvailability.save();
 
-        res.status(201).json({ message: "Availability added", data: newAvailability });
-    } catch (error) {
-        res.status(500).json({ error: "Server error" });
-    }
-});
+//         res.status(201).json({ message: "Availability added", data: newAvailability });
+//     } catch (error) {
+//         res.status(500).json({ error: "Server error" });
+//     }
+// });
 
-//This is considered delete too no need to add delete
-app.put("/editBookingAvailability/:id", async (req, res) => {
-    try {
-        const { availability } = req.body;
-        const updatedAvailability = await bookModel.findByIdAndUpdate(req.params.id, { availability }, { new: true });
+// //This is considered delete too no need to add delete
+// app.put("/editBookingAvailability/:id", async (req, res) => {
+//     try {
+//         const { availability } = req.body;
+//         const updatedAvailability = await bookModel.findByIdAndUpdate(req.params.id, { availability }, { new: true });
 
-        if (!updatedAvailability) {
-            return res.status(404).json({ error: "Availability not found" });
-        }
+//         if (!updatedAvailability) {
+//             return res.status(404).json({ error: "Availability not found" });
+//         }
 
-        res.json({ message: "Availability updated", data: updatedAvailability });
-    } catch (error) {
-        res.status(500).json({ error: "Server error" });
-    }
-});
+//         res.json({ message: "Availability updated", data: updatedAvailability });
+//     } catch (error) {
+//         res.status(500).json({ error: "Server error" });
+//     }
+// });
 
 
 // app.use("/announcement", router);
