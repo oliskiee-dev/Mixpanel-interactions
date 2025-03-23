@@ -128,6 +128,26 @@ app.post('/reset-password', async (req, res) => {
     }
 });
 
+// Endpoint to delete user account
+app.delete('/delete-account', authenticate, async (req, res) => {
+    try {
+        // Get user ID from the authenticated request
+        const userId = req.user.id;
+        
+        // Find and delete the user
+        const deletedUser = await userModel.findByIdAndDelete(userId);
+        
+        if (!deletedUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        res.status(200).json({ message: "Account deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 
 const authenticate = require('./middleware/authMiddleware'); // Import middleware
@@ -161,50 +181,6 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-//ADD BOOKING AVAILABILITY
-// app.get("/bookingAvailability", async (req, res) => {
-//     try {
-//         const availabilityData = await bookModel.find();
-//         res.json(availabilityData);
-//     } catch (error) {
-//         res.status(500).json({ error: "Server error" });
-//     }
-// });
-
-// app.post("/addBookingAvailability", async (req, res) => {
-//     try {
-//         const { availability } = req.body;
-
-//         const newAvailability = new bookModel({ availability });
-//         await newAvailability.save();
-
-//         res.status(201).json({ message: "Availability added", data: newAvailability });
-//     } catch (error) {
-//         res.status(500).json({ error: "Server error" });
-//     }
-// });
-
-// //This is considered delete too no need to add delete
-// app.put("/editBookingAvailability/:id", async (req, res) => {
-//     try {
-//         const { availability } = req.body;
-//         const updatedAvailability = await bookModel.findByIdAndUpdate(req.params.id, { availability }, { new: true });
-
-//         if (!updatedAvailability) {
-//             return res.status(404).json({ error: "Availability not found" });
-//         }
-
-//         res.json({ message: "Availability updated", data: updatedAvailability });
-//     } catch (error) {
-//         res.status(500).json({ error: "Server error" });
-//     }
-// });
-
-
-// app.use("/announcement", router);
-// app.use("/announcement", express.static(path.join(__dirname, "announcement")));
-
 
 app.listen(3000,() => {
     console.log("app is running");
