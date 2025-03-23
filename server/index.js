@@ -321,33 +321,33 @@ app.get('/calendar', async (req,res) =>{
 
 
 // POST - Add a Booking
-app.post('/addBooking', async (req, res) => {
-    const { email, appointment_date, preferred_time, purpose_of_visit } = req.body;
+// app.post('/addBooking', async (req, res) => {
+//     const { email, appointment_date, preferred_time, purpose_of_visit } = req.body;
 
-    if (!email) {
-        return res.status(400).json({ error: "Email is required to update the booking." });
-    }
+//     if (!email) {
+//         return res.status(400).json({ error: "Email is required to update the booking." });
+//     }
 
-    try {
-        const user = await preRegistrationModel.findOne({ email });
+//     try {
+//         const user = await preRegistrationModel.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ error: "User not found. Please register first." });
-        }
+//         if (!user) {
+//             return res.status(404).json({ error: "User not found. Please register first." });
+//         }
 
-        // Update appointment details
-        user.appointment_date = appointment_date || user.appointment_date;
-        user.preferred_time = preferred_time || user.preferred_time;
-        user.purpose_of_visit = purpose_of_visit || user.purpose_of_visit;
+//         // Update appointment details
+//         user.appointment_date = appointment_date || user.appointment_date;
+//         user.preferred_time = preferred_time || user.preferred_time;
+//         user.purpose_of_visit = purpose_of_visit || user.purpose_of_visit;
 
-        await user.save();
-        res.status(200).json({ message: "Appointment updated successfully", user });
+//         await user.save();
+//         res.status(200).json({ message: "Appointment updated successfully", user });
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
-    }
-});
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: "Server error" });
+//     }
+// });
 
 
 

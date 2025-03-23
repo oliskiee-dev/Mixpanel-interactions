@@ -1,14 +1,16 @@
 const express = require('express');
-const { 
-    getPreRegistrations, 
-    addPreRegistration, 
-    updatePreRegistrationStatus 
+const {
+    getPreRegistrations,
+    addPreRegistration,
+    updatePreRegistrationStatus,
+    addBooking
 } = require('../controllers/preRegistrationController');
 
 const router = express.Router();
 
-router.get('/preregistration', getPreRegistrations);
-router.post('/addPreRegistration', addPreRegistration);
-router.put('/preRegistrationStatus/:id', updatePreRegistrationStatus);
+router.get('/', getPreRegistrations);
+router.post('/add', addPreRegistration);
+router.put('/status/:id', updatePreRegistrationStatus);
+router.post('/addBooking', addBooking);
 
 module.exports = router;
