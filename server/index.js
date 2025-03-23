@@ -156,6 +156,27 @@ app.delete('/delete-account', authenticate, async (req, res) => {
     }
 });
 
+// Endpoint to get current user's information
+app.get('/current-user', authenticate, async (req, res) => {
+    try {
+        // The authenticate middleware already verified the token
+        // and added the user ID to req.user
+        const userId = req.user.id;
+        
+        // Find the user in the database (excluding password)
+        const user = await userModel.findById(userId).select('-password');
+        
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        res.status(200).json({ user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 //REGISTER TEMP CODE
 app.post('/register', async (req, res) => {
