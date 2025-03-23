@@ -385,7 +385,6 @@ app.post('/forgot-password', async (req, res) => {
         // Check if user exists by username or email
         const user = await userModel.findOne({ 
             $or: [
-                { username: username },
                 { email: username }
             ] 
         });
