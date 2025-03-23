@@ -111,26 +111,58 @@ app.post('/forgot-password', async (req, res) => {
 });
 
 // Endpoint to reset password
-app.post('/reset-password', authenticate, async (req, res) => {
-    const { password } = req.body;
+// Updated reset-password endpoint for server.js
+app.post('/reset-password', async (req, res) => {
+    const { password, token } = req.body;
 
     try {
-        // User is already authenticated via middleware
-        const userId = req.user.id;
+        let userId;
+
+        // Check if we have a token in the request body (password reset flow)
+        if (token) {
+            // Verify the reset token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            userId = decoded.id;
+        } 
+        // Check if user is authenticated (logged in user changing password)
+        else {
+            const authHeader = req.headers.authorization;
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                return res.status(401).json({ error: 'Authentication required or reset token needed' });
+            }
+            
+            // Extract token from header
+            const authToken = authHeader.split(' ')[1];
+            
+            // Verify the auth token
+            const decoded = jwt.verify(authToken, process.env.JWT_SECRET);
+            userId = decoded.id;
+        }
+
+        if (!userId) {
+            return res.status(401).json({ error: 'User identification failed' });
+        }
         
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
         // Update user's password
-        await userModel.findByIdAndUpdate(
+        const updatedUser = await userModel.findByIdAndUpdate(
             userId,
             { password: hashedPassword }
         );
         
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
         res.status(200).json({ message: "Password updated successfully" });
     } catch (error) {
         console.error(error);
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
         res.status(500).json({ error: "Server error" });
     }
 });
