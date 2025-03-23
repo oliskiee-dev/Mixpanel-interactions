@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaUser } from "react-icons/fa";
+import { FaUser, FaExclamationTriangle } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import './ForgotPassword.css';
 import TeamLogo from "../assets/images/TeamLogo.jpg";
@@ -29,10 +29,8 @@ function ForgotPassword() {
         body: JSON.stringify({ username }),
       });
       
-      // Check if response is empty
       const text = await response.text();
       
-      // If we got a non-empty response, try to parse it as JSON
       let data;
       if (text) {
         try {
@@ -49,7 +47,6 @@ function ForgotPassword() {
         throw new Error(data?.error || "Failed to verify user");
       }
       
-      // If verification succeeds, navigate to reset password page
       navigate('/reset-password', { 
         state: { 
           resetToken: data.resetToken, 
@@ -73,10 +70,16 @@ function ForgotPassword() {
             <FaUser className="admin-icon" />
             <div className="title">FORGOT PASSWORD?</div>
             <p className="description">
-              Please enter your registered email or username to reset your password.
+              Please enter your registered email to reset your password.
             </p>
-            {error && <p className="error-message">{error}</p>}
-            <br />
+            
+            {error && (
+              <div className="error-container">
+                <FaExclamationTriangle className="error-icon" />
+                <span className="error-text">{error}</span>
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit}>
               <input 
                 type="text" 
