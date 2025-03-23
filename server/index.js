@@ -43,6 +43,7 @@ app.use("/booking", bookRoutes);
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
 // Update your login endpoint in server.js
+const authenticate = require('./middleware/authMiddleware'); // Import middleware
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -133,9 +134,6 @@ app.post('/reset-password', authenticate, async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-
-const authenticate = require('./middleware/authMiddleware'); // Import middleware
 
 app.get('/admin-homepage', authenticate, (req, res) => {
     res.json({ message: "Welcome to the Admin Homepage!" });
