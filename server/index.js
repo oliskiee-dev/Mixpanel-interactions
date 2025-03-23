@@ -377,6 +377,66 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Endpoint to verify email/username for password reset
+app.post('/forgot-password', async (req, res) => {
+    const { username } = req.body;
+
+    try {
+        // Check if user exists by username or email
+        const user = await userModel.findOne({ 
+            $or: [
+                { username: username },
+                { email: username }
+            ] 
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "No account found with that username or email" });
+        }
+
+        // Generate a reset token
+        const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+        
+        // In a real application, you would send this token via email
+        // For this implementation, we'll just return it
+        res.status(200).json({ 
+            message: "User verified successfully", 
+            resetToken,
+            userId: user._id 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// Endpoint to reset password
+app.post('/reset-password', async (req, res) => {
+    const { password, token } = req.body;
+
+    try {
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        
+        // Update user's password
+        await userModel.findByIdAndUpdate(
+            decoded.id,
+            { password: hashedPassword }
+        );
+        
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error(error);
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
+        res.status(500).json({ error: "Server error" });
+    }
+});
 
 
 
