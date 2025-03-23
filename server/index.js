@@ -214,8 +214,9 @@ app.get('/current-user', authenticate, async (req, res) => {
 
 
 //REGISTER TEMP CODE
+// Updated register endpoint that includes email
 app.post('/register', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     try {
         // Check if the username already exists
@@ -224,16 +225,27 @@ app.post('/register', async (req, res) => {
             return res.status(400).json({ error: "Username already exists" });
         }
 
-        // Hash the password (even if it's the same, the hash will be different)
+        // Check if the email already exists
+        const existingEmail = await userModel.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({ error: "Email already exists" });
+        }
+
+        // Hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Save new user with a unique username but possibly the same password
-        const newUser = new userModel({ username, password: hashedPassword });
+        // Save new user with username, email, and hashed password
+        const newUser = new userModel({ 
+            username, 
+            email,
+            password: hashedPassword 
+        });
         await newUser.save();
 
         res.json({ message: "User registered successfully" });
     } catch (error) {
+        console.error("Registration error:", error);
         res.status(500).json({ error: "Server error" });
     }
 });
