@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router"; // For navigation
-import { FaUser, FaExclamationCircle } from "react-icons/fa"; // Import error icon
+import { FaUser, FaExclamationCircle, FaEye, FaEyeSlash } from "react-icons/fa"; // Added eye icons
 import "./Login.css";
 import TeamLogo from "../assets/images/TeamLogo.png";
 
 function Login() {
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [error, setError] = useState(""); // State for error messages
+    const [showPassword, setShowPassword] = useState(false); // State for password visibility
     const navigate = useNavigate(); // Hook for navigation
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+    
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
     
     const handleSubmit = async (e) => {
@@ -37,9 +42,6 @@ function Login() {
         }
     };
     
-    
-    
-
     return (
         <div className="page-container">
             <img src={TeamLogo} alt="Team Logo" className="team-logo" /> {/* Logo at the top left */}
@@ -64,18 +66,23 @@ function Login() {
                                 onChange={handleChange}
                                 required
                             />
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="PASSWORD"
-                                className="input-field"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
+                            <div className="password-input-container">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="PASSWORD"
+                                    className="input-field"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <span className="password-toggle-icon" onClick={togglePasswordVisibility}>
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </span>
+                            </div>
                             <button type="submit" className="btn">LOGIN</button>
                         </form>
-                        <a href="/reset-password" className="forgot-password">Forgot Password?</a>
+                        <a href="/forgot-password" className="forgot-password">Forgot Password?</a>
                     </div>
                 </div>
             </div>

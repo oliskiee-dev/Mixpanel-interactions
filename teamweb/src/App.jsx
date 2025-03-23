@@ -4,6 +4,7 @@ import {BrowserRouter,Routes, Route, Navigate } from 'react-router'
 import Viewer from './Viewer.jsx'
 import Login from './Admin/Login.jsx'
 import ForgotPassword from './Admin/ForgotPassword.jsx';
+import ResetPassword from './Admin/ResetPassword.jsx'
 
 import Announcement from './Viewer/Announcement/Announcement.jsx';
 import Calendar from './Viewer/Calendar/Calendar.jsx';
@@ -53,7 +54,8 @@ function App(){
         {/* Viewers */}
         <Route path="/" element={<Viewer/>}></Route>
         <Route path="Login" element={<Login/>}></Route>
-        <Route path="reset-password" element={<ForgotPassword/>}></Route>
+        <Route path="forgot-password" element={<ForgotPassword/>}></Route>
+        <Route path="reset-password" element={<ResetPassword/>}></Route>
         <Route path="announcement" element={<Announcement/>}></Route>
         <Route path="calendar" element={<Calendar/>}></Route>
 
