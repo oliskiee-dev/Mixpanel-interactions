@@ -390,7 +390,7 @@ app.post('/forgot-password', async (req, res) => {
         });
 
         if (!user) {
-            return res.status(404).json({ error: "No account found with that username or email" });
+            return res.status(404).json({ error: "No account found with that email" });
         }
 
         // Generate a reset token
