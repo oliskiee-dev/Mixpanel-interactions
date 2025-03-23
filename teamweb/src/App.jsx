@@ -26,14 +26,10 @@ import ModifyAnnouncement from './Admin/ManageAnnouncement/ModifyAnnouncement.js
 
 
 import ManageCalendar from './Admin/ManageCalendar/ManageCalendar.jsx';
-
 import ManagePreRegistration from './Admin/ManagePreRegistration/ManagePreRegistration.jsx';
 import UpdateAppointment from './Admin/ManagePreRegistration/UpdateAppointment.jsx';
-import UpdatePreRegistration from './Admin/ManagePreRegistration/UpdatePreRegistration.jsx';
-import ViewReports from './Admin/ManagePreRegistration/ViewReports.jsx';
-
-
 import ManageSchoolInfo from './Admin/ManageSchoolInfo/ManageSchoolInfo.jsx';
+import ManageAccount from './Admin/ManageAccount/ManageAccount.jsx';
 
 function App(){
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -70,7 +66,7 @@ function App(){
         <Route path="schoolinfo" element={<SchoolInfo/>}></Route>
 
         {/* Admin Route for Designing */}
-        <Route path="/admin-homepage" element={<Homepage />} />
+        {/* <Route path="/admin-homepage" element={<Homepage />} />
 
 
         <Route path="/manage-announcement" element={<ManageAnnouncement />} />
@@ -82,28 +78,26 @@ function App(){
 
         <Route path="/manage-preregistration" element={<ManagePreRegistration />} />
         <Route path="/update-appointment" element={<UpdateAppointment />} />
-        <Route path="/update-preregistration" element={<UpdatePreRegistration />} />
-        <Route path="/view-report" element={<ViewReports />} />
 
         <Route path="/manage-schoolinfo" element={<ManageSchoolInfo />} />
+        <Route path="/manage-account" element={<ManageAccount />} /> */}
 
         {/* Admins */}
         {/* Temporary Disable Restrictions */}
-        {/* <Route path="/admin-homepage" element={<PrivateRoute><Homepage /></PrivateRoute>} />
-        <Route path="/manage-announcement" element={<PrivateRoute><ManageAnnouncement /></PrivateRoute>} />
+        <Route path="/admin-homepage" element={<PrivateRoute><Homepage /></PrivateRoute>} />
 
+        <Route path="/manage-announcement" element={<PrivateRoute><ManageAnnouncement /></PrivateRoute>} />
         <Route path="/create-announcement" element={<PrivateRoute><CreateAnnouncement/></PrivateRoute>} />
         <Route path="/delete-announcement" element={<PrivateRoute><DeleteAnnouncement /></PrivateRoute>} />
         <Route path="/modify-announcement" element={<PrivateRoute><ModifyAnnouncement /></PrivateRoute>} />
 
         <Route path="/manage-calendar" element={<PrivateRoute><ManageCalendar /></PrivateRoute>} />
+
         <Route path="/manage-preregistration" element={<PrivateRoute><ManagePreRegistration /></PrivateRoute>} />
-
         <Route path="/update-appointment" element={<PrivateRoute><UpdateAppointment /></PrivateRoute>} />
-        <Route path="/update-preregistration" element={<PrivateRoute><UpdatePreRegistration /></PrivateRoute>} />
-        <Route path="/view-report" element={<PrivateRoute><ViewReports /></PrivateRoute>} />
 
-        <Route path="/manage-schoolinfo" element={<PrivateRoute><ManageSchoolInfo /></PrivateRoute>} /> */}
+        <Route path="/manage-schoolinfo" element={<PrivateRoute><ManageSchoolInfo /></PrivateRoute>} />
+        <Route path="/manage-account" element={<PrivateRoute><ManageAccount /></PrivateRoute>} />
       
       </Routes>
     </BrowserRouter>
@@ -111,32 +105,3 @@ function App(){
 }
 
 export default App;
-
-
-
-// function App() {
-//   const [items,setItems] = useState([])
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const res = await fetch('http://localhost:3000');
-//         const data = await res.json();
-//         //console.log(data);//Show in Console [Debugging Purposes]
-//         setItems(data.items)
-//       } catch (error) {
-//         console.error('Error fetching data:', error);
-//       }
-//     };
-//     fetchData();
-//   }, []);
-
-//   return (
-//     <>
-//     {items.map(i =>(
-//       <p>{i.name},{i.description}</p>
-//     ))}
-//     </>
-//   );
-// }
-
-// export default App;

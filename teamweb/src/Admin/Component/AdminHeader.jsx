@@ -38,6 +38,8 @@ const AdminHeader = () => {
       setActiveTab("managepreregistration");
     } else if (path === "/manage-schoolinfo") {
       setActiveTab("manageschoolinfo");
+    } else if(path === "/manage-account"){
+      setActiveTab("manageaccount");
     } else if (path === "/admin-homepage") {
       setActiveTab("home");
     } else {
@@ -160,17 +162,16 @@ const AdminHeader = () => {
           >
             Manage Pre-Registration
           </a>
-          {/* Commented out as in original code */}
-          {/* <a
-            href="/manage-schoolinfo"
-            className={activeTab === "manageschoolinfo" ? "active" : ""}
+          <a
+            href="/manage-account"
+            className={activeTab === "manageaccount" ? "active" : ""}
             onClick={() => {
-              setActiveTab("manageschoolinfo");
+              setActiveTab("manageaccount");
               setMenuOpen(false);
             }}
           >
-            Manage School Information
-          </a> */}
+            Manage Accounts
+          </a>
         </div>
       </nav>
     </header>
