@@ -4,6 +4,13 @@ body, html {
     margin: 0;
     padding: 0;
 }
+.announcement-preview {
+    white-space: pre-line;
+    max-height: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 10px;
+}
 
 .announcement-main-container {
     flex: 1;
@@ -28,7 +35,6 @@ body, html {
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden; /* This ensures the image doesn't overflow */
-    cursor: pointer;
     transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
@@ -74,13 +80,35 @@ body, html {
     color: #333;
 }
 
-.read-more {
-    color: #002366;
+.announcement-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+/* New View More button styling */
+.view-more-button {
+    background-color: #002366;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
     font-size: 14px;
     font-weight: 500;
-    margin-top: 10px;
-    text-align: right;
-    font-style: italic;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 35, 102, 0.2);
+}
+
+.view-more-button:hover {
+    background-color: #001845;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 35, 102, 0.3);
+}
+
+.view-more-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0, 35, 102, 0.2);
 }
 
 .button-container {
@@ -236,12 +264,12 @@ body, html {
 }
 
 .popup-description {
-    font-size: 18px; /* Larger description text */
+    white-space: pre-line;
+    font-size: 18px;
     line-height: 1.8;
     margin-bottom: 30px;
     color: #333;
 }
-
 .popup-full-content {
     font-size: 18px; /* Larger content text */
     line-height: 1.8;

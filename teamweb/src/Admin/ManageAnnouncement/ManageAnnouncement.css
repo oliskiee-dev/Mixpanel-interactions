@@ -349,6 +349,7 @@ Base layout styles
     padding: 10px;
     border-radius: 4px;
     background-color: #f9f9f9;
+    white-space: pre-line; /* Preserves line breaks but collapses whitespace */
 }
 
 .card-description {

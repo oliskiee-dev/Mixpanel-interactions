@@ -74,6 +74,10 @@ function Announcement() {
         });
     };
 
+    const isTruncated = (text) => {
+        return text.length > 150;
+    };
+
     return (
         <>
             <Header />
@@ -108,12 +112,15 @@ function Announcement() {
                                             {/* ANNOUNCEMENT #{indexOfFirstAnnouncement + index + 1} */}
                                         </span>
                                         <h3>{announcement.title}</h3>
-                                        <p className="announcement-preview">
+                                        <p className={`announcement-preview ${isTruncated(announcement.description) ? 'truncated' : ''}`} 
+                                        style={{ whiteSpace: "pre-line" }}>
                                             {announcement.description.length > 150 
                                                 ? `${announcement.description.substring(0, 150)}...` 
                                                 : announcement.description}
                                         </p>
-                                        <div className="read-more">Click to read full announcement</div>
+                                        {isTruncated(announcement.description) && (
+                                            <div className="read-more">Click to read full announcement</div>
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -142,8 +149,10 @@ function Announcement() {
                                 <div className="popup-date">
                                     {formatDate(selectedAnnouncement.date || selectedAnnouncement.createdAt)}
                                 </div>
-                                <p className="popup-description">{selectedAnnouncement.description}</p>
-                                
+                                <p className="popup-description" style={{ whiteSpace: "pre-line" }}>
+                                    {selectedAnnouncement.description}
+                                </p>
+                                                                
                                 {/* Display any additional fields if available */}
                                 {selectedAnnouncement.content && (
                                     <div className="popup-full-content" 
