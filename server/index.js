@@ -178,11 +178,6 @@ app.post('/edit-password', async (req, res) => {
             return res.status(401).json({ error: 'Authentication required' });
         }
 
-        // // Ensure a target user is provided
-        // if (!targetUserId) {
-        //     return res.status(400).json({ error: "Target user ID is required" });
-        // }
-
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -206,16 +201,11 @@ app.post('/update-user-info', async (req, res) => {
 
     try {
         // Validate the token and get the authenticated user
-        const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const authenticatedUserId = decoded.userId;
-
-        // Find the current user to check permissions
-        const currentUser = await userModel.findById(authenticatedUserId);
-        if (!currentUser) {
-            return res.status(401).json({ error: 'User not found' });
+        // Ensure the requester is authenticated
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'Authentication required' });
         }
-
         // Prepare update object
         const updateData = {};
 
