@@ -201,6 +201,106 @@ app.post('/edit-password', async (req, res) => {
     }
 });
 
+app.post('/update-user-info', async (req, res) => {
+    const { targetUserId, username, email, password } = req.body;
+
+    try {
+        // Ensure the requester is authenticated
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        // Validate the token and get the authenticated user
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const authenticatedUserId = decoded.userId;
+
+        // Find the current user to check permissions
+        const currentUser = await userModel.findById(authenticatedUserId);
+        if (!currentUser) {
+            return res.status(401).json({ error: 'User not found' });
+        }
+
+        // Prepare update object
+        const updateData = {};
+
+        // Check username update
+        if (username) {
+            // Check if username is already taken
+            const existingUsername = await userModel.findOne({ username });
+            if (existingUsername && existingUsername._id.toString() !== targetUserId) {
+                return res.status(400).json({ error: 'Username already exists' });
+            }
+            updateData.username = username;
+        }
+
+        // Check email update
+        if (email) {
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return res.status(400).json({ error: 'Invalid email format' });
+            }
+
+            // Check if email is already taken
+            const existingEmail = await userModel.findOne({ email });
+            if (existingEmail && existingEmail._id.toString() !== targetUserId) {
+                return res.status(400).json({ error: 'Email already exists' });
+            }
+            updateData.email = email;
+        }
+
+        // Check password update
+        if (password) {
+            // Hash the new password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            updateData.password = hashedPassword;
+        }
+
+        // Permissions check
+        // Head admin can update any user
+        // Regular admin can only update their own account or other admin accounts
+        // Users can only update their own account
+        const targetUser = await userModel.findById(targetUserId);
+        if (!targetUser) {
+            return res.status(404).json({ error: 'Target user not found' });
+        }
+
+        const isHeadAdmin = currentUser.role === 'head_admin';
+        const isSameUser = authenticatedUserId === targetUserId;
+        const isAdminUpdatingAdmin = currentUser.role === 'admin' && 
+            (targetUser.role === 'admin' || targetUser.role === 'home_admin');
+
+        if (!(isHeadAdmin || isSameUser || isAdminUpdatingAdmin)) {
+            return res.status(403).json({ error: 'Unauthorized to update this account' });
+        }
+
+        // Perform the update
+        const updatedUser = await userModel.findByIdAndUpdate(
+            targetUserId, 
+            { $set: updateData }, 
+            { new: true, select: '-password' }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json({ 
+            message: "User information updated successfully",
+            user: updatedUser 
+        });
+    } catch (error) {
+        console.error(error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ error: 'Invalid authentication token' });
+        }
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 app.get('/admin-homepage', authenticate, (req, res) => {
     res.json({ message: "Welcome to the Admin Homepage!" });
