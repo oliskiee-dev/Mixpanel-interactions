@@ -179,11 +179,6 @@ app.delete('/delete-account', authenticate, async (req, res) => {
         // Get current user details
         const currentUser = await userModel.findById(req.user.id);
         
-        // Check permissions: head_admin can delete any account, admin can only delete their own
-        if (currentUser.role !== 'head_admin' && req.user.id !== targetUserId) {
-            return res.status(403).json({ error: 'Unauthorized to delete this account' });
-        }
-        
         // Prevent deleting the only head admin
         if (currentUser.role === 'head_admin') {
             const headAdminCount = await userModel.countDocuments({ role: 'head_admin' });
