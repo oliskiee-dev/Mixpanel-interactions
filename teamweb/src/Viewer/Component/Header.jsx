@@ -49,7 +49,7 @@ const Header = () => {
       <div className="main-top-bar">
         <div className="main-logo-container">
           <img src={TeamLogo} alt="School Logo" className="main-logo" />
-          <h1 className="school-name">Team Mission School</h1>
+          <h1 className="school-name">Team Mission Christian School</h1>
         </div>
         
         <div className="header-controls">
