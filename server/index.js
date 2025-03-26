@@ -178,15 +178,6 @@ app.post('/edit-password', async (req, res) => {
             return res.status(401).json({ error: 'Authentication required' });
         }
 
-        const authToken = authHeader.split(' ')[1];
-        const decoded = jwt.verify(authToken, process.env.JWT_SECRET);
-
-        // Fetch the requesting user
-        const requestingUser = await userModel.findById(decoded.id);
-        if (!requestingUser || requestingUser.role !== "head_admin") {
-            return res.status(403).json({ error: "Insufficient permissions" });
-        }
-
         // Ensure a target user is provided
         if (!targetUserId) {
             return res.status(400).json({ error: "Target user ID is required" });
