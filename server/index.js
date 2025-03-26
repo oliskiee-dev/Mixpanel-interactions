@@ -192,20 +192,30 @@ app.delete('/delete-account', authenticate, async (req, res) => {
 });
 
 // Endpoint to get current user's information
+// Endpoint to get current user's information
 app.get('/current-user', authenticate, async (req, res) => {
     try {
-        // The authenticate middleware already verified the token
-        // and added the user ID to req.user
         const userId = req.user.id;
         
-        // Find the user in the database (excluding password)
+        // Find the requesting user's details
         const user = await userModel.findById(userId).select('-password');
-        
+
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        
-        res.status(200).json({ user });
+
+        if (user.role === 'head_admin') {
+            // Fetch all admins, sorting to ensure the Head Admin appears first
+            const admins = await userModel.find({ role: { $in: ['head_admin', 'admin'] } })
+                .sort({ role: -1 }) // Ensures 'head_admin' comes first
+                .select('-password');
+
+            return res.status(200).json({ user, admins });
+        }
+
+        // If normal admin, return only their own data
+        return res.status(200).json({ user });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
