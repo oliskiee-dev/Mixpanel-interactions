@@ -173,12 +173,27 @@ app.get('/admin-homepage', authenticate, (req, res) => {
 
 // Endpoint to delete user account
 app.delete('/delete-account', authenticate, async (req, res) => {
+    const { targetUserId } = req.body;
+
     try {
-        // Get user ID from the authenticated request
-        const userId = req.user.id;
+        // Get current user details
+        const currentUser = await userModel.findById(req.user.id);
+        
+        // Check permissions: head_admin can delete any account, admin can only delete their own
+        if (currentUser.role !== 'head_admin' && req.user.id !== targetUserId) {
+            return res.status(403).json({ error: 'Unauthorized to delete this account' });
+        }
+        
+        // Prevent deleting the only head admin
+        if (currentUser.role === 'head_admin') {
+            const headAdminCount = await userModel.countDocuments({ role: 'head_admin' });
+            if (headAdminCount <= 1 && currentUser._id.toString() === targetUserId) {
+                return res.status(400).json({ error: 'Cannot delete the last head admin account' });
+            }
+        }
         
         // Find and delete the user
-        const deletedUser = await userModel.findByIdAndDelete(userId);
+        const deletedUser = await userModel.findByIdAndDelete(targetUserId);
         
         if (!deletedUser) {
             return res.status(404).json({ error: "User not found" });
