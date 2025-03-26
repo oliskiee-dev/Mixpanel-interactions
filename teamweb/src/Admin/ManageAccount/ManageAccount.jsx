@@ -66,6 +66,10 @@ function ManageAccount() {
         
         if (!response.ok) {
           const errorData = await response.json();
+          localStorage.removeItem("token");
+          localStorage.removeItem("username");
+          setUsername("");
+          navigate("/login");
           throw new Error(errorData.error || 'Failed to load user data');
         }
         
@@ -89,6 +93,10 @@ function ManageAccount() {
         }
       } catch (err) {
         console.error('Fetch user error:', err);
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        setUsername("");
+        navigate("/login");
         setError("Failed to load user data: " + (err.message || 'Unknown error'));
       } finally {
         setLoading(false);
