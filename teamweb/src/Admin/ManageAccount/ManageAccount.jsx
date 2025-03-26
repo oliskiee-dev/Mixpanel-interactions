@@ -4,6 +4,7 @@ import "./ManageAccount.css";
 
 function ManageAccount() {
   const [accounts, setAccounts] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -17,14 +18,15 @@ function ManageAccount() {
     username: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    role: "admin" // Default role
   });
   const [formErrors, setFormErrors] = useState({});
   const [apiErrors, setApiErrors] = useState({});
 
   // Get the JWT token from localStorage
   const getToken = () => {
-    return localStorage.getItem('token'); // Make sure this key matches what you set in login
+    return localStorage.getItem('token');
   };
   
   // Fetch current user data on component mount
@@ -35,8 +37,7 @@ function ManageAccount() {
           const token = getToken();
           if (!token) {
             setError("Not authenticated");
-            localStorage.removeItem('token'); // Clear invalid token
-            // Redirect to login page
+            localStorage.removeItem('token');
             window.location.href = '/login';
             return;
           }
@@ -49,10 +50,8 @@ function ManageAccount() {
           });
           
           if (response.status === 401) {
-            // Token expired or invalid
             localStorage.removeItem('token');
             setError("Session expired. Please login again.");
-            // Redirect to login page
             window.location.href = '/login';
             return;
           }
@@ -63,14 +62,22 @@ function ManageAccount() {
           }
           
           const data = await response.json();
-          if (data.user) {
+          
+          // Set current user
+          setCurrentUser(data.user);
+          
+          // Handle accounts based on role
+          if (data.user.role === 'head_admin' && data.admins) {
+            // For head admin, show all admin accounts
+            setAccounts(data.admins);
+          } else {
+            // For regular admin, show only their own account
             setAccounts([{
               id: data.user._id,
               username: data.user.username,
-              email: data.user.email || 'No email provided'
+              email: data.user.email || 'No email provided',
+              role: data.user.role
             }]);
-          } else {
-            throw new Error('User data format is incorrect');
           }
         } catch (err) {
           console.error('Fetch user error:', err);
@@ -102,7 +109,8 @@ function ManageAccount() {
       username: "",
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      role: "admin"
     });
     setFormErrors({});
     setApiErrors({});
@@ -121,74 +129,133 @@ function ManageAccount() {
   // Handle password save - connect to reset-password API
   const handlePasswordSave = async () => {
     if (!newPassword.trim()) return;
-    
     setLoading(true);
+
     try {
-      const token = getToken();
-      if (!token) {
-        setError("Not authenticated");
-        return;
-      }
-      
-      const response = await fetch('http://localhost:3000/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          password: newPassword
-          // Don't include token in body, it's already in the Authorization header
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update password');
-      }
-      
-      // Success
-      alert('Password updated successfully');
-      closeModals();
+        const token = getToken();
+        if (!token) {
+            setError("Not authenticated");
+            return;
+        }
+
+        let targetUserId = null;
+
+        // Check if head_admin is changing another user's password
+        if (currentUser.role === "head_admin" && selectedAccount) {
+            targetUserId = selectedAccount.id || selectedAccount._id;
+        } else if (selectedAccount.role === "admin") {
+            targetUserId = selectedAccount.id;
+        } else if (selectedAccount.role === "home_admin") {
+            targetUserId = selectedAccount._id;
+        }
+
+        if (!targetUserId) {
+            setError("Invalid user selection or missing ID");
+            return;
+        }
+
+        const response = await fetch('http://localhost:3000/edit-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                password: newPassword,
+                targetUserId
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update password');
+        }
+
+        alert('Password updated successfully');
+        closeModals();
     } catch (err) {
-      setError(err.message);
-      console.error(err);
+        setError(err.message);
+        console.error(err);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   // Handle account deletion - connect to delete-account API
   const handleAccountDelete = async () => {
     setLoading(true);
     try {
-      const token = getToken();
-      
-      const response = await fetch('http://localhost:3000/delete-account', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+        const token = getToken();
+        if (!token) {
+            setError("Not authenticated");
+            return;
         }
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete account');
-      }
-      
-      // Success - handle logout
-      localStorage.removeItem('token');
-      alert('Account deleted successfully');
-      // Redirect to login page
-      window.location.href = '/login'; 
+
+        let targetUserId = null;
+
+        // Allow head_admin to delete any user
+        if (currentUser.role === "head_admin" && selectedAccount) {
+            targetUserId = selectedAccount.id || selectedAccount._id;
+        } else if (selectedAccount.role === "admin") {
+            targetUserId = selectedAccount.id;
+        } else if (selectedAccount.role === "home_admin") {
+            targetUserId = selectedAccount._id;
+        }
+
+        if (!targetUserId) {
+            setError("Invalid user selection or missing ID");
+            return;
+        }
+
+        const response = await fetch('http://localhost:3000/delete-account', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                targetUserId
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Handle specific error messages from the backend
+            if (data.error) {
+                if (data.error === 'Cannot delete the last head admin account') {
+                    setError('You cannot delete the last head admin account');
+                } else if (data.error === 'Unauthorized to delete this account') {
+                    setError('You are not authorized to delete this account');
+                } else {
+                    setError(data.error || 'Failed to delete account');
+                }
+                return;
+            }
+
+            throw new Error(data.error || 'Failed to delete account');
+        }
+
+        // Success - handle logout or refresh
+        if (targetUserId === currentUser._id) {
+            // If deleting own account, logout
+            localStorage.removeItem('token');
+            alert('Account deleted successfully');
+            window.location.href = '/login';
+        } else {
+            // If deleting another account, refresh the list
+            alert('Account deleted successfully');
+            window.location.reload();
+        }
     } catch (err) {
-      setError(err.message);
-      console.error(err);
+        setError(err.message);
+        console.error(err);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   // Handle new account form changes
   const handleNewAccountChange = (e) => {
@@ -232,9 +299,6 @@ function ManageAccount() {
     if (!newAccount.password) {
       errors.password = "Password is required";
     }
-    // else if (newAccount.password.length < 6) {
-    //   errors.password = "Password must be at least 6 characters";
-    // }
     
     if (newAccount.password !== newAccount.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
@@ -252,15 +316,18 @@ function ManageAccount() {
     setApiErrors({});
     
     try {
+      const token = getToken();
       const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Include token for admin-only registration
         },
         body: JSON.stringify({
           username: newAccount.username,
           email: newAccount.email,
-          password: newAccount.password
+          password: newAccount.password,
+          role: currentUser.role === 'head_admin' ? newAccount.role : 'admin'
         })
       });
       
@@ -287,7 +354,7 @@ function ManageAccount() {
       alert('Account created successfully');
       closeModals();
       
-      // Refresh the accounts list or redirect to login based on your app flow
+      // Refresh the accounts list
       window.location.reload();
     } catch (err) {
       setError(err.message);
@@ -303,7 +370,11 @@ function ManageAccount() {
       <div className="content-container">
         <div className="page-header">
           <h1>Account Management</h1>
-          <p>Create, update, and manage your account.</p>
+          <p>
+            {currentUser?.role === 'head_admin' 
+              ? "Manage all admin accounts" 
+              : "Manage your account"}
+          </p>
         </div>
       </div>
       
@@ -318,14 +389,20 @@ function ManageAccount() {
         <div className="dashboard-panel-accounts">
           <div className="panel-header-accounts">
             <div className="header-content-accounts">
-              <h2 className="panel-title-accounts">Manage Your Account</h2>
-              <button 
-                className="btn-accounts btn-create-accounts" 
-                onClick={handleCreateClick}
-                disabled={loading}
-              >
-                Create Account
-              </button>
+              <h2 className="panel-title-accounts">
+                {currentUser?.role === 'head_admin' 
+                  ? "Manage Admin Accounts" 
+                  : "Manage Your Account"}
+              </h2>
+              {currentUser?.role === 'head_admin' && (
+                <button 
+                  className="btn-accounts btn-create-accounts" 
+                  onClick={handleCreateClick}
+                  disabled={loading}
+                >
+                  Create Account
+                </button>
+              )}
             </div>
           </div>
 
@@ -338,6 +415,9 @@ function ManageAccount() {
                   <tr className="table-row-accounts">
                     <th className="table-header-accounts">Username</th>
                     <th className="table-header-accounts">Email</th>
+                    {currentUser?.role === 'head_admin' && (
+                      <th className="table-header-accounts">Role</th>
+                    )}
                     <th className="table-header-accounts">Actions</th>
                   </tr>
                 </thead>
@@ -346,15 +426,24 @@ function ManageAccount() {
                     <tr key={account.id} className="table-row-accounts">
                       <td className="table-cell-accounts">{account.username}</td>
                       <td className="table-cell-accounts">{account.email}</td>
-                      <td className="table-cell-accounts">
-                        <div className="action-buttons-accounts">
-                          <button 
-                            className="btn-accounts btn-edit-accounts" 
-                            onClick={() => handleEditClick(account)}
-                            disabled={loading}
-                          >
-                            Edit Password
-                          </button>
+                      {currentUser?.role === 'head_admin' && (
+                        <td className="table-cell-accounts">
+                          {account.role === 'head_admin' 
+                            ? 'Head Admin' 
+                            : 'Admin'}
+                        </td>
+                      )}
+                    <td className="table-cell-accounts">
+                      <div className="action-buttons-accounts">
+                        <button 
+                          className="btn-accounts btn-edit-accounts" 
+                          onClick={() => handleEditClick(account)}
+                          disabled={loading}
+                        >
+                          Edit Password
+                        </button>
+                        {(currentUser?.role === 'head_admin' && account.id !== currentUser?._id) ||
+                        (currentUser?.role !== 'head_admin' && account.id === currentUser?._id) ? (
                           <button 
                             className="btn-accounts btn-delete-accounts" 
                             onClick={() => handleDeleteClick(account)}
@@ -362,8 +451,11 @@ function ManageAccount() {
                           >
                             Delete Account
                           </button>
-                        </div>
-                      </td>
+                        ) : null}
+                      </div>
+                    </td>
+
+
                     </tr>
                   ))}
                 </tbody>
@@ -423,8 +515,10 @@ function ManageAccount() {
                   <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
                 </svg>
               </div>
-              <p className="modal-text-accounts warning-text-accounts">Are you sure you want to delete your account?</p>
-              <p className="modal-subtext-accounts">This action cannot be undone. All your data will be permanently removed.</p>
+              <p className="modal-text-accounts warning-text-accounts">
+                Are you sure you want to delete {selectedAccount.username}'s account?
+              </p>
+              <p className="modal-subtext-accounts">This action cannot be undone. All account data will be permanently removed.</p>
             </div>
             <div className="modal-footer-accounts">
               <button className="btn-accounts btn-cancel-accounts" onClick={closeModals} disabled={loading}>Cancel</button>
@@ -507,6 +601,23 @@ function ManageAccount() {
                 />
                 {formErrors.confirmPassword && <div className="error-message-accounts">{formErrors.confirmPassword}</div>}
               </div>
+
+              {/* Role selection for Head Admin */}
+              {currentUser?.role === 'head_admin' && (
+                <div className="form-group-accounts">
+                  <label className="form-label-accounts" htmlFor="role">Role</label>
+                  <select
+                    id="role"
+                    name="role"
+                    value={newAccount.role}
+                    onChange={handleNewAccountChange}
+                    className="form-input-accounts"
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="head_admin">Head Admin</option>
+                  </select>
+                </div>
+              )}
             </div>
             <div className="modal-footer-accounts">
               <button className="btn-accounts btn-cancel-accounts" onClick={closeModals} disabled={loading}>Cancel</button>
