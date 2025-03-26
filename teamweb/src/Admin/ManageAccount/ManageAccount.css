@@ -386,3 +386,25 @@
     color: #6b7280;
     font-size: 0.95rem;
 }
+
+.loading-state-admin{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.loading-spinner-admin{
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1a3a7e;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}

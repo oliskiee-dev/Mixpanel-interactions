@@ -9,10 +9,17 @@ function ManageAccount() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
-  const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
+  // Updated state for editing user info
+  const [editUserInfo, setEditUserInfo] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
   // New account form state
   const [newAccount, setNewAccount] = useState({
     username: "",
@@ -21,6 +28,7 @@ function ManageAccount() {
     confirmPassword: "",
     role: "admin" // Default role
   });
+
   const [formErrors, setFormErrors] = useState({});
   const [apiErrors, setApiErrors] = useState({});
 
@@ -32,68 +40,83 @@ function ManageAccount() {
   // Fetch current user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
-        setLoading(true);
-        try {
-          const token = getToken();
-          if (!token) {
-            setError("Not authenticated");
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-            return;
-          }
-          
-          const response = await fetch('http://localhost:3000/current-user', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          
-          if (response.status === 401) {
-            localStorage.removeItem('token');
-            setError("Session expired. Please login again.");
-            window.location.href = '/login';
-            return;
-          }
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to load user data');
-          }
-          
-          const data = await response.json();
-          
-          // Set current user
-          setCurrentUser(data.user);
-          
-          // Handle accounts based on role
-          if (data.user.role === 'head_admin' && data.admins) {
-            // For head admin, show all admin accounts
-            setAccounts(data.admins);
-          } else {
-            // For regular admin, show only their own account
-            setAccounts([{
-              id: data.user._id,
-              username: data.user.username,
-              email: data.user.email || 'No email provided',
-              role: data.user.role
-            }]);
-          }
-        } catch (err) {
-          console.error('Fetch user error:', err);
-          setError("Failed to load user data: " + (err.message || 'Unknown error'));
-        } finally {
-          setLoading(false);
+      setLoading(true);
+      try {
+        const token = getToken();
+        if (!token) {
+          setError("Not authenticated");
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+          return;
         }
-      };
-  
+        
+        const response = await fetch('http://localhost:3000/current-user', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          setError("Session expired. Please login again.");
+          window.location.href = '/login';
+          return;
+        }
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to load user data');
+        }
+        
+        const data = await response.json();
+        
+        // Set current user
+        setCurrentUser(data.user);
+        
+        // Handle accounts based on role
+        if (data.user.role === 'head_admin' && data.admins) {
+          // For head admin, show all admin accounts
+          setAccounts(data.admins);
+        } else {
+          // For regular admin, show only their own account
+          setAccounts([{
+            id: data.user._id,
+            username: data.user.username,
+            email: data.user.email || 'No email provided',
+            role: data.user.role
+          }]);
+        }
+      } catch (err) {
+        console.error('Fetch user error:', err);
+        setError("Failed to load user data: " + (err.message || 'Unknown error'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchUserData();
   }, []);
 
-  // Handle opening the edit modal
+  // Close all modals
+  const closeModals = () => {
+    setShowDeleteModal(false);
+    setShowEditModal(false);
+    setShowCreateModal(false);
+    setSelectedAccount(null);
+    setApiErrors({});
+    setFormErrors({});
+  };
+
+  // Handle opening the edit modal with full user info
   const handleEditClick = (account) => {
     setSelectedAccount(account);
-    setNewPassword("");
+    setEditUserInfo({
+      username: account.username,
+      email: account.email || "",
+      password: "",
+      confirmPassword: ""
+    });
     setShowEditModal(true);
   };
 
@@ -117,145 +140,160 @@ function ManageAccount() {
     setShowCreateModal(true);
   };
 
-  // Close all modals
-  const closeModals = () => {
-    setShowDeleteModal(false);
-    setShowEditModal(false);
-    setShowCreateModal(false);
-    setSelectedAccount(null);
-    setApiErrors({});
+  // Validate user info form
+  const validateUserInfoForm = () => {
+    const errors = {};
+    
+    if (!editUserInfo.username.trim()) {
+      errors.username = "Username is required";
+    }
+    
+    if (!editUserInfo.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(editUserInfo.email)) {
+      errors.email = "Email is invalid";
+    }
+    
+    // Password is optional, but if provided, must match
+    if (editUserInfo.password) {
+      if (editUserInfo.password !== editUserInfo.confirmPassword) {
+        errors.confirmPassword = "Passwords do not match";
+      }
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  // Handle password save - connect to reset-password API
-  const handlePasswordSave = async () => {
-    if (!newPassword.trim()) return;
+  // Handle user info update
+  const handleUserInfoUpdate = async () => {
+    if (!validateUserInfoForm()) return;
+    
     setLoading(true);
-
+    setApiErrors({});
+    
     try {
-        const token = getToken();
-        if (!token) {
-            setError("Not authenticated");
-            return;
+      const token = getToken();
+      const response = await fetch('http://localhost:3000/update-user-info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          targetUserId: selectedAccount.id || selectedAccount._id,
+          username: editUserInfo.username,
+          email: editUserInfo.email,
+          ...(editUserInfo.password && { password: editUserInfo.password })
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        // Handle specific API errors
+        if (data.error) {
+          if (data.error.includes("Username already exists")) {
+            setApiErrors({ username: "Username already exists" });
+          } else if (data.error.includes("Email already exists")) {
+            setApiErrors({ email: "Email already exists" });
+          } else {
+            // General error
+            setError(data.error || 'Failed to update user info');
+          }
+          return;
         }
-
-        let targetUserId = null;
-
-        // Check if head_admin is changing another user's password
-        if (currentUser.role === "head_admin" && selectedAccount) {
-            targetUserId = selectedAccount.id || selectedAccount._id;
-        } else if (selectedAccount.role === "admin") {
-            targetUserId = selectedAccount.id;
-        } else if (selectedAccount.role === "home_admin") {
-            targetUserId = selectedAccount._id;
-        }
-
-        if (!targetUserId) {
-            setError("Invalid user selection or missing ID");
-            return;
-        }
-
-        const response = await fetch('http://localhost:3000/edit-password', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                password: newPassword,
-                targetUserId
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to update password');
-        }
-
-        alert('Password updated successfully');
-        closeModals();
+        
+        throw new Error(data.error || 'Failed to update user info');
+      }
+      
+      // Success
+      alert('User information updated successfully');
+      closeModals();
+      
+      // Refresh the accounts list
+      window.location.reload();
     } catch (err) {
-        setError(err.message);
-        console.error(err);
+      setError(err.message);
+      console.error(err);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
-
-  // Handle account deletion - connect to delete-account API
+  // Handle account deletion
   const handleAccountDelete = async () => {
     setLoading(true);
     try {
-        const token = getToken();
-        if (!token) {
-            setError("Not authenticated");
-            return;
+      const token = getToken();
+      if (!token) {
+        setError("Not authenticated");
+        return;
+      }
+
+      let targetUserId = null;
+
+      // Allow head_admin to delete any user
+      if (currentUser.role === "head_admin" && selectedAccount) {
+        targetUserId = selectedAccount.id || selectedAccount._id;
+      } else if (selectedAccount.role === "admin") {
+        targetUserId = selectedAccount.id;
+      } else if (selectedAccount.role === "home_admin") {
+        targetUserId = selectedAccount._id;
+      }
+
+      if (!targetUserId) {
+        setError("Invalid user selection or missing ID");
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/delete-account', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          targetUserId
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle specific error messages from the backend
+        if (data.error) {
+          if (data.error === 'Cannot delete the last head admin account') {
+            setError('You cannot delete the last head admin account');
+          } else if (data.error === 'Unauthorized to delete this account') {
+            setError('You are not authorized to delete this account');
+          } else {
+            setError(data.error || 'Failed to delete account');
+          }
+          return;
         }
 
-        let targetUserId = null;
+        throw new Error(data.error || 'Failed to delete account');
+      }
 
-        // Allow head_admin to delete any user
-        if (currentUser.role === "head_admin" && selectedAccount) {
-            targetUserId = selectedAccount.id || selectedAccount._id;
-        } else if (selectedAccount.role === "admin") {
-            targetUserId = selectedAccount.id;
-        } else if (selectedAccount.role === "home_admin") {
-            targetUserId = selectedAccount._id;
-        }
-
-        if (!targetUserId) {
-            setError("Invalid user selection or missing ID");
-            return;
-        }
-
-        const response = await fetch('http://localhost:3000/delete-account', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                targetUserId
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            // Handle specific error messages from the backend
-            if (data.error) {
-                if (data.error === 'Cannot delete the last head admin account') {
-                    setError('You cannot delete the last head admin account');
-                } else if (data.error === 'Unauthorized to delete this account') {
-                    setError('You are not authorized to delete this account');
-                } else {
-                    setError(data.error || 'Failed to delete account');
-                }
-                return;
-            }
-
-            throw new Error(data.error || 'Failed to delete account');
-        }
-
-        // Success - handle logout or refresh
-        if (targetUserId === currentUser._id) {
-            // If deleting own account, logout
-            localStorage.removeItem('token');
-            alert('Account deleted successfully');
-            window.location.href = '/login';
-        } else {
-            // If deleting another account, refresh the list
-            alert('Account deleted successfully');
-            window.location.reload();
-        }
+      // Success - handle logout or refresh
+      if (targetUserId === currentUser._id) {
+        // If deleting own account, logout
+        localStorage.removeItem('token');
+        alert('Account deleted successfully');
+        window.location.href = '/login';
+      } else {
+        // If deleting another account, refresh the list
+        alert('Account deleted successfully');
+        window.location.reload();
+      }
     } catch (err) {
-        setError(err.message);
-        console.error(err);
+      setError(err.message);
+      console.error(err);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
+  };
 
   // Handle new account form changes
   const handleNewAccountChange = (e) => {
@@ -308,7 +346,7 @@ function ManageAccount() {
     return Object.keys(errors).length === 0;
   };
 
-  // Updated handleCreateAccount function with better error handling
+  // Handle create account
   const handleCreateAccount = async () => {
     if (!validateForm()) return;
     
@@ -394,7 +432,7 @@ function ManageAccount() {
                   ? "Manage Admin Accounts" 
                   : "Manage Your Account"}
               </h2>
-              {currentUser?.role === 'head_admin' && (
+              {(currentUser?.role === 'head_admin' || currentUser?.role === 'admin') && (
                 <button 
                   className="btn-accounts btn-create-accounts" 
                   onClick={handleCreateClick}
@@ -408,14 +446,17 @@ function ManageAccount() {
 
           <div className="data-table-container-accounts">
             {loading ? (
-              <div className="loading">Loading...</div>
+                <div className="loading-state-admin">
+                          <div className="loading-spinner-admin"></div>
+                          <p>Loading Admin data...</p>
+                      </div>
             ) : (
               <table className="data-table-accounts">
                 <thead className="table-head-accounts">
                   <tr className="table-row-accounts">
                     <th className="table-header-accounts">Username</th>
                     <th className="table-header-accounts">Email</th>
-                    {currentUser?.role === 'head_admin' && (
+                    {currentUser?.role === 'head_admin' ||  currentUser?.role === 'admin' && (
                       <th className="table-header-accounts">Role</th>
                     )}
                     <th className="table-header-accounts">Actions</th>
@@ -426,36 +467,43 @@ function ManageAccount() {
                     <tr key={account.id} className="table-row-accounts">
                       <td className="table-cell-accounts">{account.username}</td>
                       <td className="table-cell-accounts">{account.email}</td>
-                      {currentUser?.role === 'head_admin' && (
+                      {currentUser?.role === 'head_admin' || currentUser?.role === "admin" && (
                         <td className="table-cell-accounts">
                           {account.role === 'head_admin' 
                             ? 'Head Admin' 
                             : 'Admin'}
                         </td>
                       )}
-                    <td className="table-cell-accounts">
-                      <div className="action-buttons-accounts">
-                        <button 
-                          className="btn-accounts btn-edit-accounts" 
-                          onClick={() => handleEditClick(account)}
-                          disabled={loading}
-                        >
-                          Edit Password
-                        </button>
-                        {(currentUser?.role === 'head_admin' && account.id !== currentUser?._id) ||
-                        (currentUser?.role !== 'head_admin' && account.id === currentUser?._id) ? (
+                      <td className="table-cell-accounts">
+                        <div className="action-buttons-accounts">
                           <button 
-                            className="btn-accounts btn-delete-accounts" 
-                            onClick={() => handleDeleteClick(account)}
+                            className="btn-accounts btn-edit-accounts" 
+                            onClick={() => handleEditClick(account)}
                             disabled={loading}
                           >
-                            Delete Account
+                            Edit
                           </button>
-                        ) : null}
-                      </div>
-                    </td>
-
-
+                          {(currentUser?.role === 'head_admin' && account.role !== 'head_admin') ||
+                          (currentUser?.role === 'admin' && account.id === currentUser?._id) ? (
+                            <button 
+                              className="btn-accounts btn-delete-accounts" 
+                              onClick={() => handleDeleteClick(account)}
+                              disabled={loading}
+                              style={loading ? { backgroundColor: "#f8d7da", opacity: 0.6, cursor: "not-allowed" } : {}}
+                            >
+                              Delete Account
+                            </button>
+                          ) : (
+                            <button 
+                              className="btn-accounts btn-delete-accounts-disable" 
+                              disabled
+                              style={{ backgroundColor: "#e0e0e0", color: "#a0a0a0", cursor: "not-allowed", border: "1px solid #d6d6d6" }}
+                            >
+                              Delete Account
+                            </button>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -465,36 +513,94 @@ function ManageAccount() {
         </div>
       </div>
       
-      {/* Edit Password Modal */}
+      {/* Edit User Info Modal */}
       {showEditModal && (
         <div className="modal-overlay-accounts">
           <div className="modal-container-accounts">
             <div className="modal-header-accounts">
-              <h3 className="modal-title-accounts">Edit Password</h3>
+              <h3 className="modal-title-accounts">Edit User Information</h3>
               <button className="close-btn-accounts" onClick={closeModals}>×</button>
             </div>
             <div className="modal-body-accounts">
-              <p className="modal-text-accounts">Changing password for user: <strong>{selectedAccount.username}</strong></p>
               <div className="form-group-accounts">
-                <label className="form-label-accounts" htmlFor="newPassword">New Password</label>
+                <label className="form-label-accounts" htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={editUserInfo.username}
+                  onChange={(e) => setEditUserInfo({
+                    ...editUserInfo,
+                    username: e.target.value
+                  })}
+                  placeholder="Enter username"
+                  className={`form-input-accounts ${formErrors.username || apiErrors.username ? 'input-error-accounts' : ''}`}
+                />
+                {formErrors.username && <div className="error-message-accounts">{formErrors.username}</div>}
+                {apiErrors.username && <div className="error-message-accounts">{apiErrors.username}</div>}
+              </div>
+              
+              <div className="form-group-accounts">
+                <label className="form-label-accounts" htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={editUserInfo.email}
+                  onChange={(e) => setEditUserInfo({
+                    ...editUserInfo,
+                    email: e.target.value
+                  })}
+                  placeholder="Enter email address"
+                  className={`form-input-accounts ${formErrors.email || apiErrors.email ? 'input-error-accounts' : ''}`}
+                />
+                {formErrors.email && <div className="error-message-accounts">{formErrors.email}</div>}
+                {apiErrors.email && <div className="error-message-accounts">{apiErrors.email}</div>}
+              </div>
+              
+              <div className="form-group-accounts">
+                <label className="form-label-accounts" htmlFor="password">New Password (Optional)</label>
                 <input
                   type="password"
-                  id="newPassword"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  id="password"
+                  name="password"
+                  value={editUserInfo.password}
+                  onChange={(e) => setEditUserInfo({
+                    ...editUserInfo,
+                    password: e.target.value
+                  })}
                   placeholder="Enter new password"
                   className="form-input-accounts"
                 />
               </div>
+              
+              {editUserInfo.password && (
+                <div className="form-group-accounts">
+                  <label className="form-label-accounts" htmlFor="confirmPassword">Confirm New Password</label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={editUserInfo.confirmPassword}
+                    onChange={(e) => setEditUserInfo({
+                      ...editUserInfo,
+                      confirmPassword: e.target.value
+                    })}
+                    placeholder="Confirm new password"
+                    className={`form-input-accounts ${formErrors.confirmPassword ? 'input-error-accounts' : ''}`}
+                  />
+                  {formErrors.confirmPassword && <div className="error-message-accounts">{formErrors.confirmPassword}</div>}
+                </div>
+              )}
             </div>
             <div className="modal-footer-accounts">
               <button className="btn-accounts btn-cancel-accounts" onClick={closeModals} disabled={loading}>Cancel</button>
               <button 
                 className="btn-accounts btn-primary-accounts" 
-                onClick={handlePasswordSave}
-                disabled={!newPassword.trim() || loading}
+                onClick={handleUserInfoUpdate}
+                disabled={loading}
               >
-                {loading ? "Saving..." : "Save Changes"}
+                {loading ? "Updating..." : "Update Information"}
               </button>
             </div>
           </div>
@@ -604,20 +710,28 @@ function ManageAccount() {
 
               {/* Role selection for Head Admin */}
               {currentUser?.role === 'head_admin' && (
-                <div className="form-group-accounts">
-                  <label className="form-label-accounts" htmlFor="role">Role</label>
-                  <select
-                    id="role"
-                    name="role"
-                    value={newAccount.role}
-                    onChange={handleNewAccountChange}
-                    className="form-input-accounts"
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="head_admin">Head Admin</option>
-                  </select>
-                </div>
-              )}
+              <div className="form-group-accounts">
+                <label className="form-label-accounts" htmlFor="role">Role</label>
+                <select
+                  id="role"
+                  name="role"
+                  value="admin" // Locked to "Admin"
+                  className="form-input-accounts"
+                  disabled // Makes it unchangeable
+                  style={{
+                    backgroundColor: '#e0e0e0', // Light gray to indicate it's locked
+                    cursor: 'not-allowed', // Shows a 'not allowed' cursor
+                    color: '#666', // Makes text slightly faded
+                    border: '1px solid #ccc', // Gives it a subtle border
+                    padding: '8px', // Keeps it looking normal
+                    fontSize: '14px',
+                  }}
+                >
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            )}
+
             </div>
             <div className="modal-footer-accounts">
               <button className="btn-accounts btn-cancel-accounts" onClick={closeModals} disabled={loading}>Cancel</button>
