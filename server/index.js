@@ -167,6 +167,50 @@ app.post('/reset-password', async (req, res) => {
     }
 });
 
+
+app.post('/edit-password', async (req, res) => {
+    const { password, targetUserId } = req.body;
+
+    try {
+        // Ensure the requester is authenticated
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        const authToken = authHeader.split(' ')[1];
+        const decoded = jwt.verify(authToken, process.env.JWT_SECRET);
+
+        // Fetch the requesting user
+        const requestingUser = await userModel.findById(decoded.id);
+        if (!requestingUser || requestingUser.role !== "head_admin") {
+            return res.status(403).json({ error: "Insufficient permissions" });
+        }
+
+        // Ensure a target user is provided
+        if (!targetUserId) {
+            return res.status(400).json({ error: "Target user ID is required" });
+        }
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Update the target user's password
+        const updatedUser = await userModel.findByIdAndUpdate(targetUserId, { password: hashedPassword });
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+
 app.get('/admin-homepage', authenticate, (req, res) => {
     res.json({ message: "Welcome to the Admin Homepage!" });
 });
