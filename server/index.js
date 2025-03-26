@@ -268,15 +268,6 @@ app.post('/update-user-info', async (req, res) => {
             return res.status(404).json({ error: 'Target user not found' });
         }
 
-        const isHeadAdmin = currentUser.role === 'head_admin';
-        const isSameUser = authenticatedUserId === targetUserId;
-        const isAdminUpdatingAdmin = currentUser.role === 'admin' && 
-            (targetUser.role === 'admin' || targetUser.role === 'home_admin');
-
-        if (!(isHeadAdmin || isSameUser || isAdminUpdatingAdmin)) {
-            return res.status(403).json({ error: 'Unauthorized to update this account' });
-        }
-
         // Perform the update
         const updatedUser = await userModel.findByIdAndUpdate(
             targetUserId, 
