@@ -464,7 +464,7 @@ function ManageAccount() {
                   <tr className="table-row-accounts">
                     <th className="table-header-accounts">Username</th>
                     <th className="table-header-accounts">Email</th>
-                    {currentUser?.role === 'head_admin' ||  currentUser?.role === 'admin' && (
+                    {currentUser?.role === 'head_admin'&& (
                       <th className="table-header-accounts">Role</th>
                     )}
                     <th className="table-header-accounts">Actions</th>
@@ -475,7 +475,7 @@ function ManageAccount() {
                     <tr key={account.id} className="table-row-accounts">
                       <td className="table-cell-accounts">{account.username}</td>
                       <td className="table-cell-accounts">{account.email}</td>
-                      {currentUser?.role === 'head_admin' || currentUser?.role === "admin" && (
+                      {currentUser?.role === 'head_admin'&& (
                         <td className="table-cell-accounts">
                           {account.role === 'head_admin' 
                             ? 'Head Admin' 
