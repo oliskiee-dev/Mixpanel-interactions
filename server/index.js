@@ -205,12 +205,6 @@ app.post('/update-user-info', async (req, res) => {
     const { targetUserId, username, email, password } = req.body;
 
     try {
-        // Ensure the requester is authenticated
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'Authentication required' });
-        }
-
         // Validate the token and get the authenticated user
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
