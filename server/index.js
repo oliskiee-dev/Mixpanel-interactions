@@ -178,10 +178,10 @@ app.post('/edit-password', async (req, res) => {
             return res.status(401).json({ error: 'Authentication required' });
         }
 
-        // Ensure a target user is provided
-        if (!targetUserId) {
-            return res.status(400).json({ error: "Target user ID is required" });
-        }
+        // // Ensure a target user is provided
+        // if (!targetUserId) {
+        //     return res.status(400).json({ error: "Target user ID is required" });
+        // }
 
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
