@@ -1,11 +1,14 @@
+/* Base Styles */
 .report-container {
     margin: 20px;
     padding: 20px;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
 }
 
+/* Responsive Table */
 .report-table {
     width: 100%;
     border-collapse: collapse;
@@ -15,6 +18,7 @@
     border: 1px solid #ddd;
     padding: 10px;
     text-align: left;
+    white-space: nowrap; /* Prevents wrapping */
 }
 
 .report-table th {
@@ -26,6 +30,24 @@
     background-color: #f9f9f9;
 }
 
+/* Responsive Table for Smaller Screens */
+@media screen and (max-width: 768px) {
+    .report-container {
+        padding: 15px;
+    }
+
+    .report-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .report-table th, .report-table td {
+        padding: 8px;
+    }
+}
+
+/* No Reports Message */
 .no-reports {
     text-align: center;
     font-style: italic;
@@ -37,17 +59,20 @@
 .pagination-container {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     margin-top: 20px;
+    gap: 5px;
 }
 
 .pagination-button {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 8px 12px;
-    margin: 0 5px;
-    border-radius: 4px;
+    padding: 10px 15px;
+    margin: 2px;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 14px;
     transition: background 0.3s ease;
 }
 
@@ -74,7 +99,7 @@
     padding: 4rem 2rem;
     text-align: center;
     background-color: #fff;
-    border-radius: 0.5rem;
+    border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -98,9 +123,9 @@
     background-color: #d9534f;
     color: white;
     border: none;
-    padding: 10px 16px;
+    padding: 12px 20px;
     margin-bottom: 15px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     transition: background 0.3s ease;
     font-size: 16px;
@@ -114,4 +139,40 @@
 .delete-logs-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+/* Make the page header responsive */
+.page-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+}
+
+.page-header p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Mobile Adjustments */
+@media screen and (max-width: 480px) {
+    .delete-logs-button {
+        width: 100%;
+        padding: 14px;
+    }
+
+    .pagination-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .page-header p {
+        font-size: 0.9rem;
+    }
 }
