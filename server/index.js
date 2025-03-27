@@ -412,6 +412,8 @@ app.post('/register', async (req, res) => {
     }
 });
 
+app.use("/", router); 
+
 app.listen(3000,() => {
     console.log("app is running");
 })
