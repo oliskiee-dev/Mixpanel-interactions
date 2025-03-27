@@ -84,7 +84,7 @@ function Homepage() {
           },
           body: JSON.stringify({
             username: username, // Replace with actual username
-            activityLog: `Uploaded an Image: ${selectedFile.name}` // Activity log message
+            activityLog: `[Manage Homepage] Uploaded an Image: ${selectedFile.name}` // Activity log message
           }),
         });
       }
@@ -134,7 +134,7 @@ function Homepage() {
           },
           body: JSON.stringify({
             username: username, // Replace with actual username
-            activityLog: `Deleted Image: ${selectedImage.image_url}` // Log message
+            activityLog: `[Manage Homepage] Deleted Image: ${selectedImage.image_url}` // Log message
           }),
         });
       }

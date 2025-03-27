@@ -38,8 +38,10 @@ const AdminHeader = () => {
       setActiveTab("managepreregistration");
     } else if (path === "/manage-schoolinfo") {
       setActiveTab("manageschoolinfo");
-    } else if(path === "/manage-account"){
+    } else if (path === "/manage-account"){
       setActiveTab("manageaccount");
+    } else if (path === "/view-report"){
+      setActiveTab("viewreport");
     } else if (path === "/admin-homepage") {
       setActiveTab("home");
     } else {
@@ -171,6 +173,16 @@ const AdminHeader = () => {
             }}
           >
             Manage Accounts
+          </a>
+          <a
+            href="/view-report"
+            className={activeTab === "viewreport" ? "active" : ""}
+            onClick={() => {
+              setActiveTab("viewreport");
+              setMenuOpen(false);
+            }}
+          >
+            Admin Logs
           </a>
         </div>
       </nav>

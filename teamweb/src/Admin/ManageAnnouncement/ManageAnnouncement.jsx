@@ -98,8 +98,8 @@ function ManageAnnouncement() {
                 body: JSON.stringify({
                     username: username, // Replace with actual username
                     activityLog: editingId 
-                        ? `Edited Announcement: ${newAnnouncement.title.trim()}`
-                        : `Added Announcement: ${newAnnouncement.title.trim()}`
+                        ? `[Manage Announcement] Edited Announcement: ${newAnnouncement.title.trim()}`
+                        : `[Manage Announcement] Added Announcement: ${newAnnouncement.title.trim()}`
                 }),
             });
     
@@ -152,7 +152,7 @@ function ManageAnnouncement() {
                 },
                 body: JSON.stringify({
                     username: "johndoe123", // Replace with actual username
-                    activityLog: `Deleted Announcement: ${announcementTitle}`
+                    activityLog: `[Manage Announcement] Deleted Announcement: ${announcementTitle}`
                 }),
             });
     

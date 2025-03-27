@@ -93,10 +93,10 @@ function ManageAccount() {
         }
       } catch (err) {
         console.error('Fetch user error:', err);
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        setUsername("");
-        navigate("/login");
+        // localStorage.removeItem("token");
+        // localStorage.removeItem("username");
+        // setUsername("");
+        // navigate("/login");
         setError("Failed to load user data: " + (err.message || 'Unknown error'));
       } finally {
         setLoading(false);
@@ -221,7 +221,7 @@ function ManageAccount() {
               },
               body: JSON.stringify({
                   username: currentUser.username, // Admin performing the update
-                  activityLog: `Updated user accout: ${selectedAccount.username}`
+                  activityLog: `[Manage Account] Updated user accout: ${selectedAccount.username}`
               }),
           });
 
@@ -302,7 +302,7 @@ function ManageAccount() {
               },
               body: JSON.stringify({
                   username: currentUser.username, // Admin performing the deletion
-                  activityLog: `Deleted account: ${selectedAccount.username}`
+                  activityLog: `[Manage Account] Deleted account: ${selectedAccount.username}`
               }),
           });
 
@@ -425,7 +425,7 @@ function ManageAccount() {
               },
               body: JSON.stringify({
                   username: currentUser.username, // Replace with the admin's username
-                  activityLog: `Created a new account: ${newAccount.username} (${newAccount.role})`
+                  activityLog: `[Manage Account] Created a new account: ${newAccount.username} (${newAccount.role})`
               }),
           });
 

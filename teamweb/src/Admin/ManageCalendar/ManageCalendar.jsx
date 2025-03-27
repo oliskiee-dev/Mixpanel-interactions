@@ -182,7 +182,7 @@ const ManageCalendar = () => {
               },
               body: JSON.stringify({
                   username: username, // Replace with actual username
-                  activityLog: `Added Event: ${newEventName.trim()} on ${newEventDate}`
+                  activityLog: `[Manage Calendar] Added Event: ${newEventName.trim()} on ${newEventDate}`
               }),
           });
 
@@ -220,11 +220,11 @@ const ManageCalendar = () => {
           // ✅ Determine what changed and log accordingly
           let activityLog = "";
           if (currentEvent.name !== newEventName.trim() && currentEvent.date !== newEventDate) {
-              activityLog = `Updated Event: Name changed from '${currentEvent.name}' to '${newEventName.trim()}' and Date changed from '${currentEvent.date}' to '${newEventDate}'`;
+              activityLog = `[Manage Calendar] Updated Event: Name changed from '${currentEvent.name}' to '${newEventName.trim()}' and Date changed from '${currentEvent.date}' to '${newEventDate}'`;
           } else if (currentEvent.name !== newEventName.trim()) {
-              activityLog = `Updated Event: Name changed from '${currentEvent.name}' to '${newEventName.trim()}'`;
+              activityLog = `[Manage Calendar] Updated Event: Name changed from '${currentEvent.name}' to '${newEventName.trim()}'`;
           } else if (currentEvent.date !== newEventDate) {
-              activityLog = `Updated Event: Date changed from '${currentEvent.date}' to '${newEventDate}'`;
+              activityLog = `[Manage Calendar] Updated Event: Date changed from '${currentEvent.date}' to '${newEventDate}'`;
           }
 
           if (activityLog) {
@@ -291,7 +291,7 @@ const ManageCalendar = () => {
               },
               body: JSON.stringify({
                   username: username, // Replace with actual username
-                  activityLog: `Deleted Event: '${eventToDelete.name}' on '${eventToDelete.date}'`
+                  activityLog: `[Manage Calendar] Deleted Event: '${eventToDelete.name}' on '${eventToDelete.date}'`
               }),
           });
 

@@ -28,8 +28,9 @@ import ModifyAnnouncement from './Admin/ManageAnnouncement/ModifyAnnouncement.js
 import ManageCalendar from './Admin/ManageCalendar/ManageCalendar.jsx';
 import ManagePreRegistration from './Admin/ManagePreRegistration/ManagePreRegistration.jsx';
 import UpdateAppointment from './Admin/ManagePreRegistration/UpdateAppointment.jsx';
-import ManageSchoolInfo from './Admin/ManageSchoolInfo/ManageSchoolInfo.jsx';
 import ManageAccount from './Admin/ManageAccount/ManageAccount.jsx';
+
+import ViewReport from './Admin/ViewReport/ViewReport.jsx'
 
 function App(){
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -79,8 +80,9 @@ function App(){
         <Route path="/manage-preregistration" element={<ManagePreRegistration />} />
         <Route path="/update-appointment" element={<UpdateAppointment />} />
 
-        <Route path="/manage-schoolinfo" element={<ManageSchoolInfo />} />
-        <Route path="/manage-account" element={<ManageAccount />} /> */}
+        <Route path="/manage-account" element={<ManageAccount />} /> 
+        <Route path="/view-report" element={<ViewReport />} /> */}
+        
 
         {/* Admins */}
         {/* Temporary Disable Restrictions */}
@@ -96,8 +98,8 @@ function App(){
         <Route path="/manage-preregistration" element={<PrivateRoute><ManagePreRegistration /></PrivateRoute>} />
         <Route path="/update-appointment" element={<PrivateRoute><UpdateAppointment /></PrivateRoute>} />
 
-        <Route path="/manage-schoolinfo" element={<PrivateRoute><ManageSchoolInfo /></PrivateRoute>} />
         <Route path="/manage-account" element={<PrivateRoute><ManageAccount /></PrivateRoute>} />
+        <Route path="/view-report" element={<PrivateRoute><ViewReport /></PrivateRoute>} />
       
       </Routes>
     </BrowserRouter>
