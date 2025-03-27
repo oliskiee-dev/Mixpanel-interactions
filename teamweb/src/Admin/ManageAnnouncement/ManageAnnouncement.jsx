@@ -151,7 +151,7 @@ function ManageAnnouncement() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    username: "johndoe123", // Replace with actual username
+                    username: username, // Replace with actual username
                     activityLog: `[Manage Announcement] Deleted Announcement: ${announcementTitle}`
                 }),
             });

@@ -504,49 +504,51 @@ function ManageAccount() {
                   </tr>
                 </thead>
                 <tbody className="table-body-accounts">
-                  {accounts.map((account) => (
-                    <tr key={account.id} className="table-row-accounts">
-                      <td className="table-cell-accounts">{account.username}</td>
-                      <td className="table-cell-accounts">{account.email}</td>
-                      {currentUser?.role === 'head_admin'&& (
-                        <td className="table-cell-accounts">
-                          {account.role === 'head_admin' 
-                            ? 'Head Admin' 
-                            : 'Admin'}
-                        </td>
-                      )}
-                      <td className="table-cell-accounts">
-                        <div className="action-buttons-accounts">
-                          <button 
-                            className="btn-accounts btn-edit-accounts" 
-                            onClick={() => handleEditClick(account)}
-                            disabled={loading}
-                          >
-                            Edit
-                          </button>
-                          {(currentUser?.role === 'head_admin' && account.role !== 'head_admin') ||
-                          (currentUser?.role === 'admin' && account.id === currentUser?._id) ? (
-                            <button 
-                              className="btn-accounts btn-delete-accounts" 
-                              onClick={() => handleDeleteClick(account)}
-                              disabled={loading}
-                              style={loading ? { backgroundColor: "#f8d7da", opacity: 0.6, cursor: "not-allowed" } : {}}
-                            >
-                              Delete Account
-                            </button>
-                          ) : (
-                            <button 
-                              className="btn-accounts btn-delete-accounts-disable" 
-                              disabled
-                              style={{ backgroundColor: "#e0e0e0", color: "#a0a0a0", cursor: "not-allowed", border: "1px solid #d6d6d6" }}
-                            >
-                              Delete Account
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                {accounts.map((account) => (
+    <tr 
+        key={currentUser?.role === "head_admin" ? account._id : account.id || account._id} 
+        className="table-row-accounts"
+    >
+        <td className="table-cell-accounts">{account.username}</td>
+        <td className="table-cell-accounts">{account.email}</td>
+        {currentUser?.role === "head_admin" && (
+            <td className="table-cell-accounts">
+                {account.role === "head_admin" ? "Head Admin" : "Admin"}
+            </td>
+        )}
+        <td className="table-cell-accounts">
+            <div className="action-buttons-accounts">
+                <button 
+                    className="btn-accounts btn-edit-accounts" 
+                    onClick={() => handleEditClick(account)}
+                    disabled={loading}
+                >
+                    Edit
+                </button>
+                {(currentUser?.role === "head_admin" && account.role !== "head_admin") ||
+                (currentUser?.role === "admin" && account.id === currentUser?._id) ? (
+                    <button 
+                        className="btn-accounts btn-delete-accounts" 
+                        onClick={() => handleDeleteClick(account)}
+                        disabled={loading}
+                        style={loading ? { backgroundColor: "#f8d7da", opacity: 0.6, cursor: "not-allowed" } : {}}
+                    >
+                        Delete Account
+                    </button>
+                ) : (
+                    <button 
+                        className="btn-accounts btn-delete-accounts-disable" 
+                        disabled
+                        style={{ backgroundColor: "#e0e0e0", color: "#a0a0a0", cursor: "not-allowed", border: "1px solid #d6d6d6" }}
+                    >
+                        Delete Account
+                    </button>
+                )}
+            </div>
+        </td>
+    </tr>
+))}
+
                 </tbody>
               </table>
             )}

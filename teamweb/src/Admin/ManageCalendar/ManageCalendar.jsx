@@ -4,7 +4,9 @@ import AdminHeader from '../Component/AdminHeader.jsx';
 
 // Main Calendar component
 const ManageCalendar = () => {
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const initialYear = new Date().getFullYear(); // Get the current year dynamically
+  const [currentYear, setCurrentYear] = useState(initialYear);
+  const [hasSeenInitialYear, setHasSeenInitialYear] = useState(false);
   const [events, setEvents] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,43 +67,84 @@ const ManageCalendar = () => {
   useEffect(() => {
     const loggedInUser = localStorage.getItem('username');
     if (loggedInUser) {
-      setUsername(loggedInUser);
+        setUsername(loggedInUser);
     } else {
-      setUsername("Admin");
+        setUsername("Admin");
     }
+
     // Set today's date in ISO format (YYYY-MM-DD)
     setToday(new Date().toISOString().split('T')[0]);
-    
-    const fetchCalendarData = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/calendar'); // Adjust API URL if needed
-        if (!response.ok) throw new Error('Failed to fetch data');
 
-        const data = await response.json();
-        
-        // Extract only events from the calendar data (not holidays)
-        const eventsData = data.calendar ? data.calendar.filter(item => item.type === "event") : [];
-        
-        // Format data to match the existing structure
-        const formattedEvents = eventsData.map(item => ({
-          id: item._id,
-          date: item.date.slice(0, 10),
-          name: item.title
-        }));
-        
-        setEvents(formattedEvents);
-      } catch (error) {
-        console.error('Error fetching calendar data:', error);
-        setNotification({ message: 'Failed to load calendar data.', isError: true });
-      }
+    const fetchCalendarData = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/calendar'); // Adjust API URL if needed
+            if (!response.ok) throw new Error('Failed to fetch data');
+
+            const data = await response.json();
+            
+            // Extract only events from the calendar data (not holidays)
+            const eventsData = data.calendar ? data.calendar.filter(item => item.type === "event") : [];
+            
+            // Format data to match the existing structure
+            const formattedEvents = eventsData.map(item => ({
+                id: item._id,
+                date: item.date.slice(0, 10),
+                name: item.title
+            }));
+            
+            setEvents(formattedEvents);
+        } catch (error) {
+            console.error('Error fetching calendar data:', error);
+            setNotification({ message: 'Failed to load calendar data.', isError: true });
+        }
     };
 
+    // Function to delete previous year's entries
+    const deletePreviousYearEntries = async () => {
+      try {
+          const response = await fetch('http://localhost:3000/calendar/delete-previous-year', {
+              method: 'DELETE',
+          });
+  
+          if (response.status === 404) {
+              console.log("No data found from last year to delete.");
+              //return; // Exit early to avoid unnecessary error logging
+          }
+  
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || 'Failed to delete previous year’s entries');
+          }
+  
+          const data = await response.json();
+          console.log(data.message || "Previous year's calendar entries deleted successfully.");
+      } catch (error) {
+          console.error('Error deleting previous year’s calendar entries:', error.message);
+      }
+  };
+  
+  
+
     fetchCalendarData();
-  }, []);
+    deletePreviousYearEntries(); // Call the function when the component mounts
+}, []);
+
   
   // Navigation functions
-  const prevYear = () => setCurrentYear(currentYear - 1);
-  const nextYear = () => setCurrentYear(currentYear + 1);
+  const prevYear = () => {
+    if (currentYear > initialYear) {
+      setCurrentYear(currentYear - 1);
+      if (currentYear - 1 === initialYear) {
+        setHasSeenInitialYear(true);
+      }
+    }
+  };
+
+  const nextYear = () => {
+    if (currentYear < initialYear + 1 && (currentYear === initialYear || hasSeenInitialYear)) {
+      setCurrentYear(currentYear + 1);
+    }
+  };
 
   // Modal handling
   const openAddModal = (date) => {
@@ -387,11 +430,11 @@ const ManageCalendar = () => {
             </div>
       </div>
       <div className="calendar-container admin-calendar">
-        <div className="calendar-header">
-          <button onClick={prevYear}>❮ Prev Year</button>
-          <h2>{currentYear}</h2>
-          <button onClick={nextYear}>Next Year ❯</button>
-        </div>
+      <div className="calendar-header">
+        <button onClick={prevYear} disabled={currentYear === initialYear}>❮ Prev Year</button>
+        <h2>{currentYear}</h2>
+        <button onClick={nextYear} disabled={currentYear >= initialYear + 1}>Next Year ❯</button>
+      </div>
 
         {/* Current event display */}
         {currentEvent && (
