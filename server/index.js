@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 const userModel = require('./models/user.js')
+const reportModel = require('./models/Report.js');
 
 const homepageRoutes = require("./routes/homepageRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
