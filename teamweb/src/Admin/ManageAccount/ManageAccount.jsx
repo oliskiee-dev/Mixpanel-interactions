@@ -175,133 +175,156 @@ function ManageAccount() {
 
   // Handle user info update
   const handleUserInfoUpdate = async () => {
-    if (!validateUserInfoForm()) return;
-    
-    setLoading(true);
-    setApiErrors({});
-    
-    try {
-      const token = getToken();
-      const response = await fetch('http://localhost:3000/update-user-info', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          targetUserId: selectedAccount.id || selectedAccount._id,
-          username: editUserInfo.username,
-          email: editUserInfo.email,
-          ...(editUserInfo.password && { password: editUserInfo.password })
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        // Handle specific API errors
-        if (data.error) {
-          if (data.error.includes("Username already exists")) {
-            setApiErrors({ username: "Username already exists" });
-          } else if (data.error.includes("Email already exists")) {
-            setApiErrors({ email: "Email already exists" });
-          } else {
-            // General error
-            setError(data.error || 'Failed to update user info');
+      if (!validateUserInfoForm()) return;
+
+      setLoading(true);
+      setApiErrors({});
+
+      try {
+          const token = getToken();
+          const response = await fetch('http://localhost:3000/update-user-info', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                  targetUserId: selectedAccount.id || selectedAccount._id,
+                  username: editUserInfo.username,
+                  email: editUserInfo.email,
+                  ...(editUserInfo.password && { password: editUserInfo.password })
+              })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+              // Handle specific API errors
+              if (data.error) {
+                  if (data.error.includes("Username already exists")) {
+                      setApiErrors({ username: "Username already exists" });
+                  } else if (data.error.includes("Email already exists")) {
+                      setApiErrors({ email: "Email already exists" });
+                  } else {
+                      setError(data.error || 'Failed to update user info');
+                  }
+                  return;
+              }
+              throw new Error(data.error || 'Failed to update user info');
           }
-          return;
-        }
-        
-        throw new Error(data.error || 'Failed to update user info');
+
+          // ✅ Call `/add-report` API
+          await fetch("http://localhost:3000/add-report", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  username: currentUser.username, // Admin performing the update
+                  activityLog: `Updated user accout: ${selectedAccount.username}`
+              }),
+          });
+
+          // Success
+          alert('User information updated successfully');
+          closeModals();
+
+          // Refresh the accounts list
+          window.location.reload();
+      } catch (err) {
+          setError(err.message);
+          console.error(err);
+      } finally {
+          setLoading(false);
       }
-      
-      // Success
-      alert('User information updated successfully');
-      closeModals();
-      
-      // Refresh the accounts list
-      window.location.reload();
-    } catch (err) {
-      setError(err.message);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
   };
+
 
   // Handle account deletion
   const handleAccountDelete = async () => {
-    setLoading(true);
-    try {
-      const token = getToken();
-      if (!token) {
-        setError("Not authenticated");
-        return;
-      }
-
-      let targetUserId = null;
-
-      // Allow head_admin to delete any user
-      if (currentUser.role === "head_admin" && selectedAccount) {
-        targetUserId = selectedAccount.id || selectedAccount._id;
-      } else if (selectedAccount.role === "admin") {
-        targetUserId = selectedAccount.id;
-      } else if (selectedAccount.role === "home_admin") {
-        targetUserId = selectedAccount._id;
-      }
-
-      if (!targetUserId) {
-        setError("Invalid user selection or missing ID");
-        return;
-      }
-
-      const response = await fetch('http://localhost:3000/delete-account', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          targetUserId
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Handle specific error messages from the backend
-        if (data.error) {
-          if (data.error === 'Cannot delete the last head admin account') {
-            setError('You cannot delete the last head admin account');
-          } else if (data.error === 'Unauthorized to delete this account') {
-            setError('You are not authorized to delete this account');
-          } else {
-            setError(data.error || 'Failed to delete account');
+      setLoading(true);
+      try {
+          const token = getToken();
+          if (!token) {
+              setError("Not authenticated");
+              return;
           }
-          return;
-        }
 
-        throw new Error(data.error || 'Failed to delete account');
-      }
+          let targetUserId = null;
 
-      // Success - handle logout or refresh
-      if (targetUserId === currentUser._id) {
-        // If deleting own account, logout
-        localStorage.removeItem('token');
-        alert('Account deleted successfully');
-        window.location.href = '/login';
-      } else {
-        // If deleting another account, refresh the list
-        alert('Account deleted successfully');
-        window.location.reload();
+          // Allow head_admin to delete any user
+          if (currentUser.role === "head_admin" && selectedAccount) {
+              targetUserId = selectedAccount.id || selectedAccount._id;
+          } else if (selectedAccount.role === "admin") {
+              targetUserId = selectedAccount.id;
+          } else if (selectedAccount.role === "home_admin") {
+              targetUserId = selectedAccount._id;
+          }
+
+          if (!targetUserId) {
+              setError("Invalid user selection or missing ID");
+              return;
+          }
+
+          const response = await fetch('http://localhost:3000/delete-account', {
+              method: 'DELETE',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                  targetUserId
+              })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+              // Handle specific error messages from the backend
+              if (data.error) {
+                  if (data.error === 'Cannot delete the last head admin account') {
+                      setError('You cannot delete the last head admin account');
+                  } else if (data.error === 'Unauthorized to delete this account') {
+                      setError('You are not authorized to delete this account');
+                  } else {
+                      setError(data.error || 'Failed to delete account');
+                  }
+                  return;
+              }
+              throw new Error(data.error || 'Failed to delete account');
+          }
+
+          // ✅ Call `/add-report` API
+          await fetch("http://localhost:3000/add-report", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  username: currentUser.username, // Admin performing the deletion
+                  activityLog: `Deleted account: ${selectedAccount.username}`
+              }),
+          });
+
+          // Success - handle logout or refresh
+          if (targetUserId === currentUser._id) {
+              // If deleting own account, logout
+              localStorage.removeItem('token');
+              alert('Account deleted successfully');
+              window.location.href = '/login';
+          } else {
+              // If deleting another account, refresh the list
+              alert('Account deleted successfully');
+              window.location.reload();
+          }
+      } catch (err) {
+          setError(err.message);
+          console.error(err);
+      } finally {
+          setLoading(false);
       }
-    } catch (err) {
-      setError(err.message);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
   };
+
 
   // Handle new account form changes
   const handleNewAccountChange = (e) => {
@@ -356,58 +379,68 @@ function ManageAccount() {
 
   // Handle create account
   const handleCreateAccount = async () => {
-    if (!validateForm()) return;
-    
-    setLoading(true);
-    setApiErrors({});
-    
-    try {
-      const token = getToken();
-      const response = await fetch('http://localhost:3000/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Include token for admin-only registration
-        },
-        body: JSON.stringify({
-          username: newAccount.username,
-          email: newAccount.email,
-          password: newAccount.password,
-          role: currentUser.role === 'head_admin' ? newAccount.role : 'admin'
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        // Handle specific API errors and map them to form fields
-        if (data.error) {
-          if (data.error.includes("Username already exists")) {
-            setApiErrors({ username: "Username already exists" });
-          } else if (data.error.includes("Email already exists")) {
-            setApiErrors({ email: "Email already exists" });
-          } else {
-            // General error
-            setError(data.error || 'Failed to create account');
+      if (!validateForm()) return;
+
+      setLoading(true);
+      setApiErrors({});
+
+      try {
+          const token = getToken();
+          const response = await fetch('http://localhost:3000/register', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}` // Include token for admin-only registration
+              },
+              body: JSON.stringify({
+                  username: newAccount.username,
+                  email: newAccount.email,
+                  password: newAccount.password,
+                  role: currentUser.role === 'head_admin' ? newAccount.role : 'admin'
+              })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+              // Handle specific API errors and map them to form fields
+              if (data.error) {
+                  if (data.error.includes("Username already exists")) {
+                      setApiErrors({ username: "Username already exists" });
+                  } else if (data.error.includes("Email already exists")) {
+                      setApiErrors({ email: "Email already exists" });
+                  } else {
+                      setError(data.error || 'Failed to create account');
+                  }
+                  return;
+              }
+              throw new Error(data.error || 'Failed to create account');
           }
-          return;
-        }
-        
-        throw new Error(data.error || 'Failed to create account');
+
+          // ✅ Call `/add-report` API
+          await fetch("http://localhost:3000/add-report", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  username: currentUser.username, // Replace with the admin's username
+                  activityLog: `Created a new account: ${newAccount.username} (${newAccount.role})`
+              }),
+          });
+
+          // Success
+          alert('Account created successfully');
+          closeModals();
+
+          // Refresh the accounts list
+          window.location.reload();
+      } catch (err) {
+          setError(err.message);
+          console.error(err);
+      } finally {
+          setLoading(false);
       }
-      
-      // Success
-      alert('Account created successfully');
-      closeModals();
-      
-      // Refresh the accounts list
-      window.location.reload();
-    } catch (err) {
-      setError(err.message);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (

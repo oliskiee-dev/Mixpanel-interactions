@@ -10,8 +10,15 @@ function Homepage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
+    const loggedInUser = localStorage.getItem('username');
+    if (loggedInUser) {
+      setUsername(loggedInUser);
+    } else {
+      setUsername("Admin");
+    }
     fetchImages();
   }, []);
 
@@ -62,10 +69,26 @@ function Homepage() {
         method: "POST",
         body: formData,
       });
-      
+
       clearInterval(uploadTimer);
       setUploadProgress(100);
-      
+
+      if (response.ok) {
+        fetchImages(); // Refresh images after upload
+
+        // ✅ Call the `/add-report` API
+        await fetch("http://localhost:3000/add-report", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username, // Replace with actual username
+            activityLog: `Uploaded an Image: ${selectedFile.name}` // Activity log message
+          }),
+        });
+      }
+
       setTimeout(() => {
         setIsUploading(false);
         setUploadProgress(0);
@@ -73,14 +96,12 @@ function Homepage() {
         setSelectedFile(null);
       }, 500);
       
-      if (response.ok) {
-        fetchImages();
-      }
     } catch (error) {
       setIsUploading(false);
       console.error("Error uploading image:", error);
     }
   };
+
   
   const cancelUpload = () => {
     setPreviewImage(null);
@@ -99,10 +120,23 @@ function Homepage() {
       const response = await fetch(`http://localhost:3000/homepage/delete-image/${selectedImage.image_url}`, {
         method: "DELETE",
       });
+
       if (response.ok) {
         fetchImages();
         setShowDeleteConfirm(false);
         setSelectedImage(null);
+
+        // ✅ Call the `/add-report` API
+        await fetch("http://localhost:3000/add-report", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username, // Replace with actual username
+            activityLog: `Deleted Image: ${selectedImage.image_url}` // Log message
+          }),
+        });
       }
     } catch (error) {
       console.error("Error deleting image:", error);

@@ -15,12 +15,20 @@ function ManageAnnouncement() {
     const [showFormModal, setShowFormModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
+    const [announcementTitle, setAnnouncementTitle] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const announcementsPerPage = 6;
     const baseUrl = "http://localhost:3000";
+    const [username, setUsername] = useState("");
 
     useEffect(() => {
+        const loggedInUser = localStorage.getItem('username');
+        if (loggedInUser) {
+          setUsername(loggedInUser);
+        } else {
+          setUsername("Admin");
+        }
         fetchAnnouncements();
     }, []);
     
@@ -43,7 +51,7 @@ function ManageAnnouncement() {
     
     const handleCreateOrUpdateAnnouncement = async (event) => {
         event.preventDefault();
-
+    
         // Validate inputs
         if (!newAnnouncement.title.trim() || !newAnnouncement.description.trim()) {
             alert("Title and description are required.");
@@ -62,7 +70,7 @@ function ManageAnnouncement() {
                 ? `${baseUrl}/announcement/edit/${editingId}`
                 : `${baseUrl}/announcement/add`;
             const method = editingId ? "PUT" : "POST";
-            
+    
             // Show loading state
             const submitBtn = document.querySelector('.submit-button');
             if (submitBtn) {
@@ -81,9 +89,23 @@ function ManageAnnouncement() {
                 throw new Error("Failed to save announcement");
             }
     
+            // ✅ Call the `/add-report` API
+            await fetch("http://localhost:3000/add-report", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username, // Replace with actual username
+                    activityLog: editingId 
+                        ? `Edited Announcement: ${newAnnouncement.title.trim()}`
+                        : `Added Announcement: ${newAnnouncement.title.trim()}`
+                }),
+            });
+    
             resetForm();
             fetchAnnouncements();
-            
+    
             // Show success toast
             showToast(editingId ? "Announcement updated successfully!" : "Announcement posted successfully!");
         } catch (error) {
@@ -99,32 +121,46 @@ function ManageAnnouncement() {
         }
     };
     
+    
     const resetForm = () => {
         setNewAnnouncement({ title: "", description: "", image_url: null, preview: null });
         setEditingId(null);
         setShowFormModal(false);
     };
 
-    const handleDelete = async () => {
+    const handleDelete = async (announcement) => {
         try {
             const deleteBtn = document.querySelector('.delete-confirm-btn');
             if (deleteBtn) {
                 deleteBtn.disabled = true;
                 deleteBtn.textContent = "Deleting...";
             }
-            
+    
             const response = await fetch(`${baseUrl}/announcement/delete/${deleteId}`, {
                 method: "DELETE",
             });
-
+    
             if (!response.ok) {
                 throw new Error("Failed to delete announcement");
             }
-
+    
+            // ✅ Call `/add-report` API
+            await fetch("http://localhost:3000/add-report", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: "johndoe123", // Replace with actual username
+                    activityLog: `Deleted Announcement: ${announcementTitle}`
+                }),
+            });
+    
             fetchAnnouncements();
             setShowDeleteModal(false);
             setDeleteId(null);
-            
+            setAnnouncementTitle(null);
+    
             // Show success toast
             showToast("Announcement deleted successfully!");
         } catch (error) {
@@ -139,8 +175,10 @@ function ManageAnnouncement() {
         }
     };
     
-    const openDeleteModal = (id) => {
+    
+    const openDeleteModal = (id,title) => {
         setDeleteId(id);
+        setAnnouncementTitle(title);
         setShowDeleteModal(true);
     };
     
@@ -293,7 +331,7 @@ function ManageAnnouncement() {
                 </button>
                 <div className="format-info">All post types supported</div>
             </div>
-</div>
+            </div>
 
                 {/* Announcement List Section */}
                 <div className="announcement-list-section">
@@ -376,7 +414,7 @@ function ManageAnnouncement() {
                                                         <i className="fa fa-pencil"></i> Edit
                                                     </button>
                                                     <button 
-                                                        onClick={() => openDeleteModal(announcement._id)} 
+                                                        onClick={() => openDeleteModal(announcement._id,announcement.title)} 
                                                         className="delete-btn"
                                                         aria-label={`Delete ${announcement.title}`}
                                                     >

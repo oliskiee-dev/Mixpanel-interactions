@@ -18,6 +18,7 @@ const ManageCalendar = () => {
   // Add confirmation modal state
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
+  const [username, setUsername] = useState("");
 
   // Static holidays data (month is 0-indexed: January = 0, December = 11)
   const staticHolidays = [
@@ -62,6 +63,12 @@ const ManageCalendar = () => {
   ];
 
   useEffect(() => {
+    const loggedInUser = localStorage.getItem('username');
+    if (loggedInUser) {
+      setUsername(loggedInUser);
+    } else {
+      setUsername("Admin");
+    }
     // Set today's date in ISO format (YYYY-MM-DD)
     setToday(new Date().toISOString().split('T')[0]);
     
@@ -143,66 +150,105 @@ const ManageCalendar = () => {
 
   // Event management
   const addEvent = async () => {
-    if (newEventName.trim() === '') return;
-  
-    const newEvent = { date: newEventDate, title: newEventName.trim(), type: "event" };
-  
-    try {
-      const response = await fetch('http://localhost:3000/calendar/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newEvent),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to add event: ${errorText}`);
+      if (newEventName.trim() === '') return;
+
+      const newEvent = { date: newEventDate, title: newEventName.trim(), type: "event" };
+
+      try {
+          const response = await fetch('http://localhost:3000/calendar/add', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newEvent),
+          });
+
+          if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Failed to add event: ${errorText}`);
+          }
+
+          const responseData = await response.json();
+          
+          setEvents([...events, {
+              id: responseData.id,
+              date: newEventDate,
+              name: newEventName.trim()
+          }]);
+
+          // ✅ Call `/add-report` API
+          await fetch("http://localhost:3000/add-report", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  username: username, // Replace with actual username
+                  activityLog: `Added Event: ${newEventName.trim()} on ${newEventDate}`
+              }),
+          });
+
+          closeModal();
+          showNotification('Event added successfully!');
+      } catch (error) {
+          console.error('Error adding event:', error);
+          showNotification('Failed to add event.', true);
       }
-  
-      const responseData = await response.json();
-      
-      setEvents([...events, {
-        id: responseData.id,
-        date: newEventDate,
-        name: newEventName.trim()
-      }]);
-  
-      closeModal();
-      showNotification('Event added successfully!');
-    } catch (error) {
-      console.error('Error adding event:', error);
-      showNotification('Failed to add event.', true);
-    }
   };
+
   
   const updateEvent = async () => {
-    if (newEventName.trim() === '' || !currentEvent) return;
-  
-    try {
-      const response = await fetch(`http://localhost:3000/calendar/edit/${currentEvent.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          date: newEventDate, 
-          title: newEventName,
-          type: "event"
-        }),
-      });
-  
-      if (!response.ok) throw new Error('Failed to update event');
-  
-      const updatedEvents = events.map((event) =>
-        event.id === currentEvent.id ? { ...event, date: newEventDate, name: newEventName } : event
-      );
-  
-      setEvents(updatedEvents);
-      closeModal();
-      showNotification('Event updated successfully!');
-    } catch (error) {
-      console.error('Error updating event:', error);
-      showNotification('Failed to update event.', true);
-    }
+      if (newEventName.trim() === '' || !currentEvent) return;
+
+      try {
+          const response = await fetch(`http://localhost:3000/calendar/edit/${currentEvent.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                  date: newEventDate, 
+                  title: newEventName,
+                  type: "event"
+              }),
+          });
+
+          if (!response.ok) throw new Error('Failed to update event');
+
+          const updatedEvents = events.map((event) =>
+              event.id === currentEvent.id ? { ...event, date: newEventDate, name: newEventName } : event
+          );
+
+          setEvents(updatedEvents);
+
+          // ✅ Determine what changed and log accordingly
+          let activityLog = "";
+          if (currentEvent.name !== newEventName.trim() && currentEvent.date !== newEventDate) {
+              activityLog = `Updated Event: Name changed from '${currentEvent.name}' to '${newEventName.trim()}' and Date changed from '${currentEvent.date}' to '${newEventDate}'`;
+          } else if (currentEvent.name !== newEventName.trim()) {
+              activityLog = `Updated Event: Name changed from '${currentEvent.name}' to '${newEventName.trim()}'`;
+          } else if (currentEvent.date !== newEventDate) {
+              activityLog = `Updated Event: Date changed from '${currentEvent.date}' to '${newEventDate}'`;
+          }
+
+          if (activityLog) {
+              await fetch("http://localhost:3000/add-report", {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                      username: username, // Replace with actual username
+                      activityLog: activityLog
+                  }),
+              });
+          }
+
+          closeModal();
+          showNotification('Event updated successfully!');
+      } catch (error) {
+          console.error('Error updating event:', error);
+          showNotification('Failed to update event.', true);
+      }
   };
+
+
   
   // Show confirmation dialog before deleting
   const confirmDelete = (eventToDelete) => {
@@ -217,32 +263,46 @@ const ManageCalendar = () => {
   
   // Proceed with deletion after confirmation
   const performDelete = async () => {
-    if (!eventToDelete?.id) return;
-    
-    try {
-      const response = await fetch(`http://localhost:3000/calendar/delete/${eventToDelete.id}`, {
-        method: 'DELETE',
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to delete event: ${errorText}`);
+      if (!eventToDelete?.id) return;
+
+      try {
+          const response = await fetch(`http://localhost:3000/calendar/delete/${eventToDelete.id}`, {
+              method: 'DELETE',
+          });
+
+          if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Failed to delete event: ${errorText}`);
+          }
+
+          // Remove the deleted event from state
+          const updatedEvents = events.filter((event) => event.id !== eventToDelete.id);
+          setEvents(updatedEvents);
+          closeModal(); // Close modal if deleting from the edit modal
+          setIsConfirmationOpen(false); // Close confirmation dialog
+          setEventToDelete(null);
+          showNotification('Event deleted successfully!');
+
+          // ✅ Call `/add-report` API
+          await fetch("http://localhost:3000/add-report", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  username: username, // Replace with actual username
+                  activityLog: `Deleted Event: '${eventToDelete.name}' on '${eventToDelete.date}'`
+              }),
+          });
+
+      } catch (error) {
+          console.error('Error deleting event:', error);
+          showNotification('Failed to delete event.', true);
+          setIsConfirmationOpen(false);
+          setEventToDelete(null);
       }
-  
-      // Remove the deleted event from state
-      const updatedEvents = events.filter((event) => event.id !== eventToDelete.id);
-      setEvents(updatedEvents);
-      closeModal(); // Close modal if deleting from the edit modal
-      setIsConfirmationOpen(false); // Close confirmation dialog
-      setEventToDelete(null);
-      showNotification('Event deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting event:', error);
-      showNotification('Failed to delete event.', true);
-      setIsConfirmationOpen(false);
-      setEventToDelete(null);
-    }
   };
+
   
   // Cancel deletion
   const cancelDelete = () => {
