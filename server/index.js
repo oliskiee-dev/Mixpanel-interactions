@@ -41,6 +41,37 @@ app.use("/calendar", calendarRoutes);
 app.use('/preregistration', preRegistrationRoutes);
 app.use("/booking", bookRoutes);
 
+
+router.post('/add-report', async (req, res) => {
+    try {
+        const { username, activityLog } = req.body;
+        
+        if (!username || !activityLog) {
+            return res.status(400).json({ error: 'Username and activityLog are required' });
+        }
+        
+        const newReport = new Report({ username, activityLog });
+        await newReport.save();
+        
+        res.status(201).json({ message: 'Report added successfully', report: newReport });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Delete all reports
+router.delete('/delete-reports', async (req, res) => {
+    try {
+        await Report.deleteMany({});
+        res.status(200).json({ message: 'All reports deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
 // Update your login endpoint in server.js
