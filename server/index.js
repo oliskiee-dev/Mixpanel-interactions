@@ -50,7 +50,7 @@ router.post('/add-report', async (req, res) => {
             return res.status(400).json({ error: 'Username and activityLog are required' });
         }
         
-        const newReport = new Report({ username, activityLog });
+        const newReport = new reportModel({ username, activityLog });
         await newReport.save();
         
         res.status(201).json({ message: 'Report added successfully', report: newReport });
@@ -63,7 +63,7 @@ router.post('/add-report', async (req, res) => {
 // Delete all reports
 router.delete('/delete-reports', async (req, res) => {
     try {
-        await Report.deleteMany({});
+        await reportModel.deleteMany({});
         res.status(200).json({ message: 'All reports deleted successfully' });
     } catch (error) {
         console.error(error);
