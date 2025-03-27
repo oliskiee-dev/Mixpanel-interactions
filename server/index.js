@@ -41,6 +41,15 @@ app.use("/calendar", calendarRoutes);
 app.use('/preregistration', preRegistrationRoutes);
 app.use("/booking", bookRoutes);
 
+router.get('/view-report', async (req, res) => {
+    try {
+        const reports = await reportModel.find({});
+        res.status(200).json(reports);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 router.post('/add-report', async (req, res) => {
     try {
@@ -60,7 +69,6 @@ router.post('/add-report', async (req, res) => {
     }
 });
 
-// Delete all reports
 router.delete('/delete-reports', async (req, res) => {
     try {
         await reportModel.deleteMany({});
