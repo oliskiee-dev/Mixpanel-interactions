@@ -64,9 +64,33 @@ const deleteCalendarEntry = async (req, res) => {
     }
 };
 
+const deletePreviousYearEntries = async (req, res) => {
+    const currentYear = new Date().getFullYear(); // Get the current year
+    const previousYear = currentYear - 1; // Calculate the previous year
+
+    try {
+        const deletedEntries = await calendarModel.deleteMany({
+            date: { 
+                $gte: new Date(`${previousYear}-01-01`), 
+                $lt: new Date(`${previousYear + 1}-01-01`)
+            }
+        });
+
+        if (deletedEntries.deletedCount === 0) {
+            return res.status(404).json({ message: `No calendar entries found for ${previousYear}` });
+        }
+
+        res.json({ message: `All calendar entries from ${previousYear} deleted successfully` });
+    } catch (error) {
+        console.error("Error deleting previous year's calendar entries:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
 module.exports = { 
     getAllCalendarEntries, 
     addCalendarEntry, 
     editCalendarEntry, 
-    deleteCalendarEntry 
+    deleteCalendarEntry,
+    deletePreviousYearEntries 
 };
