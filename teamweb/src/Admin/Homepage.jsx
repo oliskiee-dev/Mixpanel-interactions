@@ -205,7 +205,7 @@ function Homepage() {
                       <img src={imagePath} alt="News" className="preview-image" />
                     </div>
                     <div className="image-info">
-                      <span className="image-filename">{img.image_url.split('/').pop()}</span>
+                      <span className="image-filename">{img.image_url}</span>
                       <button onClick={() => confirmDelete(img)} className="delete-btn">
                         <span className="delete-icon">🗑</span> Delete
                       </button>
