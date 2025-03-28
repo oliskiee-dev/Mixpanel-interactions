@@ -50,7 +50,7 @@ function ManageAccount() {
           return;
         }
         
-        const response = await fetch('http://localhost:3000/current-user', {
+        const response = await fetch('http://localhost:3000/user/current-user', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -182,7 +182,7 @@ function ManageAccount() {
 
       try {
           const token = getToken();
-          const response = await fetch('http://localhost:3000/update-user-info', {
+          const response = await fetch('http://localhost:3000/user/update-user-info', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
@@ -266,7 +266,7 @@ function ManageAccount() {
               return;
           }
 
-          const response = await fetch('http://localhost:3000/delete-account', {
+          const response = await fetch('http://localhost:3000/user/delete-account', {
               method: 'DELETE',
               headers: {
                   'Content-Type': 'application/json',
@@ -386,7 +386,7 @@ function ManageAccount() {
 
       try {
           const token = getToken();
-          const response = await fetch('http://localhost:3000/register', {
+          const response = await fetch('http://localhost:3000/user/register', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
