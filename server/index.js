@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const path = require('path');
 
-const userModel = require('./models/user.js')
+const userModel = require('./models/User.js')
 const reportModel = require('./models/Report.js');
 
 const homepageRoutes = require("./routes/homepageRoutes");
