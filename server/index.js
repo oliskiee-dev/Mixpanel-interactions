@@ -7,13 +7,14 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 const userModel = require('./models/User.js')
-const reportModel = require('./models/Report.js');
+//const reportModel = require('./models/Report.js');
 
 const homepageRoutes = require("./routes/homepageRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
 const calendarRoutes = require("./routes/calendarRoutes");
 const preRegistrationRoutes = require("./routes/preRegistrationRoutes");
 const bookRoutes = require("./routes/bookRoutes");
+const reportRoutes = require('./routes/reportRoutes');
 
 //const bookModel = require("./models/Book.js");
 
@@ -40,44 +41,45 @@ app.use("/announcement", express.static(path.join(__dirname, "announcement")));
 app.use("/calendar", calendarRoutes); 
 app.use('/preregistration', preRegistrationRoutes);
 app.use("/booking", bookRoutes);
+app.use('/report', reportRoutes);
 
-router.get('/view-report', async (req, res) => {
-    try {
-        const reports = await reportModel.find({});
-        res.status(200).json(reports);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+// router.get('/view-report', async (req, res) => {
+//     try {
+//         const reports = await reportModel.find({});
+//         res.status(200).json(reports);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
-router.post('/add-report', async (req, res) => {
-    try {
-        const { username, activityLog } = req.body;
+// router.post('/add-report', async (req, res) => {
+//     try {
+//         const { username, activityLog } = req.body;
         
-        if (!username || !activityLog) {
-            return res.status(400).json({ error: 'Username and activityLog are required' });
-        }
+//         if (!username || !activityLog) {
+//             return res.status(400).json({ error: 'Username and activityLog are required' });
+//         }
         
-        const newReport = new reportModel({ username, activityLog });
-        await newReport.save();
+//         const newReport = new reportModel({ username, activityLog });
+//         await newReport.save();
         
-        res.status(201).json({ message: 'Report added successfully', report: newReport });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+//         res.status(201).json({ message: 'Report added successfully', report: newReport });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
-router.delete('/delete-reports', async (req, res) => {
-    try {
-        await reportModel.deleteMany({});
-        res.status(200).json({ message: 'All reports deleted successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+// router.delete('/delete-reports', async (req, res) => {
+//     try {
+//         await reportModel.deleteMany({});
+//         res.status(200).json({ message: 'All reports deleted successfully' });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
 
 //==========ADMIN CODE==============
