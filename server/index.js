@@ -16,8 +16,6 @@ const preRegistrationRoutes = require("./routes/preRegistrationRoutes");
 const bookRoutes = require("./routes/bookRoutes");
 const reportRoutes = require('./routes/reportRoutes');
 
-//const bookModel = require("./models/Book.js");
-
 const { sendApprovalEmail } = require('./service/emailService.js'); //Just in case for future use
 
 dotenv.config(); 
@@ -42,45 +40,6 @@ app.use("/calendar", calendarRoutes);
 app.use('/preregistration', preRegistrationRoutes);
 app.use("/booking", bookRoutes);
 app.use('/report', reportRoutes);
-
-// router.get('/view-report', async (req, res) => {
-//     try {
-//         const reports = await reportModel.find({});
-//         res.status(200).json(reports);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
-
-// router.post('/add-report', async (req, res) => {
-//     try {
-//         const { username, activityLog } = req.body;
-        
-//         if (!username || !activityLog) {
-//             return res.status(400).json({ error: 'Username and activityLog are required' });
-//         }
-        
-//         const newReport = new reportModel({ username, activityLog });
-//         await newReport.save();
-        
-//         res.status(201).json({ message: 'Report added successfully', report: newReport });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
-
-// router.delete('/delete-reports', async (req, res) => {
-//     try {
-//         await reportModel.deleteMany({});
-//         res.status(200).json({ message: 'All reports deleted successfully' });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
-
 
 //==========ADMIN CODE==============
 //Add bycrpt and hash if register will be included in the future
