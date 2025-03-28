@@ -90,7 +90,7 @@ function ManageAnnouncement() {
             }
     
             // ✅ Call the `/add-report` API
-            await fetch("http://localhost:3000/add-report", {
+            await fetch("http://localhost:3000/report/add-report", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -145,7 +145,7 @@ function ManageAnnouncement() {
             }
     
             // ✅ Call `/add-report` API
-            await fetch("http://localhost:3000/add-report", {
+            await fetch("http://localhost:3000/report/add-report", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

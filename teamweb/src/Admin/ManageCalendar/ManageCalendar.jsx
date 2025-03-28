@@ -218,7 +218,7 @@ const ManageCalendar = () => {
           }]);
 
           // ✅ Call `/add-report` API
-          await fetch("http://localhost:3000/add-report", {
+          await fetch("http://localhost:3000/report/add-report", {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
@@ -271,7 +271,7 @@ const ManageCalendar = () => {
           }
 
           if (activityLog) {
-              await fetch("http://localhost:3000/add-report", {
+              await fetch("http://localhost:3000/report/add-report", {
                   method: "POST",
                   headers: {
                       "Content-Type": "application/json",
@@ -327,7 +327,7 @@ const ManageCalendar = () => {
           showNotification('Event deleted successfully!');
 
           // ✅ Call `/add-report` API
-          await fetch("http://localhost:3000/add-report", {
+          await fetch("http://localhost:3000/report/add-report", {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
