@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite build && serve -s dist -l $PORT",
+    "start": "vite build && vite preview --port $PORT",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "vite build && serve -s dist"
+    "deploy": "vite build && vite preview --port $PORT"
   },
   "dependencies": {
     "lucide-react": "^0.483.0",
