@@ -30,6 +30,10 @@ app.use(cors())
 
 connectDB()
 
+// Set the correct path for static frontend files
+const frontendPath = path.join(__dirname, "..", "teamweb");
+app.use(express.static(frontendPath));
+
 
 app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 app.use("/homepage", homepageRoutes);
@@ -44,6 +48,10 @@ app.use('/report', reportRoutes);
 app.use('/user', userRoutes);
 
 app.use("/", router); 
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
+});
 
 // app.listen(3000,() => {
 //     console.log("app is running");
