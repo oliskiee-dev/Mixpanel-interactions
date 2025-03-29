@@ -30,6 +30,14 @@ app.use(cors())
 
 connectDB()
 
+// Serve frontend from 'teamweb' instead of 'dist'
+app.use(express.static(path.join(__dirname, 'teamweb')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'teamweb', 'index.html'));
+});
+
+
 
 app.use("/homepage", express.static(path.join(__dirname, "homepage")));
 app.use("/homepage", homepageRoutes);
