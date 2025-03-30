@@ -13,7 +13,6 @@ const UpdateAppointment = () => {
     Sunday: []
   });
   const [bookingId, setBookingId] = useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
   const [visibleDates, setVisibleDates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastSeventhDay, setLastSeventhDay] = useState("");
@@ -381,26 +380,6 @@ const UpdateAppointment = () => {
     <div className="appointment-container">
       <h1 className="appointment-title">Appointment Calendar</h1>
 
-      <div className="admin-control">
-        <h3 className="control-title">Admin Controls</h3>
-        <div className="control-input">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="date-picker"
-          />
-          <button
-            className="toggle-button"
-            onClick={() => toggleUnavailableDate(selectedDate)}
-          >
-            {unavailableDates.includes(selectedDate)
-              ? "Mark as Available"
-              : "Mark as Unavailable"}
-          </button>
-        </div>
-      </div>
-
       {Object.entries(groupedDates).map(([monthYear, dates]) => (
         <div key={monthYear} className="month-section">
           <h2 className="month-title">{monthYear}</h2>
@@ -417,8 +396,17 @@ const UpdateAppointment = () => {
                     isUnavailable ? "unavailable-card" : ""
                   } ${isSeventhDay ? "seventh-day-card" : ""}`}
                 >
-                  <h3 className="appointment-date">{formatDate(date)}</h3>
-                  <h4 className="appointment-day-of-week">{date.toLocaleDateString('en-US', { weekday: 'long' })}</h4>
+                  <div className="card-header">
+                    <h3 className="appointment-date">{formatDate(date)}</h3>
+                    <h4 className="appointment-day-of-week">{date.toLocaleDateString('en-US', { weekday: 'long' })}</h4>
+                    <button 
+                      className={`day-toggle-button ${isUnavailable ? "day-unavailable" : "day-available"}`}
+                      onClick={() => toggleUnavailableDate(formattedDate)}
+                    >
+                      {isUnavailable ? "Mark as Available" : "Mark as Unavailable"}
+                    </button>
+                  </div>
+                  
                   {isUnavailable ? (
                     <p className="unavailable-message">Not Available</p>
                   ) : (
