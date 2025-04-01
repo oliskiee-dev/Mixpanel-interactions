@@ -32,6 +32,7 @@ function ManagePreRegistration() {
     
     // UI state
     const [activeTab, setActiveTab] = useState('table');
+    const [selectedStudentId, setSelectedStudentId] = useState(null);
 
     // Fetch data on component mount or when pagination/filters change
     useEffect(() => {
@@ -158,7 +159,7 @@ function ManagePreRegistration() {
                         </div>, 
                         {
                             icon: <Send size={16} />,
-                            position: "top-center", // Changed from top-right to top-center
+                            position: "top-center",
                             autoClose: 5000,
                         }
                     );
@@ -169,7 +170,7 @@ function ManagePreRegistration() {
         } catch (err) {
             console.error('Failed to update status:', err);
             toast.error('Failed to update status. Please try again.', {
-                position: "top-center", // Changed from top-right to top-center
+                position: "top-center",
                 autoClose: 5000,
             });
         } finally {
@@ -178,6 +179,7 @@ function ManagePreRegistration() {
         }
     };
 
+    // Toggle row expansion
     const toggleRow = (index) => {
         setExpandedRow(expandedRow === index ? null : index);
     };
@@ -194,6 +196,39 @@ function ManagePreRegistration() {
         return filters.length > 0 
             ? `Filtered by: ${filters.join(', ')}` 
             : 'Showing all records';
+    };
+    
+    // Handle viewing student details from appointment tab
+    const handleViewStudentDetails = (studentId) => {
+        // Find the student index in the array
+        const studentIndex = students.findIndex(s => s._id === studentId);
+        
+        if (studentIndex !== -1) {
+            // Set active tab to table view
+            setActiveTab('table');
+            
+            // If we need to navigate to a different page
+            const pageForStudent = Math.floor(studentIndex / limit) + 1;
+            if (pageForStudent !== currentPage) {
+                setCurrentPage(pageForStudent);
+            }
+            
+            // After a short delay to allow for tab switch and possible page change
+            setTimeout(() => {
+                setExpandedRow(studentIndex % limit);
+                
+                // Scroll to the student row
+                const studentRow = document.getElementById(`student-row-${studentId}`);
+                if (studentRow) {
+                    studentRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Add a highlight class temporarily
+                    studentRow.classList.add('highlight-row');
+                    setTimeout(() => {
+                        studentRow.classList.remove('highlight-row');
+                    }, 3000);
+                }
+            }, 300);
+        }
     };
     
     // Confirmation Dialog Component
@@ -301,7 +336,10 @@ function ManagePreRegistration() {
                                 const age = new Date().getFullYear() - birthDate.getFullYear();
                                 return (
                                     <React.Fragment key={student._id || index}>
-                                        <tr className={expandedRow === index ? 'row-expanded' : ''}>
+                                        <tr 
+                                            id={`student-row-${student._id}`}
+                                            className={expandedRow === index ? 'row-expanded' : ''}
+                                        >
                                             <td className="cell-name" title={student.name}>{student.name}</td>
                                             <td className="cell-center">{student.gender}</td>
                                             <td className="cell-center">{student.isNewStudent}</td>
@@ -501,7 +539,13 @@ function ManagePreRegistration() {
                     </>
                 )}
                 
-                {activeTab === "appointment" && <UpdateAppointment />}
+                {activeTab === "appointment" && (
+                    <UpdateAppointment 
+                        studentData={students}
+                        onViewStudentDetails={handleViewStudentDetails}
+                        onSetActiveTab={(tab) => setActiveTab(tab)}
+                    />
+                )}
             </div>
             
             {/* Confirmation Dialog */}
