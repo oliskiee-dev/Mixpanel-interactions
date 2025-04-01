@@ -83,7 +83,7 @@ function ForgotPassword() {
             <form onSubmit={handleSubmit}>
               <input 
                 type="text" 
-                placeholder="Email or Username" 
+                placeholder="Email" 
                 className="input-field" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
