@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from '../Component/AdminHeader.jsx';
 import UpdateAppointment from './UpdateAppointment';
+import ExpectedStudents from './ExpectedStudents';
 import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send } from 'lucide-react';
 import './ManagePreRegistration.css';
 import { toast, ToastContainer } from 'react-toastify';
@@ -485,6 +486,13 @@ function ManagePreRegistration() {
                         <Calendar size={16} />
                         Appointment Availability
                     </button>
+                    <button 
+                        className={`tab ${activeTab === "expected" ? "active" : ""}`}
+                        onClick={() => setActiveTab("expected")}
+                    >
+                        <CheckCircle size={16} />
+                        Expected Students
+                    </button>
                 </div>
                 
                 {activeTab === "table" && (
@@ -539,6 +547,9 @@ function ManagePreRegistration() {
                     </>
                 )}
                 
+
+                {activeTab === "appointment" && <UpdateAppointment />}
+                {activeTab === "expected" && <ExpectedStudents />}
                 {activeTab === "appointment" && (
                     <UpdateAppointment 
                         studentData={students}
@@ -546,6 +557,7 @@ function ManagePreRegistration() {
                         onSetActiveTab={(tab) => setActiveTab(tab)}
                     />
                 )}
+
             </div>
             
             {/* Confirmation Dialog */}
