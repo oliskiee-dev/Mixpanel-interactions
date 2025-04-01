@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react"; 
 import Header from "./Viewer/Component/Header.jsx";
 import Footer from "./Viewer/Component/Footer.jsx";
 import "./Viewer.css";
@@ -9,7 +9,6 @@ function Viewer() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch images using a more robust approach
   const fetchImages = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -30,34 +29,24 @@ function Viewer() {
     fetchImages();
   }, [fetchImages]);
 
-  // Auto rotation for carousel
   useEffect(() => {
-    if (images.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
   }, [images]);
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  };
-
-  // Simplified - only active or not active
-  const getItemClassName = (index) => {
-    return index === currentIndex ? "news-item active" : "news-item";
+  const getPosition = (index) => {
+    if (index === currentIndex) return "active";
+    if (index === (currentIndex - 1 + images.length) % images.length) return "prev";
+    if (index === (currentIndex + 1) % images.length) return "next";
+    return "hidden";
   };
 
   return (
     <div className="page-container">
       <Header />
 
-      {/* Main Hero Section */}
       <div className="main-container">
         <div className="welcome-section">
           <h1 className="welcome-text">
@@ -75,10 +64,9 @@ function Viewer() {
         </div>
       </div>
 
-      {/* Latest News Section with Simplified Slideshow */}
       <div className="latest-news">
         <h2>LATEST NEWS</h2>
-        
+
         {isLoading ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
@@ -89,36 +77,35 @@ function Viewer() {
         ) : images.length > 0 ? (
           <>
             <div className="news-container">
-              {/* Navigation Buttons */}
-              <button className="prev-btn" onClick={prevSlide} aria-label="Previous slide">‹</button>
-              
-              {/* Display only the current image */}
-              {images.map((image, index) => (
-                <div 
-                  key={index} 
-                  className={getItemClassName(index)}
-                >
-                  <img 
-                    src={`http://localhost:3000/homepage/${image.image_url}`} 
-                    alt={`News ${index + 1}`} 
-                    className="news-image" 
+              {images.map((image, index) => {
+                const position = getPosition(index);
+                return (
+                  <div
+                    key={index}
+                    className={`news-item ${position}`}
+                  >
+                    <img
+                      src={`http://localhost:3000/homepage/${image.image_url}`}
+                      alt={`News ${index + 1}`}
+                      className="news-image"
+                    />
+                    <div className="news-title-overlay">
+                      {image.title || `News ${index + 1}`}
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="carousel-dots">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`dot ${currentIndex === index ? "active" : ""}`}
+                    aria-label={`Go to slide ${index + 1}`}
                   />
-                </div>
-              ))}
-              
-              <button className="next-btn" onClick={nextSlide} aria-label="Next slide">›</button>
-            </div>
-            
-            {/* Carousel Dots for Navigation */}
-            <div className="carousel-dots">
-              {images.map((_, index) => (
-                <span 
-                  key={index} 
-                  className={`dot ${index === currentIndex ? 'active' : ''}`} 
-                  onClick={() => setCurrentIndex(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                ></span>
-              ))}
+                ))}
+              </div>
             </div>
           </>
         ) : (
