@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router";
 import './ResetPassword.css';
-import TeamLogo from "../assets/images/TeamLogo.jpg";
+import TeamLogo from "../assets/images/TeamLogo.png";
 
 function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
@@ -89,7 +89,7 @@ function ResetPassword() {
 
   return (
     <>
-      <img src={TeamLogo} alt="Team Logo" className="team-logo" />
+    <img src={TeamLogo} alt="Team Logo" className="team-logo" /> {/* Logo at the top left */}
       <div className="container">
         <div className="form-box">
           <div className="form-content">
