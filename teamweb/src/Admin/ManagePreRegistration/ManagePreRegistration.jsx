@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from '../Component/AdminHeader.jsx';
 import UpdateAppointment from './UpdateAppointment';
-import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send } from 'lucide-react';
+import ViewReports from './ViewReports';
+import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send, ChartBar } from 'lucide-react';
 import './ManagePreRegistration.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 function ManagePreRegistration() {
     // State management
@@ -485,6 +487,13 @@ function ManagePreRegistration() {
                         <Calendar size={16} />
                         Appointment Availability
                     </button>
+                    <button 
+                        className={`tab ${activeTab === "reports" ? "active" : ""}`}
+                        onClick={() => setActiveTab("reports")}
+                    >
+                        <ChartBar size={16} />
+                        Reports
+                    </button>
                 </div>
                 
                 {activeTab === "table" && (
@@ -544,6 +553,13 @@ function ManagePreRegistration() {
                         studentData={students}
                         onViewStudentDetails={handleViewStudentDetails}
                         onSetActiveTab={(tab) => setActiveTab(tab)}
+                    />
+                )}
+
+                {activeTab === "reports" && (
+                    <ViewReports 
+                        studentData={students}
+                        totalRecords={totalRecords}
                     />
                 )}
             </div>

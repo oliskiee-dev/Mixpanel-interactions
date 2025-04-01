@@ -8,7 +8,7 @@ const UpdateAppointment = (props) => {
   // Initial state for calendar
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState({});
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [appointmentForm, setAppointmentForm] = useState({
     timeSlots: [],
     purpose: '',
@@ -20,97 +20,74 @@ const UpdateAppointment = (props) => {
   const [bookingsData, setBookingsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState('availability'); // 'availability' or 'bookings'
+  const [viewMode, setViewMode] = useState('availability');
 
-  // Get days in month
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  // Get day of week for first day of month
-  const getFirstDayOfMonth = (year, month) => {
-    return new Date(year, month, 1).getDay();
-  };
-
-  // Generate calendar days
-  const generateCalendarDays = () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDayOfMonth = getFirstDayOfMonth(year, month);
-    
-    const days = [];
-    
-    // Add empty cells for days before first day of month
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(null);
+  // Generate time slots from 9 AM to 4 PM in 1-hour intervals
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 9; hour <= 16; hour++) {
+      const timeString = `${hour.toString().padStart(2, '0')}:00`;
+      slots.push(timeString);
     }
-    
-    // Add days of the month
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(i);
-    }
-    
-    return days;
+    return slots;
   };
+
+  const availableTimeSlots = generateTimeSlots();
 
   // Format date as YYYY-MM-DD
-  const formatDate = (year, month, day) => {
-    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  // Get the next 7 days starting from the current date
+  const getNextSevenDays = (startDate) => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startDate);
+      day.setDate(startDate.getDate() + i);
+      days.push(day);
+    }
+    return days;
   };
 
   // Load appointment data
   useEffect(() => {
     fetchAvailabilityData();
     fetchBookingsData();
-  }, [props.studentData]); // Refetch when student data changes
+  }, [props.studentData, currentDate]);
 
   const fetchAvailabilityData = async () => {
     try {
       setIsLoading(true);
+      const response = await fetch('http://localhost:3000/booking/bookingAvailability');
+      if (!response.ok) {
+        throw new Error('Failed to fetch availability data');
+      }
+      const data = await response.json();
       
-      // Mock availability data
-      const mockData = {
-        availability: [
-          {
-            _id: "1",
-            date: new Date(2025, 3, 10), // April 10, 2025
-            timeSlots: ["09:00", "10:30", "13:00", "14:30"],
-            purpose: "Student Registration",
-            maxAppointments: 5
-          },
-          {
-            _id: "2",
-            date: new Date(2025, 3, 15), // April 15, 2025
-            timeSlots: ["09:30", "11:00", "13:30"],
-            purpose: "Document Submission",
-            maxAppointments: 3
-          },
-          {
-            _id: "3",
-            date: new Date(2025, 3, 22), // April 22, 2025
-            timeSlots: ["10:00", "11:30", "14:00", "15:30"],
-            purpose: "Parent Orientation",
-            maxAppointments: 10
-          }
-        ]
-      };
+      setAvailabilityData(data);
       
-      setAvailabilityData(mockData.availability || []);
-      
-      // Process availability data to appointments format
       const formattedAppointments = {};
-      mockData.availability?.forEach(item => {
-        const dateStr = new Date(item.date).toISOString().split('T')[0];
-        if (!formattedAppointments[dateStr]) {
-          formattedAppointments[dateStr] = [];
-        }
+      data.forEach(item => {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const weekDays = getNextSevenDays(currentDate);
         
-        formattedAppointments[dateStr].push({
-          id: item._id,
-          timeSlots: item.timeSlots || [],
-          purpose: item.purpose || '',
-          maxAppointments: item.maxAppointments || 5
+        weekDays.forEach(date => {
+          const dayName = days[date.getDay()];
+          if (item.availability[dayName] && item.availability[dayName].length > 0) {
+            const dateStr = formatDate(date);
+            
+            if (!formattedAppointments[dateStr]) {
+              formattedAppointments[dateStr] = [];
+            }
+            
+            formattedAppointments[dateStr].push({
+              id: item._id,
+              timeSlots: item.availability[dayName] || [],
+              purpose: 'Available Slots',
+              maxAppointments: 5
+            });
+          }
         });
       });
       
@@ -125,16 +102,13 @@ const UpdateAppointment = (props) => {
   
   const fetchBookingsData = async () => {
     try {
-      // Try to get real student data from props if available
       if (props.studentData && props.studentData.length > 0) {
-        // Transform student data into booking format
         const studentBookings = props.studentData.map(student => {
-          // Check if student has appointment data
           if (student.appointment_date) {
             return {
               _id: student._id,
               date: new Date(student.appointment_date),
-              timeSlot: student.preferred_time || "09:00", // Default if not specified
+              timeSlot: student.preferred_time || "09:00",
               studentName: student.name,
               studentEmail: student.email,
               studentPhone: student.phone_number,
@@ -143,34 +117,28 @@ const UpdateAppointment = (props) => {
               grade_level: student.grade_level,
               strand: student.strand,
               gender: student.gender,
-              // Include any other relevant fields
             };
           }
           return null;
-        }).filter(booking => booking !== null); // Remove nulls (students without appointments)
+        }).filter(booking => booking !== null);
         
         if (studentBookings.length > 0) {
           setBookingsData(studentBookings);
-          return; // Exit early if we have real data
+          return;
         }
       }
       
-      // Fall back to mock data if no real data available
+      // Fallback to mock data
       const today = new Date();
-      
-      // Create mock data for the past 7 days and upcoming days
       const mockBookings = [];
-      for (let i = -7; i <= 14; i++) {
+      for (let i = 0; i < 14; i++) {
         const bookingDate = new Date(today);
         bookingDate.setDate(today.getDate() + i);
         
-        // Create 1-5 random bookings for this date
         const numBookings = Math.floor(Math.random() * 5) + 1;
         for (let j = 0; j < numBookings; j++) {
-          // Generate random time 9AM - 4PM
           const hour = Math.floor(Math.random() * 8) + 9;
-          const minute = Math.random() > 0.5 ? "00" : "30";
-          const timeSlot = `${hour.toString().padStart(2, '0')}:${minute}`;
+          const timeSlot = `${hour.toString().padStart(2, '0')}:00`;
           
           mockBookings.push({
             _id: `booking_${i}_${j}`,
@@ -193,15 +161,23 @@ const UpdateAppointment = (props) => {
     }
   };
 
+  // Get current date + next 6 days
+  const getCurrentWeekDays = () => {
+    return getNextSevenDays(currentDate);
+  };
+
+  // Navigate between date ranges
+  const navigateDays = (step) => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + (step * 7));
+    setCurrentDate(newDate);
+  };
+
   // Handle click on a calendar day
   const handleDayClick = (day) => {
-    if (!day) return; // Ignore clicks on empty cells
-    
-    const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
-    setSelectedDate(dateStr);
+    setSelectedDate(day);
     setEditingAppointmentId(null);
     
-    // Reset form values
     if (viewMode === 'availability') {
       setAppointmentForm({
         timeSlots: [''],
@@ -213,19 +189,11 @@ const UpdateAppointment = (props) => {
     setIsFormVisible(false);
   };
 
-  // Handle month navigation
-  const navigateMonth = (step) => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() + step);
-    setCurrentDate(newDate);
-  };
-
   // Handle form input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
     if (name === 'maxAppointments') {
-      // Ensure maxAppointments is a number between 1 and 20
       const numValue = parseInt(value, 10);
       if (isNaN(numValue)) return;
       
@@ -251,71 +219,40 @@ const UpdateAppointment = (props) => {
     try {
       setIsLoading(true);
       
-      const appointmentData = {
-        date: selectedDate,
-        timeSlots: appointmentForm.timeSlots,
-        purpose: appointmentForm.purpose,
-        maxAppointments: appointmentForm.maxAppointments
+      const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+      const availabilityUpdate = {
+        [dayOfWeek]: appointmentForm.timeSlots
       };
       
-      // Skip API call for now and directly update local state
-      const updatedAppointments = { ...appointments };
-      
-      if (!updatedAppointments[selectedDate]) {
-        updatedAppointments[selectedDate] = [];
-      }
-      
+      let response;
       if (editingAppointmentId) {
-        // Update existing appointment
-        const apptIndex = updatedAppointments[selectedDate].findIndex(apt => apt.id === editingAppointmentId);
-        if (apptIndex !== -1) {
-          updatedAppointments[selectedDate][apptIndex] = {
-            id: editingAppointmentId,
-            ...appointmentForm
-          };
-        }
+        response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${editingAppointmentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ availability: availabilityUpdate })
+        });
       } else {
-        // Add new appointment with generated ID
-        const newId = Date.now().toString();
-        updatedAppointments[selectedDate].push({
-          id: newId,
-          ...appointmentForm
+        response = await fetch('http://localhost:3000/booking/addBookingAvailability', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ availability: availabilityUpdate })
         });
       }
       
-      setAppointments(updatedAppointments);
+      if (!response.ok) {
+        throw new Error('Failed to save appointment');
+      }
+      
+      await fetchAvailabilityData();
+      
       setIsFormVisible(false);
       setEditingAppointmentId(null);
       
       toast.success(editingAppointmentId ? 'Appointment updated successfully' : 'Appointment created successfully');
-      
-      // Note: When your API is ready, replace with this API call:
-      /*
-      let url = 'http://localhost:3000/appointments/availability';
-      let method = 'POST';
-      
-      if (editingAppointmentId) {
-        url = `http://localhost:3000/appointments/availability/${editingAppointmentId}`;
-        method = 'PUT';
-      }
-      
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(appointmentData),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      // Refresh data
-      fetchAvailabilityData();
-      */
     } catch (err) {
       toast.error('Failed to save appointment: ' + err.message);
       console.error(err);
@@ -340,28 +277,26 @@ const UpdateAppointment = (props) => {
     try {
       setIsLoading(true);
       
-      // Skip API call for now and directly update local state
-      const updatedAppointments = { ...appointments };
-      updatedAppointments[selectedDate] = updatedAppointments[selectedDate].filter(
-        appointment => appointment.id !== appointmentId
-      );
-      setAppointments(updatedAppointments);
+      const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+      const availabilityUpdate = {
+        [dayOfWeek]: []
+      };
       
-      toast.success('Appointment deleted successfully');
-      
-      // Note: When your API is ready, use this:
-      /*
-      const response = await fetch(`http://localhost:3000/appointments/availability/${appointmentId}`, {
-        method: 'DELETE',
+      const response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ availability: availabilityUpdate })
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error('Failed to delete appointment');
       }
       
-      // Refresh data from server
-      fetchAvailabilityData();
-      */
+      await fetchAvailabilityData();
+      
+      toast.success('Appointment deleted successfully');
     } catch (err) {
       toast.error('Failed to delete appointment: ' + err.message);
       console.error(err);
@@ -400,22 +335,20 @@ const UpdateAppointment = (props) => {
   };
 
   // Get bookings for a specific date
-  const getBookingsForDate = (dateStr) => {
-    // Convert ISO string to date for comparison
-    const date = new Date(dateStr);
-    date.setHours(0, 0, 0, 0);
+  const getBookingsForDate = (date) => {
+    const dateObj = new Date(date);
+    dateObj.setHours(0, 0, 0, 0);
     
-    // Filter bookings for the given date
     return bookingsData.filter(booking => {
       const bookingDate = new Date(booking.date);
       bookingDate.setHours(0, 0, 0, 0);
-      return bookingDate.getTime() === date.getTime();
+      return bookingDate.getTime() === dateObj.getTime();
     });
   };
   
   // Get bookings organized by time slot
-  const getBookingsByTimeSlot = (dateStr) => {
-    const bookings = getBookingsForDate(dateStr);
+  const getBookingsByTimeSlot = (date) => {
+    const bookings = getBookingsForDate(date);
     const slotMap = {};
     
     bookings.forEach(booking => {
@@ -425,111 +358,47 @@ const UpdateAppointment = (props) => {
       slotMap[booking.timeSlot].push(booking);
     });
     
-    // Convert to sorted array
     return Object.entries(slotMap)
       .sort(([timeA], [timeB]) => timeA.localeCompare(timeB))
       .map(([time, bookings]) => ({ time, bookings }));
   };
-  
-  // Has bookings for the day
-  const hasBookingsForDay = (day) => {
-    if (!day) return false;
-    const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
-    return getBookingsForDate(dateStr).length > 0;
-  };
 
-  // Has appointments for the day
-  const hasAppointmentsForDay = (day) => {
-    if (!day) return false;
-    const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
-    return appointments[dateStr] && appointments[dateStr].length > 0;
-  };
-  
-  // Get appointment counts for the day
-  const getAppointmentCounts = (day) => {
-    if (!day) return null;
+  // Render week days
+  const renderWeekDays = () => {
+    const days = getCurrentWeekDays();
     
-    const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
-    if (!appointments[dateStr] || appointments[dateStr].length === 0) return null;
-    
-    // Count total time slots available
-    let totalSlots = 0;
-    appointments[dateStr].forEach(appointment => {
-      totalSlots += appointment.timeSlots?.length || 0;
-    });
-    
-    return totalSlots;
-  };
-  
-  // Get bookings count for a day
-  const getBookingsCount = (day) => {
-    if (!day) return null;
-    
-    const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const bookings = getBookingsForDate(dateStr);
-    
-    return bookings.length > 0 ? bookings.length : null;
-  };
-
-  // Get month name
-  const getMonthName = (month) => {
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return monthNames[month];
-  };
-
-  // Render calendar days
-  const renderCalendarDays = () => {
-    const days = generateCalendarDays();
     return days.map((day, index) => {
-      const appointmentCount = getAppointmentCounts(day);
-      const bookingCount = getBookingsCount(day);
+      const dayNumber = day.getDate();
+      const isToday = day.toDateString() === new Date().toDateString();
+      const dateStr = formatDate(day);
       
-      // Check if the day has appointments or bookings
-      const hasContent = (viewMode === 'availability' && hasAppointmentsForDay(day)) || 
-                         (viewMode === 'bookings' && hasBookingsForDay(day));
+      // Check if this day is selected
+      const isSelected = selectedDate && day.toDateString() === selectedDate.toDateString();
       
-      // Check if this is today
-      const isToday = day && 
-        currentDate.getFullYear() === new Date().getFullYear() &&
-        currentDate.getMonth() === new Date().getMonth() &&
-        day === new Date().getDate();
-      
-      // Check if this is within the past week (for highlighting recent bookings)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const sevenDaysAgo = new Date(today);
-      sevenDaysAgo.setDate(today.getDate() - 7);
-      
-      const thisDate = day ? new Date(currentDate.getFullYear(), currentDate.getMonth(), day) : null;
-      const isRecentDay = thisDate && thisDate >= sevenDaysAgo && thisDate <= today;
+      const hasAppointments = appointments[dateStr] && appointments[dateStr].length > 0;
+      const bookings = getBookingsForDate(day);
       
       return (
         <div 
-          key={index} 
+          key={index}
           className={`calendar-day 
-            ${!day ? 'empty' : ''} 
-            ${hasContent ? 'has-content' : ''} 
-            ${viewMode === 'bookings' && hasBookingsForDay(day) ? 'has-bookings' : ''}
-            ${viewMode === 'availability' && hasAppointmentsForDay(day) ? 'has-appointments' : ''}
             ${isToday ? 'today' : ''}
-            ${isRecentDay ? 'recent-day' : ''}`
-          }
-          onClick={() => day && handleDayClick(day)}
+            ${isSelected ? 'selected' : ''}
+            ${viewMode === 'availability' && hasAppointments ? 'has-appointments' : ''}
+            ${viewMode === 'bookings' && bookings.length > 0 ? 'has-bookings' : ''}`}
+          onClick={() => handleDayClick(day)}
         >
-          <span className="day-number">{day}</span>
-          {viewMode === 'availability' && appointmentCount && (
-            <span className="appointment-count" title={`${appointmentCount} available time slots`}>
-              {appointmentCount}
+          <div className="weekday-name">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day.getDay()]}
+          </div>
+          <span className="day-number">{dayNumber}</span>
+          {viewMode === 'availability' && hasAppointments && (
+            <span className="appointment-count">
+              {appointments[dateStr].reduce((sum, appt) => sum + (appt.timeSlots?.length || 0), 0)}
             </span>
           )}
-          {viewMode === 'bookings' && bookingCount && (
-            <span className="booking-count" title={`${bookingCount} bookings`}>
-              {bookingCount}
-            </span>
+          {viewMode === 'bookings' && bookings.length > 0 && (
+            <span className="booking-count">{bookings.length}</span>
           )}
         </div>
       );
@@ -541,11 +410,7 @@ const UpdateAppointment = (props) => {
     const bookingsBySlot = getBookingsByTimeSlot(selectedDate);
     
     if (bookingsBySlot.length === 0) {
-      return (
-        <div className="no-bookings">
-          <p>No bookings found for this date.</p>
-        </div>
-      );
+      return <div className="no-bookings">No bookings found for this date.</div>;
     }
     
     return (
@@ -577,7 +442,7 @@ const UpdateAppointment = (props) => {
                     </div>
                     <button 
                       className="btn-view-details"
-                      onClick={() => navigateToStudentDetails(booking._id)}
+                      onClick={() => props.onViewStudentDetails?.(booking._id)}
                     >
                       View Details
                     </button>
@@ -590,20 +455,23 @@ const UpdateAppointment = (props) => {
       </div>
     );
   };
-  
-  // Function to navigate to student details in the Student Records tab
-  const navigateToStudentDetails = (studentId) => {
-    // This function would be implemented to communicate with the parent component
-    // to navigate to the Student Records tab and expand the student's details
-    if (props.onViewStudentDetails) {
-      props.onViewStudentDetails(studentId);
-    } else {
-      // If no parent handler is provided, just show a toast notification
-      toast.info("View student details functionality requires integration with student records", {
-        position: "top-center",
-        autoClose: 3000
-      });
-    }
+
+  // Render calendar header with date range
+  const renderCalendarHeader = () => {
+    const days = getCurrentWeekDays();
+    const startDate = days[0];
+    const endDate = days[6];
+    const options = { month: 'short', day: 'numeric' };
+    
+    return (
+      <div className="calendar-header">
+        <button onClick={() => navigateDays(-1)}>&lt; Previous 7 Days</button>
+        <h2>
+          {startDate.toLocaleDateString('default', options)} - {endDate.toLocaleDateString('default', options)}
+        </h2>
+        <button onClick={() => navigateDays(1)}>Next 7 Days &gt;</button>
+      </div>
+    );
   };
 
   return (
@@ -630,24 +498,10 @@ const UpdateAppointment = (props) => {
         </button>
       </div>
       
-      <div className="calendar-header">
-        <button onClick={() => navigateMonth(-1)}>&lt;</button>
-        <h2>{getMonthName(currentDate.getMonth())} {currentDate.getFullYear()}</h2>
-        <button onClick={() => navigateMonth(1)}>&gt;</button>
-      </div>
-      
-      <div className="calendar-weekdays">
-        <div>Sun</div>
-        <div>Mon</div>
-        <div>Tue</div>
-        <div>Wed</div>
-        <div>Thu</div>
-        <div>Fri</div>
-        <div>Sat</div>
-      </div>
+      {renderCalendarHeader()}
       
       <div className="calendar-days">
-        {renderCalendarDays()}
+        {renderWeekDays()}
       </div>
       
       {isLoading && (
@@ -668,34 +522,44 @@ const UpdateAppointment = (props) => {
         <div className="appointment-section">
           <h3>
             <Calendar size={20} />
-            Appointment Slots for {selectedDate}
+            Appointment Slots for {selectedDate.toLocaleDateString('default', { 
+              weekday: 'long', 
+              month: 'long', 
+              day: 'numeric', 
+              year: 'numeric' 
+            })}
           </h3>
           
-          {appointments[selectedDate] && appointments[selectedDate].length > 0 ? (
+          {appointments[formatDate(selectedDate)]?.length > 0 ? (
             <div className="appointment-list">
-              {appointments[selectedDate].map(appointment => (
+              {appointments[formatDate(selectedDate)].map(appointment => (
                 <div key={appointment.id} className="appointment-item">
                   <div className="appointment-info">
                     <div className="appointment-purpose">
-                      <strong>Purpose:</strong> {appointment.purpose || "General Registration"}
+                      <strong>Purpose:</strong> {appointment.purpose}
                     </div>
                     <div className="appointment-slots">
                       <strong>Available Time Slots:</strong>
                       <div className="time-slots-container">
-                        {appointment.timeSlots && appointment.timeSlots.length > 0 ? (
-                          appointment.timeSlots.map((slot, index) => (
-                            <div key={index} className="time-slot">
-                              <Clock size={14} />
-                              <span>{slot}</span>
-                            </div>
-                          ))
+                        {appointment.timeSlots?.length > 0 ? (
+                          appointment.timeSlots.map((slot, index) => {
+                            const hour = parseInt(slot.split(':')[0]);
+                            const ampm = hour >= 12 ? 'PM' : 'AM';
+                            const displayHour = hour > 12 ? hour - 12 : hour;
+                            return (
+                              <div key={index} className="time-slot">
+                                <Clock size={14} />
+                                <span>{`${displayHour}:00 ${ampm}`}</span>
+                              </div>
+                            );
+                          })
                         ) : (
                           <span className="no-slots">No time slots defined</span>
                         )}
                       </div>
                     </div>
                     <div className="appointment-limit">
-                      <strong>Max Appointments Per Slot:</strong> {appointment.maxAppointments || 5}
+                      <strong>Max Appointments Per Slot:</strong> {appointment.maxAppointments}
                     </div>
                   </div>
                   <div className="appointment-actions">
@@ -751,12 +615,24 @@ const UpdateAppointment = (props) => {
                 <label>Time Slots:</label>
                 {appointmentForm.timeSlots.map((timeSlot, index) => (
                   <div key={index} className="time-slot-input">
-                    <input 
-                      type="time" 
+                    <select
                       value={timeSlot}
                       onChange={(e) => updateTimeSlot(index, e.target.value)}
                       required
-                    />
+                      className="time-slot-select"
+                    >
+                      <option value="">Select a time</option>
+                      {availableTimeSlots.map(slot => {
+                        const hour = parseInt(slot.split(':')[0]);
+                        const ampm = hour >= 12 ? 'PM' : 'AM';
+                        const displayHour = hour > 12 ? hour - 12 : hour;
+                        return (
+                          <option key={slot} value={slot}>
+                            {`${displayHour}:00 ${ampm}`}
+                          </option>
+                        );
+                      })}
+                    </select>
                     <button 
                       type="button" 
                       className="remove-slot-button"
@@ -771,6 +647,7 @@ const UpdateAppointment = (props) => {
                   type="button" 
                   className="add-slot-button"
                   onClick={addTimeSlot}
+                  disabled={appointmentForm.timeSlots.length >= availableTimeSlots.length}
                 >
                   + Add Time Slot
                 </button>
@@ -806,29 +683,13 @@ const UpdateAppointment = (props) => {
           <div className="bookings-header">
             <h3>
               <Users size={20} />
-              Bookings for {selectedDate}
+              Bookings for {selectedDate.toLocaleDateString('default', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+              })}
             </h3>
-            
-            {/* Check if the selected date is within past 7 days */}
-            {(() => {
-              const selectedDateObj = new Date(selectedDate);
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              
-              const sevenDaysAgo = new Date(today);
-              sevenDaysAgo.setDate(today.getDate() - 7);
-              
-              const isWithinPastWeek = selectedDateObj >= sevenDaysAgo && selectedDateObj <= today;
-              
-              if (isWithinPastWeek) {
-                return (
-                  <div className="recent-badge">
-                    Within past 7 days
-                  </div>
-                );
-              }
-              return null;
-            })()}
           </div>
           
           {renderBookings()}
@@ -838,18 +699,14 @@ const UpdateAppointment = (props) => {
   );
 };
 
-// PropTypes for component
 UpdateAppointment.propTypes = {
   studentData: PropTypes.array,
   onViewStudentDetails: PropTypes.func,
-  onSetActiveTab: PropTypes.func
 };
 
-// Default props
 UpdateAppointment.defaultProps = {
   studentData: [],
   onViewStudentDetails: null,
-  onSetActiveTab: null
 };
 
 export default UpdateAppointment;
