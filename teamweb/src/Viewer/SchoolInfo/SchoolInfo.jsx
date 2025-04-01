@@ -162,30 +162,30 @@ function SchoolInfo() {
                 </div>
                 <div className="about-content">
                     <div className="about-text">
-                        <div className="about-subsection">
-                            <h3 className="subsection-title">Vision</h3>
-                            <p>
-                                TMCS envisions to produce graduates instilled with Godly character and values, intellectual competence and proficient skills who will become leaders of the nations.
-                            </p>
-                        </div>
-                        
-                        <div className="about-subsection">
-                            <h3 className="subsection-title">Mission</h3>
-                            <p>  
-                                To provide quality education by nurturing and empowering the child's intelligence for the glory of God.
-                            </p>
-                        </div>
-                        
-                        <div className="about-subsection">
-                            <h3 className="subsection-title">Philosophy</h3>
-                            <p>
-                                TMCS is a non-stock, non-profit Christian School and the educational arm of Team Mission Philippines Inc.
-                                We believe that God is the central figure in the School's Curriculum and education.
-                                We believe in the partnership of the parents and the school that God has given the parents the primary responsibility to educate their children and the second responsibility to the school and its teachers.
-                                We believe in the correct balance of love and discipline which is anchored in Proverbs 22:6, "Train up a child in the way he should go, and when he is old, we will not depart from it."
-                            </p>
-                        </div>
-                        
+            {/* Vision, Mission and Philosophy section */}
+                <div className="about-columns">
+                <div className="about-subsection">
+                    <h3 className="subsection-title">Vision</h3>
+                    <p>
+                    TMCS envisions to produce graduates instilled with Godly character and values, intellectual competence and proficient skills who will become leaders of the nations.
+                    </p>
+                </div>
+                <div className="about-subsection">
+                    <h3 className="subsection-title">Philosophy</h3>
+                    <p>
+                    TMCS is a non-stock, non-profit Christian School and the educational arm of Team Mission Philippines Inc.
+                    We believe that God is the central figure in the School's Curriculum and education.
+                    We believe in the partnership of the parents and the school that God has given the parents the primary responsibility to educate their children and the second responsibility to the school and its teachers.
+                    We believe in the correct balance of love and discipline which is anchored in Proverbs 22:6, "Train up a child in the way he should go, and when he is old, we will not depart from it."
+                    </p>
+                </div>
+                <div className="about-subsection">
+                    <h3 className="subsection-title">Mission</h3>
+                    <p>
+                    To provide quality education by nurturing and empowering the child's intelligence for the glory of God.
+                    </p>
+                </div>
+                </div>
                         {/* Core Values Section - Redesigned */}
                         <div className="about-subsection core-values-section">
                             <h3 className="subsection-title">Core Values</h3>
@@ -208,9 +208,6 @@ function SchoolInfo() {
                                 ))}
                             </div>
                         </div>
-                    </div>
-                    <div className="about-image">
-                        <img src="../../../public/assets/images/school.jpg" alt="Team Mission Christian School" />
                     </div>
                 </div>
             </section>

@@ -34,13 +34,15 @@ body {
 
 /* Hero Section - Enhanced */
 .hero-section {
-  background: linear-gradient(rgba(14, 41, 84, 0.85), rgba(30, 71, 133, 0.95)), url('/path-to-school-bg.jpg');
+  background: linear-gradient(rgba(14, 41, 84, 0.85), rgba(30, 71, 133, 0.95)),
+              url('../../../public/assets/images/school.jpg');
   background-size: cover;
   background-position: center;
   color: var(--white);
-  padding: 90px 20px;
+  padding: 170px 20px;
   text-align: center;
   border-bottom: 5px solid var(--accent-color);
+  height: 500px;
 }
 
 .hero-content h1 {
@@ -104,16 +106,26 @@ body {
 }
 
 .about-text {
+  justify-content: center;
   flex: 1 1 500px;
 }
 
 /* Enhanced styling for about subsections */
+
+.about-columns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+}
 .about-subsection {
-  margin-bottom: 2rem;
+  flex: 1 1 300px;
+  max-width: 350px;
   background-color: var(--off-white);
   padding: 20px;
   border-radius: var(--border-radius);
-  border-left: 4px solid var(--primary-color);
+  border-top: 4px solid var(--primary-color);
   transition: var(--transition);
 }
 
@@ -124,17 +136,19 @@ body {
 
 .subsection-title {
   color: var(--primary-color);
-  font-size: 1.4rem;
+  font-size: 16px;
   margin-bottom: 0.7rem;
   position: relative;
   padding-bottom: 10px;
+  text-align: center;
 }
 
 .subsection-title::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 45px;
   height: 3px;
   background-color: var(--accent-color);
@@ -142,7 +156,7 @@ body {
 
 .about-text p {
   margin-bottom: 1rem;
-  font-size: 1rem;
+  font-size: 14px;
   color: var(--text-color);
   text-align: justify;
   line-height: 1.7;
@@ -170,11 +184,19 @@ body {
 /* Core Values Section - Enhanced */
 .core-values-section {
   margin-top: 2.5rem;
+  padding: 30px 20px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--primary-color);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .core-values-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   margin-top: 25px;
 }
@@ -408,7 +430,7 @@ body {
 }
 
 .faculty-category {
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 
 .faculty-category h3 {
@@ -425,7 +447,7 @@ body {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 65px;
+  width: 35px;
   height: 3px;
   background-color: var(--accent-color);
 }
@@ -433,36 +455,41 @@ body {
 .faculty-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 25px;
-  justify-content: center;
+  justify-content: space-around;
+  gap: 15px;
+  padding: 8px 18px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
+
 
 .faculty-card {
   background-color: var(--white);
   border-radius: var(--border-radius);
   overflow: hidden;
-  width: 220px;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
   box-shadow: var(--shadow);
   transition: var(--transition);
-  border: 1px solid var(--light-gray);
 }
 
 .faculty-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .faculty-photo {
   width: 100%;
-  height: 180px;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-bottom: 3px solid var(--primary-light);
 }
 
 .faculty-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  justify-content: center;
   transition: var(--transition);
 }
 
@@ -477,18 +504,19 @@ body {
 }
 
 .faculty-info h4 {
-  margin: 0 0 6px;
-  font-size: 1rem;
+  margin: 0 0 2px;
+  font-size: 13px;
   color: var(--primary-dark);
   font-weight: 600;
 }
 
 .faculty-info p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 11px;
   color: var(--primary-light);
-  font-weight: 500;
+  font-weight: 600;
 }
+
 
 /* Modal Styles - Enhanced */
 .modal-overlay {
@@ -503,7 +531,7 @@ body {
   justify-content: center;
   z-index: 1000;
   padding: 20px;
-  backdrop-filter: blur(3px);
+  /* backdrop-filter: blur(3px); */
 }
 
 .modal-content {
@@ -609,11 +637,12 @@ body {
   }
   
   .section {
-      padding: 55px 25px;
+      padding: 30px 25px;
   }
   
   .faculty-card {
-      width: 200px;
+      width: 100px;
+      height: 200px;
   }
 }
 
@@ -681,7 +710,7 @@ body {
   }
   
   .faculty-photo {
-      height: 140px;
+      height: 150px;
   }
   
   .faculty-info h4 {

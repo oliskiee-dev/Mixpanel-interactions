@@ -3,6 +3,9 @@ import AdminHeader from '../Component/AdminHeader.jsx';
 import UpdateAppointment from './UpdateAppointment';
 import ViewReports from './ViewReports';
 import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send, ChartBar } from 'lucide-react';
+import ExpectedStudents from './ExpectedStudents';
+import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send } from 'lucide-react';
+
 import './ManagePreRegistration.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -488,11 +491,18 @@ function ManagePreRegistration() {
                         Appointment Availability
                     </button>
                     <button 
+
                         className={`tab ${activeTab === "reports" ? "active" : ""}`}
                         onClick={() => setActiveTab("reports")}
                     >
                         <ChartBar size={16} />
                         Reports
+
+                        className={`tab ${activeTab === "expected" ? "active" : ""}`}
+                        onClick={() => setActiveTab("expected")}
+                    >
+                        <CheckCircle size={16} />
+                        Expected Students
                     </button>
                 </div>
                 
@@ -548,6 +558,9 @@ function ManagePreRegistration() {
                     </>
                 )}
                 
+
+                {activeTab === "appointment" && <UpdateAppointment />}
+                {activeTab === "expected" && <ExpectedStudents />}
                 {activeTab === "appointment" && (
                     <UpdateAppointment 
                         studentData={students}
