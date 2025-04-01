@@ -66,6 +66,22 @@
     border-bottom: 3px solid #1a3a7e;
 }
 
+/* Add these styles to your existing CSS */
+.tab[data-tab="reports"] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab[data-tab="reports"] svg {
+    stroke-width: 2px;
+}
+
+.tab[data-tab="reports"].active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+}
+
 /* ======= Search & Filters ======= */
 .filters-container {
     display: flex;
