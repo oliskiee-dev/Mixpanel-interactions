@@ -3,7 +3,8 @@ const {
     getPreRegistrations,
     addPreRegistration,
     updatePreRegistrationStatus,
-    addBooking
+    addBooking,
+    deletePreRegistration
 } = require('../controllers/preRegistrationController');
 
 const router = express.Router();
