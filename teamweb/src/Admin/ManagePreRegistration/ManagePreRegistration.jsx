@@ -38,6 +38,128 @@ function ManagePreRegistration() {
     const [activeTab, setActiveTab] = useState('table');
     const [selectedStudentId, setSelectedStudentId] = useState(null);
 
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [deleteConfirmText, setDeleteConfirmText] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+
+
+    const handleDeleteAllPreRegistrations = async () => {
+        if (deleteConfirmText !== 'Confirm') {
+            toast.error('Please type "Confirm" to proceed with deletion', {
+                position: "top-center",
+                autoClose: 3000,
+            });
+            return;
+        }
+    
+        try {
+            setIsDeleting(true);
+            
+            const response = await fetch('http://localhost:3000/preregistration/delete-all', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            // Log the activity
+            try {
+                const username = localStorage.getItem('username') || 'Admin';
+                await fetch("http://localhost:3000/report/add-report", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        activityLog: `[Manage Pre-Registration] Deleted all pre-registration records`,
+                    }),
+                });
+            } catch (logError) {
+                console.error('Failed to log activity:', logError);
+            }
+    
+            toast.success(
+                <div>
+                    <p><strong>Deletion Successful</strong></p>
+                    <p>All pre-registration records have been deleted</p>
+                </div>,
+                {
+                    position: "top-center",
+                    autoClose: 5000,
+                }
+            );
+    
+            // Reset the state and refresh the data
+            setShowDeleteConfirmation(false);
+            setDeleteConfirmText('');
+            fetchStudentData();
+        } catch (err) {
+            console.error('Failed to delete records:', err);
+            toast.error('Failed to delete records. Please try again.', {
+                position: "top-center",
+                autoClose: 5000,
+            });
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const DeleteConfirmationDialog = () => {
+        if (!showDeleteConfirmation) return null;
+        
+        return (
+            <div className="confirmation-overlay">
+                <div className="confirmation-dialog">
+                    <div className="confirmation-header">
+                        <h3>Confirm Deletion</h3>
+                    </div>
+                    <div className="confirmation-content">
+                        <p><strong>Warning:</strong> You are about to delete ALL pre-registration records.</p>
+                        <p>This action cannot be undone. All student data will be permanently removed from the system.</p>
+                        <p>Type <strong>Confirm</strong> below to proceed:</p>
+                        <input
+                            type="text"
+                            className="confirm-input"
+                            value={deleteConfirmText}
+                            onChange={(e) => setDeleteConfirmText(e.target.value)}
+                            placeholder="Type 'Confirm' here"
+                        />
+                    </div>
+                    <div className="confirmation-actions">
+                        <button 
+                            className="btn-cancel"
+                            onClick={() => {
+                                setShowDeleteConfirmation(false);
+                                setDeleteConfirmText('');
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            className="btn-confirm delete"
+                            onClick={handleDeleteAllPreRegistrations}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <span className="status-loading"></span>
+                                    Deleting...
+                                </>
+                            ) : (
+                                'Delete All Records'
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     // Fetch data on component mount or when pagination/filters change
     useEffect(() => {
         fetchStudentData();
@@ -549,6 +671,7 @@ function ManagePreRegistration() {
 
                 </div>
                 
+                
                 {activeTab === "table" && (
                     <>
                         <div className="filters-container">
@@ -598,6 +721,16 @@ function ManagePreRegistration() {
                         </div>
                         
                         {renderTable()}
+                        <div className="page-actions">
+                            <br />
+                        <button 
+                            className="btn-delete-all"
+                            onClick={() => setShowDeleteConfirmation(true)}
+                        >
+                            Delete All Records
+                        </button>
+                        <br />
+                    </div>
                     </>
                 )}
                 
@@ -617,7 +750,7 @@ function ManagePreRegistration() {
                     />
                 )}
             </div>
-            
+            <DeleteConfirmationDialog />
             {/* Confirmation Dialog */}
             <ConfirmationDialog />
             
