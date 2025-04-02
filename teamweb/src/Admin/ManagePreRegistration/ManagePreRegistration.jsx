@@ -158,6 +158,11 @@ function ManagePreRegistration() {
     const DeleteConfirmationDialog = () => {
         if (!showDeleteConfirmation) return null;
         
+        // Calculate if input matches required confirmation text
+        const isConfirmTextValid = deleteConfirmText === 'Confirm';
+        // Check how close user is to typing "Confirm" (for providing feedback)
+        const confirmProgress = Math.min(deleteConfirmText.length, 7) / 7;
+        
         return (
             <div className="confirmation-overlay">
                 <div className="confirmation-dialog">
@@ -168,13 +173,33 @@ function ManagePreRegistration() {
                         <p><strong>Warning:</strong> You are about to delete ALL pre-registration records.</p>
                         <p>This action cannot be undone. All student data will be permanently removed from the system.</p>
                         <p>Type <strong>Confirm</strong> below to proceed:</p>
-                        <input
-                            type="text"
-                            className="confirm-input"
-                            value={deleteConfirmText}
-                            onChange={(e) => setDeleteConfirmText(e.target.value)}
-                            placeholder="Type 'Confirm' here"
-                        />
+                        <div className="confirm-input-container">
+                            <input
+                                type="text"
+                                className={`confirm-input ${isConfirmTextValid ? 'valid' : deleteConfirmText.length > 0 ? 'in-progress' : ''}`}
+                                value={deleteConfirmText}
+                                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                placeholder="Type 'Confirm' here"
+                                autoFocus
+                            />
+                            {deleteConfirmText.length > 0 && !isConfirmTextValid && (
+                                <div className="confirmation-progress">
+                                    <div 
+                                        className="progress-bar"
+                                        style={{ width: `${confirmProgress * 100}%` }}
+                                    ></div>
+                                </div>
+                            )}
+                            {deleteConfirmText.length > 0 && (
+                                <span className="input-feedback">
+                                    {isConfirmTextValid ? (
+                                        <span className="valid-text">✓ Ready to delete</span>
+                                    ) : (
+                                        <span className="invalid-text">Keep typing "Confirm"</span>
+                                    )}
+                                </span>
+                            )}
+                        </div>
                     </div>
                     <div className="confirmation-actions">
                         <button 
@@ -187,9 +212,9 @@ function ManagePreRegistration() {
                             Cancel
                         </button>
                         <button 
-                            className="btn-confirm delete"
+                            className={`btn-confirm delete ${isConfirmTextValid ? 'ready' : 'disabled'}`}
                             onClick={handleDeleteAllPreRegistrations}
-                            disabled={isDeleting}
+                            disabled={!isConfirmTextValid || isDeleting}
                         >
                             {isDeleting ? (
                                 <>
@@ -205,7 +230,6 @@ function ManagePreRegistration() {
             </div>
         );
     };
-
     // Fetch data on component mount or when pagination/filters change
     useEffect(() => {
         fetchStudentData();
