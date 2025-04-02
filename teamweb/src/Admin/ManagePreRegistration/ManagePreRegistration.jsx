@@ -4,7 +4,6 @@ import UpdateAppointment from './UpdateAppointment';
 import ViewReports from './ViewReports';
 import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send, ChartBar } from 'lucide-react';
 import ExpectedStudents from './ExpectedStudents';
-import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send } from 'lucide-react';
 
 import './ManagePreRegistration.css';
 import { toast, ToastContainer } from 'react-toastify';
@@ -491,19 +490,21 @@ function ManagePreRegistration() {
                         Appointment Availability
                     </button>
                     <button 
-
                         className={`tab ${activeTab === "reports" ? "active" : ""}`}
                         onClick={() => setActiveTab("reports")}
                     >
                         <ChartBar size={16} />
                         Reports
+                    </button>
 
+                    <button 
                         className={`tab ${activeTab === "expected" ? "active" : ""}`}
                         onClick={() => setActiveTab("expected")}
                     >
                         <CheckCircle size={16} />
                         Expected Students
                     </button>
+
                 </div>
                 
                 {activeTab === "table" && (
