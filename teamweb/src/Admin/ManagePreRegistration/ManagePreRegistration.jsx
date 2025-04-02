@@ -152,6 +152,18 @@ function ManagePreRegistration() {
             
             const data = await response.json();
             
+            // Log the activity if the status was updated
+            await fetch("http://localhost:3000/report/add-report", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username, // Replace with actual username
+                    activityLog: `[Manage Pre-Registration:Student Records] Updated status for student ${studentToUpdate.name} (ID: ${studentToUpdate.id}) to ${newStatus}`,
+                }),
+            });
+            
             // Show notification if email was sent (when approving)
             if (newStatus === "approved" && data.emailSent) {
                 const student = students.find(s => s._id === studentToUpdate.id);
@@ -182,6 +194,7 @@ function ManagePreRegistration() {
             setStudentToUpdate(null);
         }
     };
+    
 
     // Toggle row expansion
     const toggleRow = (index) => {
