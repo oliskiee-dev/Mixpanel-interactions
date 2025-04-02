@@ -1,5 +1,4 @@
-
-/* Main Calendar Container */ 
+/* Main Calendar Container */
 .calendar-container {
   width: 95%;
   max-width: 1100px;
@@ -18,28 +17,45 @@
   margin-bottom: 20px;
 }
 
-.calendar-header button {
-  padding: 8px 12px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  background: #007bff;
-  color: white;
-  border-radius: 5px;
-  transition: background 0.3s, opacity 0.3s;
+.calendar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
-/* Normal hover effect */
-.calendar-header button:hover {
+.calendar-header button {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background: #007bff;
+  font-size: 16px;
+}
+/* Hover effect (only if not disabled) */
+.calendar-header button:hover:not(:disabled) {
   background: #0056b3;
 }
 
-/* Disabled button styling (still blue, just dimmed) */
+/* Disabled button style (keep blue background, slightly faded) */
+.calendar-header button:not(:disabled) {
+    background-color: #007bff !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 8px 15px !important;
+    font-size: 16px !important;
+    border-radius: 5px !important;
+    transition: background-color 0.3s !important;
+}
+
 .calendar-header button:disabled {
-  background: gray;
-  color: white;
-  opacity: 0.5;
-  cursor: not-allowed;
+    background-color: #7abaff !important;
+    color: white !important;
+    cursor: not-allowed !important;
 }
 
 .calendar-header h2 {

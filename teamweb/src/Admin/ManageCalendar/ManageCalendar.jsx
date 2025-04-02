@@ -433,7 +433,7 @@ const ManageCalendar = () => {
       <div className="calendar-header">
         <button onClick={prevYear} disabled={currentYear === initialYear}>❮ Prev Year</button>
         <h2>{currentYear}</h2>
-        <button onClick={nextYear} disabled={currentYear >= initialYear + 1}>Next Year ❯</button>
+        <button onClick={nextYear} disabled={currentYear > initialYear}>Next Year ❯</button>   
       </div>
 
         {/* Current event display */}
