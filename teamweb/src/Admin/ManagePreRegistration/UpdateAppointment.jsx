@@ -56,27 +56,38 @@ const UpdateAppointment = (props) => {
     fetchBookingsData();
   }, [props.studentData]);
 
-  const fetchAvailabilityData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('http://localhost:3000/booking/bookingAvailability');
-      if (!response.ok) {
-        throw new Error('Failed to fetch availability data');
-      }
-      const data = await response.json();
-      
-      setAvailabilityData(data);
-      
-      const formattedAppointments = {};
+// Modify the fetchAvailabilityData function to auto-populate all days with default availability
+// Modify the fetchAvailabilityData function to respect deleted dates
+const fetchAvailabilityData = async () => {
+  try {
+    setIsLoading(true);
+    const response = await fetch('http://localhost:3000/booking/bookingAvailability');
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch availability data');
+    }
+    
+    const data = await response.json();
+    setAvailabilityData(data);
+    
+    // Create a formatted appointments object
+    const formattedAppointments = {};
+    
+    // Get the next 7 days
+    const weekDays = getNextSevenDays();
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    // Get list of recently deleted dates to avoid recreating them
+    const recentlyDeletedDates = JSON.parse(localStorage.getItem('deletedAvailabilityDates') || '[]');
+    
+    // First, populate with any existing availability data from the API
+    if (data && data.length > 0) {
       data.forEach(item => {
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const weekDays = getNextSevenDays();
-        
         weekDays.forEach(date => {
           const dayName = days[date.getDay()];
-          if (item.availability[dayName] && item.availability[dayName].length > 0) {
-            const dateStr = formatDate(date);
-            
+          const dateStr = formatDate(date);
+          
+          if (item.availability && item.availability[dayName] && item.availability[dayName].length > 0) {
             if (!formattedAppointments[dateStr]) {
               formattedAppointments[dateStr] = [];
             }
@@ -90,15 +101,106 @@ const UpdateAppointment = (props) => {
           }
         });
       });
-      
-      setAppointments(formattedAppointments);
-    } catch (err) {
-      setError('Failed to fetch appointment data: ' + err.message);
-      console.error(err);
-    } finally {
-      setIsLoading(false);
     }
-  };
+    
+    // Now, auto-populate any days that don't have availability with default slots
+    // EXCEPT for days that have been explicitly deleted
+    weekDays.forEach(date => {
+      const dateStr = formatDate(date);
+      
+      // Skip auto-population if this date was recently deleted
+      if (recentlyDeletedDates.includes(dateStr)) {
+        console.log(`Skipping auto-population for deleted date: ${dateStr}`);
+        return; // Skip this date
+      }
+      
+      // If this date doesn't have any appointments yet, add default ones
+      if (!formattedAppointments[dateStr] || formattedAppointments[dateStr].length === 0) {
+        // Check if we have an existing availability entry to use
+        let availabilityId = null;
+        if (data && data.length > 0) {
+          availabilityId = data[0]._id;
+        }
+        
+        formattedAppointments[dateStr] = [{
+          id: availabilityId, // This might be null if no availability exists yet
+          timeSlots: generateTimeSlots(), // This gives us 9AM to 4PM
+          purpose: 'Available Slots',
+          maxAppointments: 5
+        }];
+      }
+    });
+    
+    // Update the appointments state with our complete set
+    setAppointments(formattedAppointments);
+    
+    // If no availability exists yet in the database but we want to show defaults,
+    // we might need to create an initial entry
+    if (data.length === 0) {
+      // This would be a good place to create default availability in the database
+      // for all days of the week if you want persistence
+      createDefaultAvailability();
+    }
+    
+  } catch (err) {
+    setError('Failed to fetch appointment data: ' + err.message);
+    console.error(err);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// Add this new function to create default availability if none exists
+// Fix the createDefaultAvailability function to respect deleted days
+const createDefaultAvailability = async () => {
+  try {
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+
+    // Fetch existing availability
+    const fetchResponse = await fetch('http://localhost:3000/booking/getBookingAvailability');
+    if (!fetchResponse.ok) throw new Error('Failed to fetch existing availability');
+
+    const existingAvailability = await fetchResponse.json();
+    const existingDates = Object.keys(existingAvailability || {});
+
+    // Keep track of which days have been explicitly deleted
+    // We need to store this information somewhere or infer it from the data
+    
+    // If we have availability data, check if the specific day was deleted
+    const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+    
+    // If this exact date was recently deleted, don't recreate it
+    const dateStr = formatDate(selectedDate);
+    const recentlyDeletedDates = JSON.parse(localStorage.getItem('deletedAvailabilityDates') || '[]');
+    
+    if (recentlyDeletedDates.includes(dateStr)) {
+      console.log(`Availability for ${dateStr} was recently deleted. Skipping auto-creation.`);
+      return;
+    }
+
+    // Only create default availability for today if it doesn't exist yet
+    // and hasn't been explicitly deleted
+    if (!existingDates.includes(todayFormatted)) {
+      const defaultAvailability = { [todayFormatted]: generateTimeSlots() };
+
+      const response = await fetch('http://localhost:3000/booking/addBookingAvailability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ availability: defaultAvailability }),
+      });
+
+      if (!response.ok) throw new Error('Failed to create default availability');
+      console.log(`Created availability for ${todayFormatted}`);
+    } else {
+      console.log(`Availability for ${todayFormatted} already exists.`);
+    }
+
+  } catch (err) {
+    console.error('Error creating availability:', err);
+  }
+};
+
   
   const fetchBookingsData = async () => {
     try {
@@ -198,7 +300,6 @@ const UpdateAppointment = (props) => {
   };
 
   // Save appointment
-// Save appointment
 const saveAppointment = async () => {
   if (!appointmentForm.timeSlots || appointmentForm.timeSlots.length === 0) {
     toast.error('Please add at least one time slot');
@@ -319,54 +420,63 @@ const saveAppointment = async () => {
   };
 
   // Delete appointment for a specific day
-  const deleteAppointment = async (appointmentId) => {
-    try {
-      setIsLoading(true);
-      
-      const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
-      
-      // First, fetch the current availability data to preserve other days
-      const currentResponse = await fetch('http://localhost:3000/booking/bookingAvailability');
-      if (!currentResponse.ok) {
-        throw new Error('Failed to fetch current availability data');
-      }
-      
-      const availabilityData = await currentResponse.json();
-      const existingEntry = availabilityData.find(item => item._id === appointmentId);
-      
-      if (!existingEntry) {
-        throw new Error('Could not find the availability entry to delete');
-      }
-      
-      // Create a copy of the existing availability object
-      const updatedAvailability = { ...existingEntry.availability };
-      
-      // Remove only the selected day's availability
-      delete updatedAvailability[dayOfWeek];
-      
-      // Update with the modified availability (where the selected day is removed)
-      const response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${appointmentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ availability: updatedAvailability })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete appointment');
-      }
-      
-      await fetchAvailabilityData();
-      
-      toast.success(`Availability for ${dayOfWeek} deleted successfully`);
-    } catch (err) {
-      toast.error('Failed to delete appointment: ' + err.message);
-      console.error(err);
-    } finally {
-      setIsLoading(false);
+// Delete appointment for a specific day
+const deleteAppointment = async (appointmentId) => {
+  try {
+    setIsLoading(true);
+    
+    const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+    const dateStr = formatDate(selectedDate);
+    
+    // First, fetch the current availability data to preserve other days
+    const currentResponse = await fetch('http://localhost:3000/booking/bookingAvailability');
+    if (!currentResponse.ok) {
+      throw new Error('Failed to fetch current availability data');
     }
-  };
+    
+    const availabilityData = await currentResponse.json();
+    const existingEntry = availabilityData.find(item => item._id === appointmentId);
+    
+    if (!existingEntry) {
+      throw new Error('Could not find the availability entry to delete');
+    }
+    
+    // Create a copy of the existing availability object
+    const updatedAvailability = { ...existingEntry.availability };
+    
+    // Remove only the selected day's availability
+    delete updatedAvailability[dayOfWeek];
+    
+    // Update with the modified availability (where the selected day is removed)
+    const response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${appointmentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ availability: updatedAvailability })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete appointment');
+    }
+    
+    // Track this deleted date so we don't auto-recreate it
+    const recentlyDeletedDates = JSON.parse(localStorage.getItem('deletedAvailabilityDates') || '[]');
+    if (!recentlyDeletedDates.includes(dateStr)) {
+      recentlyDeletedDates.push(dateStr);
+      localStorage.setItem('deletedAvailabilityDates', JSON.stringify(recentlyDeletedDates));
+    }
+    
+    await fetchAvailabilityData();
+    
+    toast.success(`Availability for ${dayOfWeek} deleted successfully`);
+  } catch (err) {
+    toast.error('Failed to delete appointment: ' + err.message);
+    console.error(err);
+  } finally {
+    setIsLoading(false);
+  }
+};
   
   // Add time slot
   const addTimeSlot = () => {
@@ -389,12 +499,28 @@ const saveAppointment = async () => {
   
   // Update time slot
   const updateTimeSlot = (index, value) => {
+    // Check if the time is already selected in another slot
+    if (value && appointmentForm.timeSlots.findIndex((slot, i) => slot === value && i !== index) !== -1) {
+      toast.error('This time slot is already selected. Please choose a different time.');
+      return;
+    }
+    
     const newTimeSlots = [...appointmentForm.timeSlots];
     newTimeSlots[index] = value;
     setAppointmentForm({
       ...appointmentForm,
       timeSlots: newTimeSlots
     });
+  };
+
+  // Get available time slots that haven't been selected yet
+  const getAvailableTimeSlots = (currentIndex) => {
+    // Get all time slots that are already selected (except the current one)
+    const selectedSlots = appointmentForm.timeSlots
+      .filter((slot, i) => slot && i !== currentIndex);
+    
+    // Return only time slots that aren't already selected
+    return availableTimeSlots.filter(slot => !selectedSlots.includes(slot));
   };
 
   // Get bookings for a specific date
@@ -634,10 +760,7 @@ const saveAppointment = async () => {
             <div className="no-appointments">
               <p>No appointment slots configured for this date.</p>
               <p>Click the button below to add availability.</p>
-            </div>
-          )}
-          
-          <button 
+              <button 
             className="add-appointment-button"
             onClick={() => {
               setIsFormVisible(!isFormVisible);
@@ -654,6 +777,8 @@ const saveAppointment = async () => {
           >
             {isFormVisible ? 'Cancel' : 'Add Availability'}
           </button>
+            </div>
+          )}
           
           {isFormVisible && (
             <div className="appointment-form">
@@ -674,41 +799,48 @@ const saveAppointment = async () => {
               
               <div className="form-group">
                 <label>Time Slots:</label>
-                {appointmentForm.timeSlots.map((timeSlot, index) => (
-                  <div key={index} className="time-slot-input">
-                    <select
-                      value={timeSlot}
-                      onChange={(e) => updateTimeSlot(index, e.target.value)}
-                      required
-                      className="time-slot-select"
-                    >
-                      <option value="">Select a time</option>
-                      {availableTimeSlots.map(slot => {
-                        const hour = parseInt(slot.split(':')[0]);
-                        const ampm = hour >= 12 ? 'PM' : 'AM';
-                        const displayHour = hour > 12 ? hour - 12 : hour;
-                        return (
-                          <option key={slot} value={slot}>
-                            {`${displayHour}:00 ${ampm}`}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <button 
-                      type="button" 
-                      className="remove-slot-button"
-                      onClick={() => removeTimeSlot(index)}
-                      disabled={appointmentForm.timeSlots.length <= 1}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
+                {appointmentForm.timeSlots.map((timeSlot, index) => {
+                  // Get available time slots for this dropdown (including currently selected value)
+                  const availableOptions = timeSlot 
+                    ? [...getAvailableTimeSlots(index), timeSlot] 
+                    : getAvailableTimeSlots(index);
+                  
+                  return (
+                    <div key={index} className="time-slot-input">
+                      <select
+                        value={timeSlot}
+                        onChange={(e) => updateTimeSlot(index, e.target.value)}
+                        required
+                        className="time-slot-select"
+                      >
+                        <option value="">Select a time</option>
+                        {availableOptions.sort().map(slot => {
+                          const hour = parseInt(slot.split(':')[0]);
+                          const ampm = hour >= 12 ? 'PM' : 'AM';
+                          const displayHour = hour > 12 ? hour - 12 : hour;
+                          return (
+                            <option key={slot} value={slot}>
+                              {`${displayHour}:00 ${ampm}`}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <button 
+                        type="button" 
+                        className="remove-slot-button"
+                        onClick={() => removeTimeSlot(index)}
+                        disabled={appointmentForm.timeSlots.length <= 1}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })}
                 <button 
                   type="button" 
                   className="add-slot-button"
                   onClick={addTimeSlot}
-                  disabled={appointmentForm.timeSlots.length >= availableTimeSlots.length}
+                  disabled={appointmentForm.timeSlots.filter(slot => slot !== '').length >= availableTimeSlots.length}
                 >
                   + Add Time Slot
                 </button>
