@@ -152,17 +152,34 @@ function ManagePreRegistration() {
             
             const data = await response.json();
             
+            // Update the local state immediately without refetching
+            setStudents(prevStudents => 
+                prevStudents.map(student => 
+                    student._id === studentToUpdate.id 
+                        ? { ...student, status: newStatus } 
+                        : student
+                )
+            );
+            
             // Log the activity if the status was updated
-            await fetch("http://localhost:3000/report/add-report", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username, // Replace with actual username
-                    activityLog: `[Manage Pre-Registration:Student Records] Updated status for student ${studentToUpdate.name} (ID: ${studentToUpdate.id}) to ${newStatus}`,
-                }),
-            });
+            try {
+                // Get the current user's username from localStorage or a global state
+                const username = localStorage.getItem('username') || 'Admin'; // Fallback to 'Admin' if not found
+                
+                await fetch("http://localhost:3000/report/add-report", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        activityLog: `[Manage Pre-Registration:Student Records] Updated status for student ${studentToUpdate.name} (ID: ${studentToUpdate.id}) to ${newStatus}`,
+                    }),
+                });
+            } catch (logError) {
+                console.error('Failed to log activity:', logError);
+                // Don't show toast for this error as it's not critical to the user
+            }
             
             // Show notification if email was sent (when approving)
             if (newStatus === "approved" && data.emailSent) {
@@ -182,7 +199,19 @@ function ManagePreRegistration() {
                 }
             }
             
-            fetchStudentData();
+            // Show success toast for status update
+            toast.success(
+                <div>
+                    <p><strong>Status Updated</strong></p>
+                    <p>Student status changed to {newStatus}</p>
+                </div>,
+                {
+                    icon: <CheckCircle size={16} />,
+                    position: "top-center",
+                    autoClose: 3000,
+                }
+            );
+            
         } catch (err) {
             console.error('Failed to update status:', err);
             toast.error('Failed to update status. Please try again.', {
