@@ -559,8 +559,6 @@ function ManagePreRegistration() {
                     </>
                 )}
                 
-
-                {activeTab === "appointment" && <UpdateAppointment />}
                 {activeTab === "expected" && <ExpectedStudents />}
                 {activeTab === "appointment" && (
                     <UpdateAppointment 
