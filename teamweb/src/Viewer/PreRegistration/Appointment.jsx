@@ -13,6 +13,7 @@ function Appointment() {
     const [appointmentSuccess, setAppointmentSuccess] = useState(false);
     const [availabilityData, setAvailabilityData] = useState(null);
     const [availableTimes, setAvailableTimes] = useState([]);
+    const [availableDays, setAvailableDays] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Fetch availability data on component mount
@@ -35,12 +36,46 @@ function Appointment() {
             
             if (data && data.length > 0) {
                 setAvailabilityData(data[0]);
+                generateAvailableDays(data[0]);
             }
             setLoading(false);
         } catch (error) {
             console.error('Error fetching availability data:', error);
             setLoading(false);
         }
+    };
+
+    const generateAvailableDays = (availabilityData) => {
+        if (!availabilityData || !availabilityData.availability) return;
+
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const today = new Date();
+        const availableDaysList = [];
+
+        // Look ahead 7 days
+        for (let i = 0; i < 7; i++) {
+            const date = new Date();
+            date.setDate(today.getDate() + i);
+            const dayName = daysOfWeek[date.getDay()];
+            
+            // Check if this day has any availability slots
+            if (availabilityData.availability[dayName] && 
+                availabilityData.availability[dayName].length > 0) {
+                
+                availableDaysList.push({
+                    dateString: date.toISOString().split('T')[0],
+                    dayName,
+                    formattedDate: formatDate(date)
+                });
+            }
+        }
+
+        setAvailableDays(availableDaysList);
+    };
+
+    const formatDate = (date) => {
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
     };
 
     const updateAvailableTimes = (dateString) => {
@@ -104,6 +139,18 @@ function Appointment() {
         });
     };
 
+    const handleDateSelection = (dateString) => {
+        setAppointmentData({
+            ...appointmentData,
+            appointmentDate: dateString,
+            appointmentTime: ""
+        });
+        setAppointmentErrors({
+            ...appointmentErrors,
+            appointmentDate: ""
+        });
+    };
+
     const validateAppointment = (data) => {
         let errors = {};
         if (!data.email.trim()) errors.email = "Email is required";
@@ -148,14 +195,6 @@ function Appointment() {
         }
     };
 
-    // Calculate the min and max dates
-    const today = new Date();
-    const sixDaysAhead = new Date();
-    sixDaysAhead.setDate(today.getDate() + 6); // +6 gives a total of 7 days including today
-
-    const minDate = today.toISOString().split('T')[0];
-    const maxDate = sixDaysAhead.toISOString().split('T')[0];
-
     return (
         <>
             <div className="appointment-main-container">
@@ -185,53 +224,69 @@ function Appointment() {
                                         name="email"
                                         value={appointmentData.email}
                                         onChange={handleAppointmentChange}
+                                        placeholder="your@email.com"
                                         required
                                     />
                                     {appointmentErrors.email && 
                                         <div className="appointment-error">{appointmentErrors.email}</div>}
                                 </div>
+                                
                                 <div className="appointment-form-group">
-                                    <label htmlFor="appointmentDate">Preferred Date <span className="appointment-required">*</span></label>
-                                    <input 
-                                        type="date" 
-                                        id="appointmentDate" 
-                                        name="appointmentDate"
-                                        value={appointmentData.appointmentDate}
-                                        onChange={handleAppointmentChange}
-                                        min={minDate}
-                                        max={maxDate}
-                                        required
-                                    />
+                                    <label>Preferred Date <span className="appointment-required">*</span></label>
+                                    <div className="appointment-date-selection">
+                                        {availableDays.length > 0 ? (
+                                            availableDays.map(day => (
+                                                <div 
+                                                    key={day.dateString}
+                                                    className={`appointment-date-option ${appointmentData.appointmentDate === day.dateString ? 'active' : ''}`}
+                                                    onClick={() => handleDateSelection(day.dateString)}
+                                                >
+                                                    <div className="date-option-weekday">{day.dayName}</div>
+                                                    <div className="date-option-date">{day.formattedDate}</div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="appointment-no-dates">No available dates within the next 7 days</div>
+                                        )}
+                                    </div>
                                     {appointmentErrors.appointmentDate && 
                                         <div className="appointment-error">{appointmentErrors.appointmentDate}</div>}
                                 </div>
+                                
                                 <div className="appointment-form-group">
                                     <label htmlFor="appointmentTime">Preferred Time <span className="appointment-required">*</span></label>
-                                    <select 
-                                        id="appointmentTime" 
-                                        name="appointmentTime"
-                                        value={appointmentData.appointmentTime}
-                                        onChange={handleAppointmentChange}
-                                        required
-                                        disabled={!appointmentData.appointmentDate || availableTimes.length === 0}
-                                    >
-                                        <option value="">Select Time</option>
-                                        {availableTimes.map(time => (
-                                            <option key={time} value={time}>
-                                                {convertTo12HourFormat(time)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {!appointmentData.appointmentDate && 
-                                        <div className="appointment-note">Please select a date first</div>}
-                                    {appointmentData.appointmentDate && availableTimes.length === 0 && 
-                                        <div className="appointment-note" style={{ color: "red" }}>
-                                        No available times for this date
-                                      </div>
-                                      }
+                                    <div className="appointment-time-selection">
+                                        {!appointmentData.appointmentDate ? (
+                                            <div className="appointment-select-date-first">Please select a date first</div>
+                                        ) : availableTimes.length === 0 ? (
+                                            <div className="appointment-no-times">No available times for this date</div>
+                                        ) : (
+                                            <div className="appointment-time-options">
+                                                {availableTimes.map(time => (
+                                                    <div 
+                                                        key={time}
+                                                        className={`appointment-time-option ${appointmentData.appointmentTime === time ? 'active' : ''}`}
+                                                        onClick={() => {
+                                                            setAppointmentData({
+                                                                ...appointmentData,
+                                                                appointmentTime: time
+                                                            });
+                                                            setAppointmentErrors({
+                                                                ...appointmentErrors,
+                                                                appointmentTime: ""
+                                                            });
+                                                        }}
+                                                    >
+                                                        {convertTo12HourFormat(time)}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                     {appointmentErrors.appointmentTime && 
                                         <div className="appointment-error">{appointmentErrors.appointmentTime}</div>}
                                 </div>
+                                
                                 <div className="appointment-form-group">
                                     <label htmlFor="appointmentReason">Purpose of Visit <span className="appointment-required">*</span></label>
                                     <textarea 
@@ -246,6 +301,7 @@ function Appointment() {
                                     {appointmentErrors.appointmentReason && 
                                         <div className="appointment-error">{appointmentErrors.appointmentReason}</div>}
                                 </div>
+                                
                                 <div className="appointment-btn-group">
                                     <button 
                                         type="submit"
