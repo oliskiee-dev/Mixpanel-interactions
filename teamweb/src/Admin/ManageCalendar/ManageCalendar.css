@@ -1,4 +1,5 @@
-/* Main Calendar Container */
+
+/* Main Calendar Container */ 
 .calendar-container {
   width: 95%;
   max-width: 1100px;
@@ -9,14 +10,6 @@
 }
 
 /* Calendar Header and Navigation */
-.calendar-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
 .calendar-header {
   display: flex;
   justify-content: center;
@@ -41,13 +34,13 @@
   background: #0056b3;
 }
 
-/* Disabled button styling (locked appearance) */
+/* Disabled button styling (still blue, just dimmed) */
 .calendar-header button:disabled {
-  background: #a0a0a0; /* Greyed out */
+  background: gray;
+  color: white;
+  opacity: 0.5;
   cursor: not-allowed;
-  opacity: 0.6; /* Slightly faded */
 }
-
 
 .calendar-header h2 {
   font-size: 22px;
