@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaUser, FaExclamationTriangle } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import './ForgotPassword.css';
-import TeamLogo from "../assets/images/TeamLogo.jpg";
+import TeamLogo from "../assets/images/TeamLogo.png";
 
 function ForgotPassword() {
   const [username, setUsername] = useState("");

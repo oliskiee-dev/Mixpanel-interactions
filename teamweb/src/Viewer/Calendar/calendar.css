@@ -1,14 +1,14 @@
-/* General Calendar Styling */
+/* Main Calendar Container */
 .calendar-container {
   width: 95%;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: auto;
-  padding: 20px;
+  padding: 10px;
   text-align: center;
   overflow-x: hidden;
 }
 
-/* Year Navigation */
+/* Calendar Header and Navigation */
 .calendar-header {
   display: flex;
   justify-content: center;
@@ -17,23 +17,51 @@
   margin-bottom: 20px;
 }
 
-.calendar-header button {
-  padding: 8px 12px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  background: #007bff;
-  color: white;
-  border-radius: 5px;
-  transition: background 0.3s;
+.calendar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  margin-top: 5px;
 }
 
-.calendar-header button:hover {
+.calendar-header button {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background: #007bff;
+  font-size: 16px;
+}
+/* Hover effect (only if not disabled) */
+.calendar-header button:hover:not(:disabled) {
   background: #0056b3;
+}
+
+/* Disabled button style (keep blue background, slightly faded) */
+.calendar-header button:not(:disabled) {
+    background-color: #007bff !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 8px 15px;
+    font-size: 16px !important;
+    border-radius: 5px !important;
+    transition: background-color 0.3s !important;
+}
+
+.calendar-header button:disabled {
+    background-color: #7abaff !important;
+    color: white !important;
+    cursor: not-allowed !important;
 }
 
 .calendar-header h2 {
   font-size: 22px;
+  margin: 0;
 }
 
 /* Full Year Calendar */
