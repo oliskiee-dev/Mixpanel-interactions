@@ -2,11 +2,88 @@ const preRegistrationModel = require('../models/PreRegistration');
 const { sendApprovalEmail } = require('../service/emailService');
 
 // GET all Pre-Registrations (with pagination & filters)
+// const getPreRegistrations = async (req, res) => {
+//     try {
+//         const page = parseInt(req.query.page) || 1;
+//         const limit = parseInt(req.query.limit) || 10;
+//         const skip = (page - 1) * limit;
+
+//         let filterQuery = {};
+
+//         if (req.query.search) {
+//             filterQuery.name = { $regex: req.query.search, $options: 'i' };
+//         }
+//         if (req.query.grade) filterQuery.grade_level = req.query.grade;
+//         if (req.query.strand) filterQuery.strand = req.query.strand;
+//         if (req.query.type) filterQuery.isNewStudent = req.query.type;
+
+//         let sortObject = { createdAt: -1 };
+//         if (req.query.search) sortObject = { name: 1 };
+//         else if (req.query.grade) sortObject = { grade_level: 1, name: 1 };
+//         else if (req.query.strand) sortObject = { strand: 1, name: 1 };
+//         else if (req.query.type) sortObject = { isNewStudent: 1, name: 1 };
+
+//         if (req.query.grade) {
+//             const aggregationPipeline = [
+//                 { $match: filterQuery },
+//                 {
+//                     $addFields: {
+//                         gradeOrder: {
+//                             $switch: {
+//                                 branches: [
+//                                     { case: { $eq: ["$grade_level", "Nursery"] }, then: -3 },
+//                                     { case: { $eq: ["$grade_level", "Kinder 1"] }, then: -2 },
+//                                     { case: { $eq: ["$grade_level", "Kinder 2"] }, then: -1 },
+//                                     { case: { $eq: ["$grade_level", "1"] }, then: 1 },
+//                                     { case: { $eq: ["$grade_level", "12"] }, then: 12 }
+//                                 ],
+//                                 default: 100
+//                             }
+//                         }
+//                     }
+//                 },
+//                 { $sort: { gradeOrder: 1, name: 1 } },
+//                 { $skip: skip },
+//                 { $limit: limit }
+//             ];
+
+//             const records = await preRegistrationModel.aggregate(aggregationPipeline);
+//             const totalRecords = await preRegistrationModel.countDocuments(filterQuery);
+
+//             return res.json({
+//                 totalRecords,
+//                 totalPages: Math.ceil(totalRecords / limit),
+//                 currentPage: page,
+//                 preregistration: records,
+//             });
+//         }
+
+//         const records = await preRegistrationModel.find(filterQuery)
+//             .sort(sortObject)
+//             .skip(skip)
+//             .limit(limit);
+
+//         const totalRecords = await preRegistrationModel.countDocuments(filterQuery);
+
+//         res.json({
+//             totalRecords,
+//             totalPages: Math.ceil(totalRecords / limit),
+//             currentPage: page,
+//             preregistration: records,
+//         });
+
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Server error' });
+//     }
+// };
+
+// GET all Pre-Registrations (with pagination & filters)
 const getPreRegistrations = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+        const limit = req.query.limit ? parseInt(req.query.limit) : null; // No default limit
+        const skip = limit ? (page - 1) * limit : 0;
 
         let filterQuery = {};
 
@@ -44,7 +121,7 @@ const getPreRegistrations = async (req, res) => {
                 },
                 { $sort: { gradeOrder: 1, name: 1 } },
                 { $skip: skip },
-                { $limit: limit }
+                ...(limit ? [{ $limit: limit }] : []) // Apply limit only if specified
             ];
 
             const records = await preRegistrationModel.aggregate(aggregationPipeline);
@@ -52,22 +129,21 @@ const getPreRegistrations = async (req, res) => {
 
             return res.json({
                 totalRecords,
-                totalPages: Math.ceil(totalRecords / limit),
+                totalPages: limit ? Math.ceil(totalRecords / limit) : 1,
                 currentPage: page,
                 preregistration: records,
             });
         }
 
-        const records = await preRegistrationModel.find(filterQuery)
-            .sort(sortObject)
-            .skip(skip)
-            .limit(limit);
+        let query = preRegistrationModel.find(filterQuery).sort(sortObject).skip(skip);
+        if (limit) query = query.limit(limit); // Apply limit only if specified
 
+        const records = await query;
         const totalRecords = await preRegistrationModel.countDocuments(filterQuery);
 
         res.json({
             totalRecords,
-            totalPages: Math.ceil(totalRecords / limit),
+            totalPages: limit ? Math.ceil(totalRecords / limit) : 1,
             currentPage: page,
             preregistration: records,
         });
@@ -77,6 +153,7 @@ const getPreRegistrations = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
+
 
 // POST - Add a new Pre-Registration
 const addPreRegistration = async (req, res) => {
