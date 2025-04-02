@@ -722,6 +722,38 @@
     font-weight: 600;
   }
 
+/* Confirmation input field */
+.confirm-input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    transition: border-color 0.2s ease;
+}
+
+.confirm-input:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+}
+
+/* Delete confirmation button */
+.btn-confirm.delete {
+    color: #ffffff;
+    background-color: #dc2626;
+}
+
+.btn-confirm.delete:hover {
+    background-color: #b91c1c;
+}
+
+.btn-confirm.delete:disabled {
+    background-color: #f87171;
+    cursor: not-allowed;
+}
+
 .danger-zone-section {
     margin-top: 40px;
     padding: 10px 0;
