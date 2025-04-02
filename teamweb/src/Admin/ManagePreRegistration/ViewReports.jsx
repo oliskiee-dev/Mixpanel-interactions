@@ -13,6 +13,8 @@ const ViewReports = () => {
     juniorHigh: 0,
     seniorHigh: 0
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   // State for report view
   const [reportView, setReportView] = useState('byGrade');
@@ -33,21 +35,75 @@ const ViewReports = () => {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
+  // Fetch registration data
+// Fetch registration data
+const fetchRegistrations = async () => {
+  setIsLoading(true);
+  setError(null);
+  
+  try {
+    const response = await fetch('http://localhost:3000/preregistration');
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Ensure data is properly extracted from the response
+    if (Array.isArray(data)) {
+      setRegistrationData(data);
+    } else if (data && typeof data === 'object') {
+      // Check for preregistration array in response
+      if (data.preregistration && Array.isArray(data.preregistration)) {
+        setRegistrationData(data.preregistration);
+      } else if (data.data && Array.isArray(data.data)) {
+        // Sometimes APIs return data nested in a data property
+        setRegistrationData(data.data);
+      } else {
+        console.error("API did not return data in expected format:", data);
+        setError("Invalid data format received from API");
+        setRegistrationData([]);
+      }
+    } else {
+      console.error("API did not return valid data:", data);
+      setError("Invalid data format received from API");
+      setRegistrationData([]);
+    }
+    
+    setLastUpdated(new Date());
+  } catch (err) {
+    console.error("Error fetching registration data:", err);
+    setError(err.message);
+    setRegistrationData([]);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   // Export functionality
   const handleExport = () => {
+    if (!Array.isArray(registrationData) || registrationData.length === 0) {
+      alert("No data available to export");
+      return;
+    }
+    
     // Create CSV content
     const csvRows = [
-      ['First Name', 'Last Name', 'Year Level', 'Strand', 'Registration Date', 'Student Type']
+      ['Name', 'Phone Number', 'Grade Level', 'Strand', 'Gender', 'Email', 'Student Type', 'Status', 'Registration Date']
     ];
 
     registrationData.forEach(student => {
       csvRows.push([
-        student.firstName,
-        student.lastName,
-        student.yearLevel,
+        student.name || '',
+        student.phone_number || '',
+        student.grade_level || '',
         student.strand || 'N/A',
-        student.registrationDate,
-        student.isNewStudent === 'new' ? 'New Student' : 'Returning Student'
+        student.gender || '',
+        student.email || '',
+        student.isNewStudent === 'new' ? 'New Student' : 'Returning Student',
+        student.status || '',
+        student.createdAt ? new Date(student.createdAt).toLocaleDateString() : ''
       ]);
     });
 
@@ -68,63 +124,17 @@ const ViewReports = () => {
 
   // Refresh functionality
   const handleRefresh = () => {
-    // Update the last updated timestamp
-    setLastUpdated(new Date());
-    
-    // In a real-world scenario, you might want to fetch fresh data from an API
-    console.log('Refreshing data...');
+    fetchRegistrations();
   };
 
-  // Fetch registration data
+  // Initial data fetch
   useEffect(() => {
-    const fetchRegistrationData = () => {
-      try {
-        const storedDataString = sessionStorage.getItem('preRegFormData');
-        let registrations = [];
-        
-        if (storedDataString) {
-          const storedData = JSON.parse(storedDataString);
-          registrations.push(storedData);
-        }
-        
-        // Mock registrations to populate the dashboard
-        registrations = [
-          ...registrations,
-          { firstName: "John", lastName: "Doe", yearLevel: "Nursery", isNewStudent: "new", registrationDate: "2025-01-15" },
-          { firstName: "Jane", lastName: "Smith", yearLevel: "Nursery", isNewStudent: "new", registrationDate: "2025-01-20" },
-          { firstName: "Sam", lastName: "Johnson", yearLevel: "Kinder1", isNewStudent: "new", registrationDate: "2025-02-05" },
-          { firstName: "Alice", lastName: "Williams", yearLevel: "Kinder2", isNewStudent: "new", registrationDate: "2025-02-15" },
-          { firstName: "Mike", lastName: "Brown", yearLevel: "1", isNewStudent: "new", registrationDate: "2025-03-01" },
-          { firstName: "Emma", lastName: "Davis", yearLevel: "2", isNewStudent: "new", registrationDate: "2025-03-10" },
-          { firstName: "Noah", lastName: "Miller", yearLevel: "3", isNewStudent: "old", registrationDate: "2025-03-15" },
-          { firstName: "Olivia", lastName: "Wilson", yearLevel: "4", isNewStudent: "old", registrationDate: "2025-03-20" },
-          { firstName: "James", lastName: "Moore", yearLevel: "5", isNewStudent: "old", registrationDate: "2025-04-01" },
-          { firstName: "Sophia", lastName: "Taylor", yearLevel: "6", isNewStudent: "old", registrationDate: "2025-04-05" },
-          { firstName: "William", lastName: "Anderson", yearLevel: "7", isNewStudent: "new", registrationDate: "2025-04-10" },
-          { firstName: "Ava", lastName: "Thomas", yearLevel: "8", isNewStudent: "old", registrationDate: "2025-04-15" },
-          { firstName: "Benjamin", lastName: "Jackson", yearLevel: "9", isNewStudent: "new", registrationDate: "2025-05-01" },
-          { firstName: "Mia", lastName: "White", yearLevel: "10", isNewStudent: "old", registrationDate: "2025-05-05" },
-          { firstName: "Lucas", lastName: "Harris", yearLevel: "11", strand: "ABM", isNewStudent: "new", registrationDate: "2025-05-10" },
-          { firstName: "Charlotte", lastName: "Martin", yearLevel: "11", strand: "STEM", isNewStudent: "new", registrationDate: "2025-05-15" },
-          { firstName: "Henry", lastName: "Thompson", yearLevel: "11", strand: "HUMSS", isNewStudent: "old", registrationDate: "2025-06-01" },
-          { firstName: "Amelia", lastName: "Garcia", yearLevel: "12", strand: "ABM", isNewStudent: "old", registrationDate: "2025-06-05" },
-          { firstName: "Alex", lastName: "Martinez", yearLevel: "12", strand: "STEM", isNewStudent: "new", registrationDate: "2025-06-10" },
-          { firstName: "Harper", lastName: "Robinson", yearLevel: "12", strand: "HUMSS", isNewStudent: "old", registrationDate: "2025-06-15" }
-        ];
-        
-        setRegistrationData(registrations);
-      } catch (error) {
-        console.error("Error fetching registration data:", error);
-        setRegistrationData([]);
-      }
-    };
-    
-    fetchRegistrationData();
+    fetchRegistrations();
   }, []);
   
   // Process registration data into grade counts
   useEffect(() => {
-    if (registrationData.length > 0) {
+    if (Array.isArray(registrationData) && registrationData.length > 0) {
       const processedData = [];
       let totalStudents = 0;
       let earlyChildhoodCount = 0;
@@ -134,7 +144,7 @@ const ViewReports = () => {
       
       // Count early childhood students
       gradeLevels.earlyChildhood.forEach(grade => {
-        const count = registrationData.filter(student => student.yearLevel === grade).length;
+        const count = registrationData.filter(student => student.grade_level === grade && student.status === 'approved').length;
         processedData.push({ 
           grade: grade === 'Kinder1' ? 'Kinder 1' : grade === 'Kinder2' ? 'Kinder 2' : grade, 
           approved: count 
@@ -145,7 +155,7 @@ const ViewReports = () => {
       
       // Count elementary students
       gradeLevels.elementary.forEach(grade => {
-        const count = registrationData.filter(student => student.yearLevel === grade).length;
+        const count = registrationData.filter(student => student.grade_level === grade && student.status === 'approved').length;
         processedData.push({ grade: `Grade ${grade}`, approved: count });
         elementaryCount += count;
         totalStudents += count;
@@ -153,7 +163,7 @@ const ViewReports = () => {
       
       // Count junior high students
       gradeLevels.juniorHigh.forEach(grade => {
-        const count = registrationData.filter(student => student.yearLevel === grade).length;
+        const count = registrationData.filter(student => student.grade_level === grade && student.status === 'approved').length;
         processedData.push({ grade: `Grade ${grade}`, approved: count });
         juniorHighCount += count;
         totalStudents += count;
@@ -163,7 +173,7 @@ const ViewReports = () => {
       ['11', '12'].forEach(gradeLevel => {
         gradeLevels.seniorHigh[gradeLevel].forEach(strand => {
           const count = registrationData.filter(
-            student => student.yearLevel === gradeLevel && student.strand === strand
+            student => student.grade_level === gradeLevel && student.strand === strand && student.status === 'approved'
           ).length;
           processedData.push({ grade: `Grade ${gradeLevel} - ${strand}`, approved: count });
           seniorHighCount += count;
@@ -181,6 +191,12 @@ const ViewReports = () => {
       });
     }
   }, [registrationData]);
+
+  // Helper function to safely filter array data
+  const safeFilter = (array, filterFn) => {
+    if (!Array.isArray(array)) return [];
+    return array.filter(filterFn);
+  };
 
   return (
     <div className="registration-reports-container">
@@ -205,142 +221,159 @@ const ViewReports = () => {
         </div>
       </div>
 
-      {/* Total Students */}
-      <div className="total-students-card">
-        <div className="total-students-count">{totalApproved}</div>
-        <div className="total-students-label">Pre-registered students</div>
-      </div>
-
-      {/* Report Tabs */}
-      <div className="report-tabs">
-        {['byGrade', 'newVsOld', 'byMonth'].map((view) => (
-          <div 
-            key={view} 
-            className={`report-tab ${reportView === view ? 'active' : ''}`}
-            onClick={() => setReportView(view)}
-          >
-            {view === 'byGrade' ? 'By Grade Level' : 
-             view === 'newVsOld' ? 'New vs. Returning' : 
-             'By Month'}
-          </div>
-        ))}
-      </div>
-
-      {/* By Grade View */}
-      {reportView === 'byGrade' && (
+      {isLoading ? (
+        <div className="loading-indicator">Loading registration data...</div>
+      ) : error ? (
+        <div className="error-message">
+          <p>Error fetching registration data: {error}</p>
+          <p>Please check your connection and try again.</p>
+        </div>
+      ) : !Array.isArray(registrationData) ? (
+        <div className="error-message">
+          <p>Invalid data format received. Expected an array of registrations.</p>
+          <p>Please check the API response and try again.</p>
+        </div>
+      ) : (
         <>
-          {/* Early Childhood */}
-          <div className="grade-level-section">
-            <div className="grade-level-section-header">Early Childhood Education</div>
-            <div className="grade-level-section-content">
-              {gradesData.slice(0, 3).map((gradeInfo, index) => (
-                <div key={index} className="grade-level-item">
-                  <span className="grade-level-item-label">{gradeInfo.grade}</span>
-                  <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
-                </div>
-              ))}
-            </div>
+          {/* Total Students */}
+          <div className="total-students-card">
+            <div className="total-students-count">{totalApproved}</div>
+            <div className="total-students-label">Pre-registered students</div>
           </div>
 
-          {/* Elementary */}
-          <div className="grade-level-section">
-            <div className="grade-level-section-header">Elementary</div>
-            <div className="grade-level-section-content">
-              {gradesData.slice(3, 9).map((gradeInfo, index) => (
-                <div key={index} className="grade-level-item">
-                  <span className="grade-level-item-label">{gradeInfo.grade}</span>
-                  <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
-                </div>
-              ))}
-            </div>
+          {/* Report Tabs */}
+          <div className="report-tabs">
+            {['byGrade', 'newVsOld', 'byMonth'].map((view) => (
+              <div 
+                key={view} 
+                className={`report-tab ${reportView === view ? 'active' : ''}`}
+                onClick={() => setReportView(view)}
+              >
+                {view === 'byGrade' ? 'By Grade Level' : 
+                 view === 'newVsOld' ? 'New vs. Returning' : 
+                 'By Month'}
+              </div>
+            ))}
           </div>
 
-          {/* Junior High */}
-          <div className="grade-level-section">
-            <div className="grade-level-section-header">Junior High School</div>
-            <div className="grade-level-section-content">
-              {gradesData.slice(9, 13).map((gradeInfo, index) => (
-                <div key={index} className="grade-level-item">
-                  <span className="grade-level-item-label">{gradeInfo.grade}</span>
-                  <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+          {/* By Grade View */}
+          {reportView === 'byGrade' && (
+            <>
+              {/* Early Childhood */}
+              <div className="grade-level-section">
+                <div className="grade-level-section-header">Early Childhood Education</div>
+                <div className="grade-level-section-content">
+                  {gradesData.slice(0, 3).map((gradeInfo, index) => (
+                    <div key={index} className="grade-level-item">
+                      <span className="grade-level-item-label">{gradeInfo.grade}</span>
+                      <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Senior High - Grade 11 */}
-          <div className="grade-level-section">
-            <div className="grade-level-section-header">Senior High School - Grade 11</div>
-            <div className="grade-level-section-content">
-              {gradesData.slice(13, 16).map((gradeInfo, index) => (
-                <div key={index} className="grade-level-item">
-                  <span className="grade-level-item-label">{gradeInfo.grade}</span>
-                  <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+              {/* Elementary */}
+              <div className="grade-level-section">
+                <div className="grade-level-section-header">Elementary</div>
+                <div className="grade-level-section-content">
+                  {gradesData.slice(3, 9).map((gradeInfo, index) => (
+                    <div key={index} className="grade-level-item">
+                      <span className="grade-level-item-label">{gradeInfo.grade}</span>
+                      <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Senior High - Grade 12 */}
-          <div className="grade-level-section">
-            <div className="grade-level-section-header">Senior High School - Grade 12</div>
-            <div className="grade-level-section-content">
-              {gradesData.slice(16).map((gradeInfo, index) => (
-                <div key={index} className="grade-level-item">
-                  <span className="grade-level-item-label">{gradeInfo.grade}</span>
-                  <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+              {/* Junior High */}
+              <div className="grade-level-section">
+                <div className="grade-level-section-header">Junior High School</div>
+                <div className="grade-level-section-content">
+                  {gradesData.slice(9, 13).map((gradeInfo, index) => (
+                    <div key={index} className="grade-level-item">
+                      <span className="grade-level-item-label">{gradeInfo.grade}</span>
+                      <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Senior High - Grade 11 */}
+              <div className="grade-level-section">
+                <div className="grade-level-section-header">Senior High School - Grade 11</div>
+                <div className="grade-level-section-content">
+                  {gradesData.slice(13, 16).map((gradeInfo, index) => (
+                    <div key={index} className="grade-level-item">
+                      <span className="grade-level-item-label">{gradeInfo.grade}</span>
+                      <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Senior High - Grade 12 */}
+              <div className="grade-level-section">
+                <div className="grade-level-section-header">Senior High School - Grade 12</div>
+                <div className="grade-level-section-content">
+                  {gradesData.slice(16).map((gradeInfo, index) => (
+                    <div key={index} className="grade-level-item">
+                      <span className="grade-level-item-label">{gradeInfo.grade}</span>
+                      <span className="grade-level-item-count">Approved: {gradeInfo.approved}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* New vs Old Students View */}
+          {reportView === 'newVsOld' && (
+            <div className="grade-level-section">
+              <div className="grade-level-section-header">New vs. Returning Students</div>
+              <div className="grade-level-section-content">
+                <div className="grade-level-item">
+                  <span className="grade-level-item-label">New Students</span>
+                  <span className="grade-level-item-count">
+                    {safeFilter(registrationData, s => s.isNewStudent === 'new' && s.status === 'approved').length}
+                  </span>
+                </div>
+                <div className="grade-level-item">
+                  <span className="grade-level-item-label">Returning Students</span>
+                  <span className="grade-level-item-count">
+                    {safeFilter(registrationData, s => s.isNewStudent === 'old' && s.status === 'approved').length}
+                  </span>
+                </div>
+              </div>
             </div>
+          )}
+
+          {/* By Month View */}
+          {reportView === 'byMonth' && (
+            <div className="grade-level-section">
+              <div className="grade-level-section-header">Monthly Registration Trends</div>
+              <div className="grade-level-section-content">
+                {months.map(month => {
+                  const monthRegistrations = safeFilter(
+                    registrationData, 
+                    s => s.status === 'approved' && s.createdAt && new Date(s.createdAt).getMonth() === months.indexOf(month)
+                  );
+                  return (
+                    <div key={month} className="grade-level-item">
+                      <span className="grade-level-item-label">{month}</span>
+                      <span className="grade-level-item-count">{monthRegistrations.length}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Last Updated */}
+          <div className="last-updated">
+            Last updated: {lastUpdated.toLocaleDateString()} at {lastUpdated.toLocaleTimeString()} | Academic Year: 2025-2026
           </div>
         </>
       )}
-
-      {/* New vs Old Students View */}
-      {reportView === 'newVsOld' && (
-        <div className="grade-level-section">
-          <div className="grade-level-section-header">New vs. Returning Students</div>
-          <div className="grade-level section-content">
-            <div className="grade-level-item">
-              <span className="grade-level-item-label">New Students</span>
-              <span className="grade-level-item-count">
-                {registrationData.filter(s => s.isNewStudent === 'new').length}
-              </span>
-            </div>
-            <div className="grade-level-item">
-              <span className="grade-level-item-label">Returning Students</span>
-              <span className="grade-level-item-count">
-                {registrationData.filter(s => s.isNewStudent === 'old').length}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* By Month View */}
-      {reportView === 'byMonth' && (
-        <div className="grade-level-section">
-          <div className="grade-level-section-header">Monthly Registration Trends</div>
-          <div className="grade-level-section-content">
-            {months.map(month => {
-              const monthRegistrations = registrationData.filter(
-                s => new Date(s.registrationDate).getMonth() === months.indexOf(month)
-              );
-              return (
-                <div key={month} className="grade-level-item">
-                  <span className="grade-level-item-label">{month}</span>
-                  <span className="grade-level-item-count">{monthRegistrations.length}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Last Updated */}
-      <div className="last-updated">
-        Last updated: {lastUpdated.toLocaleDateString()} at {lastUpdated.toLocaleTimeString()} | Academic Year: 2025-2026
-      </div>
     </div>
   );
 };
