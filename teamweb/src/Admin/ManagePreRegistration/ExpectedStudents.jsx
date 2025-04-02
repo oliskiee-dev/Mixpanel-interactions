@@ -28,29 +28,47 @@ const ExpectedStudents = () => {
         fetchData();
     }, []);
 
+    const predefinedGrades = [
+        "Nursery",
+        "Kinder 1",
+        "Kinder 2",
+        "Grade 1", "Grade 2", "Grade 3", "Grade 4",
+        "Grade 5", "Grade 6", "Grade 7", "Grade 8",
+        "Grade 9", "Grade 10", "Grade 11", "Grade 12"
+    ];
+    
+    const gradeNameMap = {
+        "Nursery": "Nursery",
+        "Kinder1": "Kinder 1",
+        "Kinder2": "Kinder 2",
+        "1": "Grade 1",
+        "2": "Grade 2",
+        "3": "Grade 3",
+        "4": "Grade 4",
+        "5": "Grade 5",
+        "6": "Grade 6",
+        "7": "Grade 7",
+        "8": "Grade 8",
+        "9": "Grade 9",
+        "10": "Grade 10",
+        "11": "Grade 11",
+        "12": "Grade 12"
+    };
+    
     const processPreRegistrationData = (data) => {
-        // Define exact grade order with correct capitalization and spacing
-        const gradeOrder = {
-            "Nursery": 1,
-            "Kinder 1": 2,
-            "Kinder 2": 3,
-            "Grade 1": 4, "Grade 2": 5, "Grade 3": 6, "Grade 4": 7,
-            "Grade 5": 8, "Grade 6": 9, "Grade 7": 10, "Grade 8": 11,
-            "Grade 9": 12, "Grade 10": 13, "Grade 11": 14, "Grade 12": 15
-        };
+        const actualDataMap = {};
     
-        const gradeMap = {};
-    
+        // Process actual data from the database
         data.forEach(student => {
             const { grade_level, strand, status } = student;
             const isApproved = status === 'approved';
-            
-            // Normalize grade level for consistent matching
-            const normalizedGradeLevel = grade_level.trim();
     
-            if (!gradeMap[normalizedGradeLevel]) {
-                gradeMap[normalizedGradeLevel] = { 
-                    grade: normalizedGradeLevel, 
+            // Convert database format to correct format
+            const formattedGrade = gradeNameMap[grade_level] || grade_level;
+    
+            if (!actualDataMap[formattedGrade]) {
+                actualDataMap[formattedGrade] = { 
+                    grade: formattedGrade, 
                     approvedCount: 0, 
                     pendingCount: 0, 
                     strands: {} 
@@ -58,36 +76,42 @@ const ExpectedStudents = () => {
             }
     
             if (strand) {
-                if (!gradeMap[normalizedGradeLevel].strands[strand]) {
-                    gradeMap[normalizedGradeLevel].strands[strand] = { 
+                if (!actualDataMap[formattedGrade].strands[strand]) {
+                    actualDataMap[formattedGrade].strands[strand] = { 
                         name: strand, 
                         approvedCount: 0, 
                         pendingCount: 0 
                     };
                 }
-                if (isApproved) {
-                    gradeMap[normalizedGradeLevel].strands[strand].approvedCount++;
-                } else {
-                    gradeMap[normalizedGradeLevel].strands[strand].pendingCount++;
-                }
+                isApproved ? actualDataMap[formattedGrade].strands[strand].approvedCount++ 
+                           : actualDataMap[formattedGrade].strands[strand].pendingCount++;
             } else {
-                if (isApproved) {
-                    gradeMap[normalizedGradeLevel].approvedCount++;
-                } else {
-                    gradeMap[normalizedGradeLevel].pendingCount++;
-                }
+                isApproved ? actualDataMap[formattedGrade].approvedCount++ 
+                           : actualDataMap[formattedGrade].pendingCount++;
             }
         });
     
-        return Object.values(gradeMap)
-            .map(grade => ({
-                ...grade,
-                strands: Object.values(grade.strands),
-                // Store sorting value to ensure proper sorting
-                sortOrder: gradeOrder[grade.grade] || 99
-            }))
-            .sort((a, b) => a.sortOrder - b.sortOrder);
+        // Ensure all predefined grades exist, but don't override actual data
+        const result = predefinedGrades.map(gradeName => {
+            if (actualDataMap[gradeName]) {
+                return {
+                    ...actualDataMap[gradeName],
+                    strands: Object.values(actualDataMap[gradeName].strands)
+                };
+            }
+            // If grade doesn't exist in the database, add it with 0 values
+            return {
+                grade: gradeName,
+                approvedCount: 0,
+                pendingCount: 0,
+                strands: []
+            };
+        });
+    
+        return result;
     };
+    
+    
     
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
