@@ -120,7 +120,20 @@ const fetchRegistrations = async () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // ✅ Call `/add-report` API
+    fetch("http://localhost:3000/report/add-report", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username, // Replace with actual username
+        activityLog: `[Manage Pre-Registration: Reports] Registration data exported as CSV on ${new Date().toLocaleString()}`
+      }),
+    });
   };
+
 
   // Refresh functionality
   const handleRefresh = () => {
