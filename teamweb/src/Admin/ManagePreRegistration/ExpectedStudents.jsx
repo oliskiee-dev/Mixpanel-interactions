@@ -137,46 +137,51 @@ const ExpectedStudents = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {gradeData.map((grade) => {
-                                if (grade.strands.length > 0) {
-                                    return grade.strands.map((strand, index) => {
-                                        const total = strand.approvedCount + strand.pendingCount;
-                                        return (
-                                            <tr key={`${grade.grade}-${strand.name}`}>
-                                                {index === 0 && (
-                                                    <td rowSpan={grade.strands.length}>{grade.grade}</td>
-                                                )}
-                                                <td>{strand.name}</td>
-                                                <td>{strand.approvedCount}</td>
-                                                <td>{strand.pendingCount}</td>
-                                                <td>{total}</td>
-                                                <td>
-                                                    <button className={`btn-status ${strand.pendingCount > 0 ? 'pending' : 'approved'}`}>
-                                                        {strand.pendingCount > 0 ? 'Processing' : 'Complete'}
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    });
-                                } else {
-                                    const total = grade.approvedCount + grade.pendingCount;
+                        {gradeData.map((grade) => {
+                            if (grade.strands.length > 0) {
+                                return grade.strands.map((strand, index) => {
+                                    const total = strand.approvedCount + strand.pendingCount;
+                                    // Check if both counts are 0
+                                    const status = total === 0 ? 'Processing' : (strand.pendingCount > 0 ? 'Processing' : 'Complete');
                                     return (
-                                        <tr key={grade.grade}>
-                                            <td>{grade.grade}</td>
-                                            <td>-</td>
-                                            <td>{grade.approvedCount}</td>
-                                            <td>{grade.pendingCount}</td>
+                                        <tr key={`${grade.grade}-${strand.name}`}>
+                                            {index === 0 && (
+                                                <td rowSpan={grade.strands.length}>{grade.grade}</td>
+                                            )}
+                                            <td>{strand.name}</td>
+                                            <td>{strand.approvedCount}</td>
+                                            <td>{strand.pendingCount}</td>
                                             <td>{total}</td>
                                             <td>
-                                                <button className={`btn-status ${grade.pendingCount > 0 ? 'pending' : 'approved'}`}>
-                                                    {grade.pendingCount > 0 ? 'Processing' : 'Complete'}
+                                                <button className={`btn-status ${status === 'Processing' ? 'pending' : 'approved'}`}>
+                                                    {status}
                                                 </button>
                                             </td>
                                         </tr>
                                     );
-                                }
-                            })}
-                        </tbody>
+                                });
+                            } else {
+                                const total = grade.approvedCount + grade.pendingCount;
+                                // Check if both counts are 0
+                                const status = total === 0 ? 'Processing' : (grade.pendingCount > 0 ? 'Processing' : 'Complete');
+                                return (
+                                    <tr key={grade.grade}>
+                                        <td>{grade.grade}</td>
+                                        <td>-</td>
+                                        <td>{grade.approvedCount}</td>
+                                        <td>{grade.pendingCount}</td>
+                                        <td>{total}</td>
+                                        <td>
+                                            <button className={`btn-status ${status === 'Processing' ? 'pending' : 'approved'}`}>
+                                                {status}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            }
+                        })}
+                    </tbody>
+
                     </table>
                 </div>
             </div>
