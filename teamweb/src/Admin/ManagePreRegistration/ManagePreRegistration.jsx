@@ -55,7 +55,7 @@ function ManagePreRegistration() {
         try {
             setIsDeleting(true);
             
-            const response = await fetch('http://localhost:3000/preregistration/delete-all', {
+            const response = await fetch('http://localhost:3000/preregistration/deleteAll', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
