@@ -721,16 +721,24 @@ function ManagePreRegistration() {
                         </div>
                         
                         {renderTable()}
-                        <div className="page-actions">
-                            <br />
-                        <button 
-                            className="btn-delete-all"
+                        <div className="danger-zone-section">
+                        <h3>Database Management</h3>
+                        <div className="danger-zone-container">
+                            <div className="danger-zone-warning">
+                            <AlertCircle size={24} />
+                            <div className="danger-zone-text">
+                                <h4>Danger Zone</h4>
+                                <p>The following action will permanently delete all student pre-registration records from the database. This action cannot be undone.</p>
+                            </div>
+                            </div>
+                            <button 
+                            className="btn-danger-zone"
                             onClick={() => setShowDeleteConfirmation(true)}
-                        >
+                            >
                             Delete All Records
-                        </button>
-                        <br />
-                    </div>
+                            </button>
+                        </div>
+                        </div>
                     </>
                 )}
                 
