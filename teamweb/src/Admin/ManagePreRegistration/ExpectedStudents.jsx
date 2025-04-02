@@ -1,38 +1,70 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './ExpectedStudents.css';
 
 const ExpectedStudents = () => {
-    const gradeData = [
-        { grade: 'Nursery', approvedCount: 5, pendingCount: 3 },
-        { grade: 'Kinder 1', approvedCount: 6, pendingCount: 2 },
-        { grade: 'Kinder 2', approvedCount: 7, pendingCount: 4 },
-        { grade: 'Grade 1', approvedCount: 8, pendingCount: 2 },
-        { grade: 'Grade 2', approvedCount: 5, pendingCount: 5 },
-        { grade: 'Grade 3', approvedCount: 7, pendingCount: 3 },
-        { grade: 'Grade 4', approvedCount: 9, pendingCount: 1 },
-        { grade: 'Grade 5', approvedCount: 6, pendingCount: 4 },
-        { grade: 'Grade 6', approvedCount: 4, pendingCount: 6 },
-        { grade: 'Grade 7', approvedCount: 8, pendingCount: 2 },
-        { grade: 'Grade 8', approvedCount: 7, pendingCount: 3 },
-        { grade: 'Grade 9', approvedCount: 6, pendingCount: 4 },
-        { grade: 'Grade 10', approvedCount: 5, pendingCount: 5 },
-        { 
-            grade: 'Grade 11',
-            strands: [
-                { name: 'ABM', approvedCount: 4, pendingCount: 3 },
-                { name: 'STEM', approvedCount: 6, pendingCount: 4 },
-                { name: 'HUMSS', approvedCount: 3, pendingCount: 5 }
-            ]
-        },
-        {
-            grade: 'Grade 12',
-            strands: [
-                { name: 'ABM', approvedCount: 5, pendingCount: 2 },
-                { name: 'STEM', approvedCount: 7, pendingCount: 3 },
-                { name: 'HUMSS', approvedCount: 4, pendingCount: 4 }
-            ]
-        }
-    ];
+    const [gradeData, setGradeData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/preregistration');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                
+                // Transform data into required format
+                const groupedData = processPreRegistrationData(data.preregistration);
+                setGradeData(groupedData);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const processPreRegistrationData = (data) => {
+        const gradeMap = {};
+
+        data.forEach(student => {
+            const { grade_level, strand, status } = student;
+            const isApproved = status === 'approved';
+
+            if (!gradeMap[grade_level]) {
+                gradeMap[grade_level] = { grade: grade_level, approvedCount: 0, pendingCount: 0, strands: {} };
+            }
+
+            if (strand) {
+                if (!gradeMap[grade_level].strands[strand]) {
+                    gradeMap[grade_level].strands[strand] = { name: strand, approvedCount: 0, pendingCount: 0 };
+                }
+                if (isApproved) {
+                    gradeMap[grade_level].strands[strand].approvedCount++;
+                } else {
+                    gradeMap[grade_level].strands[strand].pendingCount++;
+                }
+            } else {
+                if (isApproved) {
+                    gradeMap[grade_level].approvedCount++;
+                } else {
+                    gradeMap[grade_level].pendingCount++;
+                }
+            }
+        });
+
+        return Object.values(gradeMap).map(grade => ({
+            ...grade,
+            strands: Object.values(grade.strands),
+        }));
+    };
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error}</p>;
 
     return (
         <div className="content-container">
@@ -56,24 +88,20 @@ const ExpectedStudents = () => {
                         </thead>
                         <tbody>
                             {gradeData.map((grade) => {
-                                if (grade.strands) {
+                                if (grade.strands.length > 0) {
                                     return grade.strands.map((strand, index) => {
                                         const total = strand.approvedCount + strand.pendingCount;
                                         return (
                                             <tr key={`${grade.grade}-${strand.name}`}>
                                                 {index === 0 && (
-                                                    <td rowSpan={grade.strands.length}>
-                                                        {grade.grade}
-                                                    </td>
+                                                    <td rowSpan={grade.strands.length}>{grade.grade}</td>
                                                 )}
                                                 <td>{strand.name}</td>
                                                 <td>{strand.approvedCount}</td>
                                                 <td>{strand.pendingCount}</td>
                                                 <td>{total}</td>
                                                 <td>
-                                                    <button 
-                                                        className={`btn-status ${strand.pendingCount > 0 ? 'pending' : 'approved'}`}
-                                                    >
+                                                    <button className={`btn-status ${strand.pendingCount > 0 ? 'pending' : 'approved'}`}>
                                                         {strand.pendingCount > 0 ? 'Processing' : 'Complete'}
                                                     </button>
                                                 </td>
@@ -90,9 +118,7 @@ const ExpectedStudents = () => {
                                             <td>{grade.pendingCount}</td>
                                             <td>{total}</td>
                                             <td>
-                                                <button 
-                                                    className={`btn-status ${grade.pendingCount > 0 ? 'pending' : 'approved'}`}
-                                                >
+                                                <button className={`btn-status ${grade.pendingCount > 0 ? 'pending' : 'approved'}`}>
                                                     {grade.pendingCount > 0 ? 'Processing' : 'Complete'}
                                                 </button>
                                             </td>
