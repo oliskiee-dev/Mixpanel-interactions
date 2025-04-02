@@ -18,7 +18,7 @@ const UpdateAppointment = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('availability');
-  const [username, setUsername] = useState("");
+   const [username, setUsername] = useState("");
 
   // Generate time slots from 9 AM to 4 PM in 1-hour intervals
   const generateTimeSlots = () => {
@@ -205,9 +205,6 @@ const createDefaultAvailability = async () => {
   
   const fetchBookingsData = async () => {
     try {
-      setIsLoading(true);
-      
-      // If we have student data from props, use it
       if (props.studentData && props.studentData.length > 0) {
         const studentBookings = props.studentData.map(student => {
           if (student.appointment_date) {
@@ -228,17 +225,42 @@ const createDefaultAvailability = async () => {
           return null;
         }).filter(booking => booking !== null);
         
-        setBookingsData(studentBookings);
-      } else {
-        // No mock data - just set an empty array
-        setBookingsData([]);
+        if (studentBookings.length > 0) {
+          setBookingsData(studentBookings);
+          return;
+        }
       }
+      
+      // Fallback to mock data
+      const today = new Date();
+      const mockBookings = [];
+      for (let i = 0; i < 14; i++) {
+        const bookingDate = new Date(today);
+        bookingDate.setDate(today.getDate() + i);
+        
+        const numBookings = Math.floor(Math.random() * 5) + 1;
+        for (let j = 0; j < numBookings; j++) {
+          const hour = Math.floor(Math.random() * 8) + 9;
+          const timeSlot = `${hour.toString().padStart(2, '0')}:00`;
+          
+          mockBookings.push({
+            _id: `booking_${i}_${j}`,
+            date: bookingDate,
+            timeSlot: timeSlot,
+            studentName: `Student ${Math.floor(Math.random() * 100) + 1}`,
+            studentEmail: `student${Math.floor(Math.random() * 100) + 1}@example.com`,
+            studentPhone: `+63 9${Math.floor(Math.random() * 100000000) + 900000000}`,
+            purpose: ["Registration", "Document Submission", "Consultation"][Math.floor(Math.random() * 3)],
+            status: Math.random() > 0.2 ? "confirmed" : "pending",
+            grade_level: ["11", "12", "10", "9"][Math.floor(Math.random() * 4)],
+            strand: ["ABM", "STEM", "HUMSS", ""][Math.floor(Math.random() * 4)]
+          });
+        }
+      }
+      
+      setBookingsData(mockBookings);
     } catch (err) {
       console.error("Failed to fetch bookings:", err);
-      setError("Failed to fetch booking data: " + err.message);
-      setBookingsData([]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -594,15 +616,7 @@ const createDefaultAvailability = async () => {
     const bookingsBySlot = getBookingsByTimeSlot(selectedDate);
     
     if (bookingsBySlot.length === 0) {
-      return (
-        <div className="empty-state">
-          <div className="empty-state-icon">
-            <Calendar size={48} />
-          </div>
-          <h4>No Appointments Scheduled</h4>
-          <p>There are no bookings for this date. Students can book appointments from the pre-registration portal.</p>
-        </div>
-      );
+      return <div className="no-bookings">No bookings found for this date.</div>;
     }
     
     return (
