@@ -5,10 +5,9 @@ import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 
 const UpdateAppointment = (props) => {
-  // Initial state for calendar
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [appointments, setAppointments] = useState({});
+  // Initial state for calendar - always use the current date
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [appointments, setAppointments] = useState({});
   const [appointmentForm, setAppointmentForm] = useState({
     timeSlots: [],
     purpose: '',
@@ -40,11 +39,12 @@ const UpdateAppointment = (props) => {
   };
 
   // Get the next 7 days starting from the current date
-  const getNextSevenDays = (startDate) => {
+  const getNextSevenDays = () => {
+    const today = new Date();
     const days = [];
     for (let i = 0; i < 7; i++) {
-      const day = new Date(startDate);
-      day.setDate(startDate.getDate() + i);
+      const day = new Date(today);
+      day.setDate(today.getDate() + i);
       days.push(day);
     }
     return days;
@@ -54,7 +54,7 @@ const UpdateAppointment = (props) => {
   useEffect(() => {
     fetchAvailabilityData();
     fetchBookingsData();
-  }, [props.studentData, currentDate]);
+  }, [props.studentData]);
 
   const fetchAvailabilityData = async () => {
     try {
@@ -70,7 +70,7 @@ const UpdateAppointment = (props) => {
       const formattedAppointments = {};
       data.forEach(item => {
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const weekDays = getNextSevenDays(currentDate);
+        const weekDays = getNextSevenDays();
         
         weekDays.forEach(date => {
           const dayName = days[date.getDay()];
@@ -159,18 +159,6 @@ const UpdateAppointment = (props) => {
     } catch (err) {
       console.error("Failed to fetch bookings:", err);
     }
-  };
-
-  // Get current date + next 6 days
-  const getCurrentWeekDays = () => {
-    return getNextSevenDays(currentDate);
-  };
-
-  // Navigate between date ranges
-  const navigateDays = (step) => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() + (step * 7));
-    setCurrentDate(newDate);
   };
 
   // Handle click on a calendar day
@@ -363,9 +351,9 @@ const UpdateAppointment = (props) => {
       .map(([time, bookings]) => ({ time, bookings }));
   };
 
-  // Render week days
+  // Render week days - always showing today + 6 days
   const renderWeekDays = () => {
-    const days = getCurrentWeekDays();
+    const days = getNextSevenDays();
     
     return days.map((day, index) => {
       const dayNumber = day.getDate();
@@ -456,20 +444,18 @@ const UpdateAppointment = (props) => {
     );
   };
 
-  // Render calendar header with date range
+  // Render calendar header with date range - simplified to just show the date range
   const renderCalendarHeader = () => {
-    const days = getCurrentWeekDays();
+    const days = getNextSevenDays();
     const startDate = days[0];
     const endDate = days[6];
     const options = { month: 'short', day: 'numeric' };
     
     return (
       <div className="calendar-header">
-        <button onClick={() => navigateDays(-1)}>&lt; Previous 7 Days</button>
         <h2>
-          {startDate.toLocaleDateString('default', options)} - {endDate.toLocaleDateString('default', options)}
+          Current Week: {startDate.toLocaleDateString('default', options)} - {endDate.toLocaleDateString('default', options)}
         </h2>
-        <button onClick={() => navigateDays(1)}>Next 7 Days &gt;</button>
       </div>
     );
   };
