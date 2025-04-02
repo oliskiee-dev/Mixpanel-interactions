@@ -18,6 +18,7 @@ const UpdateAppointment = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('availability');
+   const [username, setUsername] = useState("");
 
   // Generate time slots from 9 AM to 4 PM in 1-hour intervals
   const generateTimeSlots = () => {
@@ -50,6 +51,12 @@ const UpdateAppointment = (props) => {
 
   // Load appointment data
   useEffect(() => {
+    const loggedInUser = localStorage.getItem('username');
+    if (loggedInUser) {
+        setUsername(loggedInUser);
+    } else {
+        setUsername("Admin");
+    }
     fetchAvailabilityData();
     fetchBookingsData();
   }, [props.studentData]);
@@ -466,7 +473,6 @@ const createDefaultAvailability = async () => {
         localStorage.setItem('deletedAvailabilityDates', JSON.stringify(recentlyDeletedDates));
       }
       
-      // ✅ Call `/add-report` API
       await fetch("http://localhost:3000/report/add-report", {
         method: "POST",
         headers: {
