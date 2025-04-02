@@ -10,8 +10,6 @@ const UpdateAppointment = (props) => {
   const [appointments, setAppointments] = useState({});
   const [appointmentForm, setAppointmentForm] = useState({
     timeSlots: [],
-    purpose: '',
-    maxAppointments: 5
   });
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingAppointmentId, setEditingAppointmentId] = useState(null);
@@ -95,8 +93,6 @@ const fetchAvailabilityData = async () => {
             formattedAppointments[dateStr].push({
               id: item._id,
               timeSlots: item.availability[dayName] || [],
-              purpose: 'Available Slots',
-              maxAppointments: 5
             });
           }
         });
@@ -125,8 +121,6 @@ const fetchAvailabilityData = async () => {
         formattedAppointments[dateStr] = [{
           id: availabilityId, // This might be null if no availability exists yet
           timeSlots: generateTimeSlots(), // This gives us 9AM to 4PM
-          purpose: 'Available Slots',
-          maxAppointments: 5
         }];
       }
     });
@@ -271,8 +265,6 @@ const createDefaultAvailability = async () => {
     if (viewMode === 'availability') {
       setAppointmentForm({
         timeSlots: [''],
-        purpose: '',
-        maxAppointments: 5
       });
     }
     
@@ -300,77 +292,48 @@ const createDefaultAvailability = async () => {
   };
 
   // Save appointment
-const saveAppointment = async () => {
-  if (!appointmentForm.timeSlots || appointmentForm.timeSlots.length === 0) {
-    toast.error('Please add at least one time slot');
-    return;
-  }
-  
-  try {
-    setIsLoading(true);
+  const saveAppointment = async () => {
+    if (!appointmentForm.timeSlots || appointmentForm.timeSlots.length === 0) {
+      toast.error('Please add at least one time slot');
+      return;
+    }
     
-    const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
-    
-    // Create the update for just this specific day
-    const dayUpdate = {
-      [dayOfWeek]: appointmentForm.timeSlots
-    };
-    
-    let response;
-    
-    if (editingAppointmentId) {
-      // For editing an existing availability entry
+    try {
+      setIsLoading(true);
       
-      // First, get the current availability to preserve other days
-      const currentResponse = await fetch(`http://localhost:3000/booking/bookingAvailability`);
-      if (!currentResponse.ok) {
-        throw new Error('Failed to fetch current availability data');
-      }
+      const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
       
-      const availabilityData = await currentResponse.json();
-      const existingEntry = availabilityData.find(item => item._id === editingAppointmentId);
-      
-      if (!existingEntry) {
-        throw new Error('Could not find the availability entry to edit');
-      }
-      
-      // Merge the existing availability with the new day's data
-      const mergedAvailability = {
-        ...existingEntry.availability, // Keep all existing days
-        ...dayUpdate // Update/add only the current day
+      // Create the update for just this specific day
+      const dayUpdate = {
+        [dayOfWeek]: appointmentForm.timeSlots
       };
       
-      // Update with the merged data
-      response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${editingAppointmentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ availability: mergedAvailability })
-      });
-    } else {
-      // For adding a new day to an existing availability
+      let response;
       
-      // Check if we already have any availability entries
-      const availabilityResponse = await fetch('http://localhost:3000/booking/bookingAvailability');
-      if (!availabilityResponse.ok) {
-        throw new Error('Failed to fetch availability data');
-      }
-      
-      const availabilityData = await availabilityResponse.json();
-      
-      if (availabilityData && availabilityData.length > 0) {
-        // If we have an existing entry, update it by merging
-        const existingEntry = availabilityData[0]; // Use the first available entry
+      if (editingAppointmentId) {
+        // For editing an existing availability entry
         
-        // Merge the existing availability with the new day
+        // First, get the current availability to preserve other days
+        const currentResponse = await fetch(`http://localhost:3000/booking/bookingAvailability`);
+        if (!currentResponse.ok) {
+          throw new Error('Failed to fetch current availability data');
+        }
+        
+        const availabilityData = await currentResponse.json();
+        const existingEntry = availabilityData.find(item => item._id === editingAppointmentId);
+        
+        if (!existingEntry) {
+          throw new Error('Could not find the availability entry to edit');
+        }
+        
+        // Merge the existing availability with the new day's data
         const mergedAvailability = {
           ...existingEntry.availability, // Keep all existing days
-          ...dayUpdate // Add/update the current day
+          ...dayUpdate // Update/add only the current day
         };
         
         // Update with the merged data
-        response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${existingEntry._id}`, {
+        response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${editingAppointmentId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -378,105 +341,153 @@ const saveAppointment = async () => {
           body: JSON.stringify({ availability: mergedAvailability })
         });
       } else {
-        // If no entries exist, create a new one with just this day's availability
-        response = await fetch('http://localhost:3000/booking/addBookingAvailability', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ availability: dayUpdate })
-        });
+        // For adding a new day to an existing availability
+        
+        // Check if we already have any availability entries
+        const availabilityResponse = await fetch('http://localhost:3000/booking/bookingAvailability');
+        if (!availabilityResponse.ok) {
+          throw new Error('Failed to fetch availability data');
+        }
+        
+        const availabilityData = await availabilityResponse.json();
+        
+        if (availabilityData && availabilityData.length > 0) {
+          // If we have an existing entry, update it by merging
+          const existingEntry = availabilityData[0]; // Use the first available entry
+          
+          // Merge the existing availability with the new day
+          const mergedAvailability = {
+            ...existingEntry.availability, // Keep all existing days
+            ...dayUpdate // Add/update the current day
+          };
+          
+          // Update with the merged data
+          response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${existingEntry._id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ availability: mergedAvailability })
+          });
+        } else {
+          // If no entries exist, create a new one with just this day's availability
+          response = await fetch('http://localhost:3000/booking/addBookingAvailability', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ availability: dayUpdate })
+          });
+        }
       }
+      
+      if (!response.ok) {
+        throw new Error('Failed to save appointment');
+      }
+      await fetch("http://localhost:3000/report/add-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username, // Replace with actual username
+          activityLog: `[Manage Pre-Registration:Appointments] ${editingAppointmentId ? 'Updated' : 'Added'} availability for ${dayOfWeek}`
+        }),
+      });
+      
+      // Refresh the availability data
+      await fetchAvailabilityData();
+      
+      setIsFormVisible(false);
+      setEditingAppointmentId(null);
+      
+      toast.success(editingAppointmentId ? 'Appointment updated successfully' : 'Appointment added successfully');
+    } catch (err) {
+      toast.error('Failed to save appointment: ' + err.message);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-    
-    if (!response.ok) {
-      throw new Error('Failed to save appointment');
-    }
-    
-    // Refresh the availability data
-    await fetchAvailabilityData();
-    
-    setIsFormVisible(false);
-    setEditingAppointmentId(null);
-    
-    toast.success(editingAppointmentId ? 'Appointment updated successfully' : 'Appointment added successfully');
-  } catch (err) {
-    toast.error('Failed to save appointment: ' + err.message);
-    console.error(err);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   // Edit appointment
   const editAppointment = (appointment) => {
     setAppointmentForm({
       timeSlots: appointment.timeSlots || [],
-      purpose: appointment.purpose || '',
-      maxAppointments: appointment.maxAppointments || 5
     });
     setEditingAppointmentId(appointment.id);
     setIsFormVisible(true);
   };
 
   // Delete appointment for a specific day
-// Delete appointment for a specific day
-const deleteAppointment = async (appointmentId) => {
-  try {
-    setIsLoading(true);
-    
-    const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
-    const dateStr = formatDate(selectedDate);
-    
-    // First, fetch the current availability data to preserve other days
-    const currentResponse = await fetch('http://localhost:3000/booking/bookingAvailability');
-    if (!currentResponse.ok) {
-      throw new Error('Failed to fetch current availability data');
+  const deleteAppointment = async (appointmentId) => {
+    try {
+      setIsLoading(true);
+      
+      const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+      const dateStr = formatDate(selectedDate);
+      
+      // First, fetch the current availability data to preserve other days
+      const currentResponse = await fetch('http://localhost:3000/booking/bookingAvailability');
+      if (!currentResponse.ok) {
+        throw new Error('Failed to fetch current availability data');
+      }
+      
+      const availabilityData = await currentResponse.json();
+      const existingEntry = availabilityData.find(item => item._id === appointmentId);
+      
+      if (!existingEntry) {
+        throw new Error('Could not find the availability entry to delete');
+      }
+      
+      // Create a copy of the existing availability object
+      const updatedAvailability = { ...existingEntry.availability };
+      
+      // Remove only the selected day's availability
+      delete updatedAvailability[dayOfWeek];
+      
+      // Update with the modified availability (where the selected day is removed)
+      const response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ availability: updatedAvailability })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete appointment');
+      }
+      
+      // Track this deleted date so we don't auto-recreate it
+      const recentlyDeletedDates = JSON.parse(localStorage.getItem('deletedAvailabilityDates') || '[]');
+      if (!recentlyDeletedDates.includes(dateStr)) {
+        recentlyDeletedDates.push(dateStr);
+        localStorage.setItem('deletedAvailabilityDates', JSON.stringify(recentlyDeletedDates));
+      }
+      
+      // ✅ Call `/add-report` API
+      await fetch("http://localhost:3000/report/add-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username, // Replace with actual username
+          activityLog: `[Manage Pre-Registration:Appointments] Deleted availability for ${dayOfWeek}`
+        }),
+      });
+      
+      await fetchAvailabilityData();
+      
+      toast.success(`Availability for ${dayOfWeek} deleted successfully`);
+    } catch (err) {
+      toast.error('Failed to delete appointment: ' + err.message);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-    
-    const availabilityData = await currentResponse.json();
-    const existingEntry = availabilityData.find(item => item._id === appointmentId);
-    
-    if (!existingEntry) {
-      throw new Error('Could not find the availability entry to delete');
-    }
-    
-    // Create a copy of the existing availability object
-    const updatedAvailability = { ...existingEntry.availability };
-    
-    // Remove only the selected day's availability
-    delete updatedAvailability[dayOfWeek];
-    
-    // Update with the modified availability (where the selected day is removed)
-    const response = await fetch(`http://localhost:3000/booking/editBookingAvailability/${appointmentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ availability: updatedAvailability })
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to delete appointment');
-    }
-    
-    // Track this deleted date so we don't auto-recreate it
-    const recentlyDeletedDates = JSON.parse(localStorage.getItem('deletedAvailabilityDates') || '[]');
-    if (!recentlyDeletedDates.includes(dateStr)) {
-      recentlyDeletedDates.push(dateStr);
-      localStorage.setItem('deletedAvailabilityDates', JSON.stringify(recentlyDeletedDates));
-    }
-    
-    await fetchAvailabilityData();
-    
-    toast.success(`Availability for ${dayOfWeek} deleted successfully`);
-  } catch (err) {
-    toast.error('Failed to delete appointment: ' + err.message);
-    console.error(err);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
   
   // Add time slot
   const addTimeSlot = () => {
@@ -619,7 +630,6 @@ const deleteAppointment = async (appointmentId) => {
                       <User size={16} />
                       {booking.studentName}
                     </div>
-                    <div className="booking-purpose">{booking.purpose}</div>
                     <div className="booking-contact">
                       <div className="booking-email">{booking.studentEmail}</div>
                       <div className="booking-phone">{booking.studentPhone}</div>
@@ -722,9 +732,6 @@ const deleteAppointment = async (appointmentId) => {
               {appointments[formatDate(selectedDate)].map(appointment => (
                 <div key={appointment.id} className="appointment-item">
                   <div className="appointment-info">
-                    <div className="appointment-purpose">
-                      <strong>Purpose:</strong> {appointment.purpose}
-                    </div>
                     <div className="appointment-slots">
                       <strong>Available Time Slots:</strong>
                       <div className="time-slots-container">
@@ -744,9 +751,6 @@ const deleteAppointment = async (appointmentId) => {
                           <span className="no-slots">No time slots defined</span>
                         )}
                       </div>
-                    </div>
-                    <div className="appointment-limit">
-                      <strong>Max Appointments Per Slot:</strong> {appointment.maxAppointments}
                     </div>
                   </div>
                   <div className="appointment-actions">
@@ -769,7 +773,6 @@ const deleteAppointment = async (appointmentId) => {
                 setAppointmentForm({
                   timeSlots: [''],
                   purpose: 'Student Registration',
-                  maxAppointments: 5
                 });
               }
             }}
@@ -844,21 +847,7 @@ const deleteAppointment = async (appointmentId) => {
                 >
                   + Add Time Slot
                 </button>
-              </div>
-              
-              <div className="form-group">
-                <label>Max Appointments Per Time Slot:</label>
-                <input 
-                  type="number" 
-                  name="maxAppointments" 
-                  min="1" 
-                  max="20"
-                  value={appointmentForm.maxAppointments}
-                  onChange={handleInputChange}
-                />
-                <small>Maximum number of students that can book each time slot</small>
-              </div>
-              
+              </div>              
               <button 
                 onClick={saveAppointment}
                 disabled={isLoading}
