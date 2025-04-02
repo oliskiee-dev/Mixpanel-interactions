@@ -149,6 +149,24 @@ const updatePreRegistrationStatus = async (req, res) => {
     }
 };
 
+// DELETE - Delete all Pre-Registrations
+const deletePreRegistration = async (req, res) => {
+    try {
+        // Delete all pre-registration records
+        const result = await preRegistrationModel.deleteMany({});
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: "No pre-registration records found to delete." });
+        }
+
+        res.status(200).json({ message: "All pre-registration records deleted successfully." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+
 // POST - Add Booking
 const addBooking = async (req, res) => {
     const { email, appointment_date, preferred_time, purpose_of_visit } = req.body;
@@ -170,4 +188,4 @@ const addBooking = async (req, res) => {
     }
 };
 
-module.exports = { getPreRegistrations, addPreRegistration, updatePreRegistrationStatus, addBooking };
+module.exports = { getPreRegistrations, addPreRegistration, updatePreRegistrationStatus, addBooking, deletePreRegistration };
