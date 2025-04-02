@@ -8,7 +8,7 @@ function ViewReport() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [deleting, setDeleting] = useState(false);
-    const reportsPerPage = 5;
+    const reportsPerPage = 20;
 
     useEffect(() => {
         fetchReports();
