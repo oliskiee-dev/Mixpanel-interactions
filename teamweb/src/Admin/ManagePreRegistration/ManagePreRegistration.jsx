@@ -66,7 +66,7 @@ function ManagePreRegistration() {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
     
-            // Log the activity
+            // Log the activity for deletion
             try {
                 const username = localStorage.getItem('username') || 'Admin';
                 await fetch("http://localhost:3000/report/add-report", {
@@ -81,6 +81,51 @@ function ManagePreRegistration() {
                 });
             } catch (logError) {
                 console.error('Failed to log activity:', logError);
+            }
+    
+            // CSV export logic after deletion
+            if (Array.isArray(registrationData) && registrationData.length > 0) {
+                const csvRows = [
+                    ['Name', 'Phone Number', 'Grade Level', 'Strand', 'Gender', 'Email', 'Student Type', 'Status', 'Registration Date']
+                ];
+    
+                registrationData.forEach(student => {
+                    csvRows.push([
+                        student.name || '',
+                        student.phone_number || '',
+                        student.grade_level || '',
+                        student.strand || 'N/A',
+                        student.gender || '',
+                        student.email || '',
+                        student.isNewStudent === 'new' ? 'New Student' : 'Returning Student',
+                        student.status || '',
+                        student.createdAt ? new Date(student.createdAt).toLocaleDateString() : ''
+                    ]);
+                });
+    
+                const csvContent = csvRows.map(e => e.join(",")).join("\n");
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `pre_registration_report_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+    
+                // Log the export activity
+                const username = localStorage.getItem('username') || 'Admin';
+                await fetch("http://localhost:3000/report/add-report", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        activityLog: `[Manage Pre-Registration: Reports] Pre-registration records exported as CSV on ${new Date().toLocaleString()}`,
+                    }),
+                });
             }
     
             toast.success(
@@ -108,6 +153,7 @@ function ManagePreRegistration() {
             setIsDeleting(false);
         }
     };
+    
 
     const DeleteConfirmationDialog = () => {
         if (!showDeleteConfirmation) return null;
