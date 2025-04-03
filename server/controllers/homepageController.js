@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Upload Image
-exports.uploadImage = async (req, res) => {
+const uploadImage = async (req, res) => {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     try {
@@ -22,7 +22,7 @@ exports.uploadImage = async (req, res) => {
 };
 
 // Delete Image
-exports.deleteImage = async (req, res) => {
+const deleteImage = async (req, res) => {
     try {
         const { filename } = req.params;
 
@@ -49,7 +49,7 @@ exports.deleteImage = async (req, res) => {
 };
 
 // Get all images
-exports.getAllImages = async (req, res) => {
+const getAllImages = async (req, res) => {
     try {
         const images = await Homepage.find();
         res.json(images);
@@ -57,3 +57,6 @@ exports.getAllImages = async (req, res) => {
         res.status(500).json({ message: "Error retrieving images" });
     }
 };
+
+module.exports = { uploadImage, deleteImage, getAllImages };
+
