@@ -152,6 +152,29 @@ const updatePreRegistrationStatus = async (req, res) => {
     }
 };
 
+// PUT - Update Pre-Registration Enrollment Status
+const updatePreregistrationEnrollmentStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const updatedRecord = await preRegistrationModel.findByIdAndUpdate(
+            id,
+            { enrollment: true },
+            { new: true }
+        );
+
+        if (!updatedRecord) {
+            return res.status(404).json({ error: "Pre-registration record not found" });
+        }
+
+        res.json({ message: "Enrollment status updated successfully", preregistration: updatedRecord });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+
 // DELETE - Delete all Pre-Registrations
 const deletePreRegistration = async (req, res) => {
     try {
@@ -208,4 +231,4 @@ const addBooking = async (req, res) => {
     }
 };
 
-module.exports = { getPreRegistrations, addPreRegistration, updatePreRegistrationStatus, addBooking, deletePreRegistration, deletePreRegistrationById };
+module.exports = { getPreRegistrations, addPreRegistration, updatePreRegistrationStatus, updatePreregistrationEnrollmentStatus, addBooking, deletePreRegistration, deletePreRegistrationById };
