@@ -110,7 +110,9 @@ const addPreRegistration = async (req, res) => {
             preRegistrationData = new preRegistrationModel({
                 name, phone_number, age, gender, birthdate: new Date(birthdate), strand, grade_level, email,
                 nationality, parent_guardian_name, parent_guardian_number, isNewStudent,
-                status: status ? status.toLowerCase() : 'pending', appointment_date, preferred_time, purpose_of_visit
+                status: status ? status.toLowerCase() : 'pending', 
+                appointment_date, preferred_time, purpose_of_visit,
+                enrollment: false // Ensure enrollment is explicitly set to false
             });
 
             await preRegistrationData.save();
@@ -122,6 +124,7 @@ const addPreRegistration = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+
 
 // PUT - Update Pre-Registration Status
 const updatePreRegistrationStatus = async (req, res) => {
