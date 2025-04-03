@@ -17,7 +17,7 @@ body {
     z-index: 1000; /* Ensures it's always on top */
 }
 
-.container {
+.login-container {
     display: flex;
     justify-content: center;
     align-items: center;

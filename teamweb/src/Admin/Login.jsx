@@ -45,7 +45,7 @@ function Login() {
     return (
         <div className="page-container">
             <img src={TeamLogo} alt="Team Logo" className="team-logo" /> {/* Logo at the top left */}
-            <div className="container">
+            <div className="login-container">
                 <div className="form-box">
                     <div className="form-content">
                         <FaUser className="admin-icon" />
