@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from "./Component/AdminHeader.jsx";
 import "./Homepage.css";
-import "@uploadthing/react/styles.css";
-import { UploadButton } from "@uploadthing/react";
 
 function Homepage() {
   const [images, setImages] = useState([]);
@@ -184,25 +182,6 @@ function Homepage() {
             </div>
           ) : (
             <label className="custom-file-upload">
-                      {/* Upload Button Component */}
-                      {/* <UploadButton
-                      endpoint="imageUploader"
-                      onClientUploadComplete={(res) => {
-                        console.log("Upload Response:", res); // Debugging
-                        if (!res || !res[0]?.fileUrl) {
-                          alert("Upload failed: Invalid response format.");
-                          return;
-                        }
-                        console.log("Uploaded file URL:", res[0].fileUrl);
-                        alert("Upload Completed");
-                      }}
-                      onUploadError={(error) => {
-                        console.error("Upload error:", error); // Debugging
-                        alert(`ERROR! ${error.message}`);
-                      }}
-                    /> */}
-
-
               <input type="file" accept="image/*" onChange={handleFileSelect} />
               <span className="upload-icon">📷</span> Choose Image
             </label>
