@@ -166,6 +166,23 @@ const deletePreRegistration = async (req, res) => {
     }
 };
 
+// DELETE - Delete a specific Pre-Registration by ID
+const deletePreRegistrationById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedRecord = await preRegistrationModel.findByIdAndDelete(id);
+
+        if (!deletedRecord) {
+            return res.status(404).json({ error: "Pre-registration record not found." });
+        }
+
+        res.status(200).json({ message: "Pre-registration record deleted successfully.", preregistration: deletedRecord });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
 
 // POST - Add Booking
 const addBooking = async (req, res) => {
@@ -188,4 +205,4 @@ const addBooking = async (req, res) => {
     }
 };
 
-module.exports = { getPreRegistrations, addPreRegistration, updatePreRegistrationStatus, addBooking, deletePreRegistration };
+module.exports = { getPreRegistrations, addPreRegistration, updatePreRegistrationStatus, addBooking, deletePreRegistration, deletePreRegistrationById };

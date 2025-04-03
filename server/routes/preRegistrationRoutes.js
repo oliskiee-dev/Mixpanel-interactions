@@ -4,7 +4,8 @@ const {
     addPreRegistration,
     updatePreRegistrationStatus,
     addBooking,
-    deletePreRegistration
+    deletePreRegistration,
+    deletePreRegistrationById
 } = require('../controllers/preRegistrationController');
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.post('/add', addPreRegistration);
 router.put('/status/:id', updatePreRegistrationStatus);
 router.post('/addBooking', addBooking);
 router.delete('/deleteAll', deletePreRegistration); 
+router.delete('/delete/:id', deletePreRegistrationById);
 
 module.exports = router;
