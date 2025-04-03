@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from "./Component/AdminHeader.jsx";
 import "./Homepage.css";
+import "@uploadthing/react/styles.css";
+import { UploadButton } from "@uploadthing/react";
 
 function Homepage() {
   const [images, setImages] = useState([]);
@@ -13,12 +15,8 @@ function Homepage() {
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-    const loggedInUser = localStorage.getItem('username');
-    if (loggedInUser) {
-      setUsername(loggedInUser);
-    } else {
-      setUsername("Admin");
-    }
+    const loggedInUser = localStorage.getItem("username");
+    setUsername(loggedInUser || "Admin");
     fetchImages();
   }, []);
 
@@ -36,27 +34,27 @@ function Homepage() {
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     setSelectedFile(file);
-    
+
     // Create preview URL
     const previewURL = URL.createObjectURL(file);
     setPreviewImage(previewURL);
   };
-  
+
   const handleUpload = async () => {
     if (!selectedFile) return;
 
     setIsUploading(true);
     setUploadProgress(0);
-    
+
     const formData = new FormData();
     formData.append("image", selectedFile);
 
     try {
       // Simulate upload progress
       const uploadTimer = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev >= 90) {
             clearInterval(uploadTimer);
             return 90;
@@ -65,10 +63,13 @@ function Homepage() {
         });
       }, 200);
 
-      const response = await fetch("http://localhost:3000/homepage/upload-image", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:3000/homepage/upload-image",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       clearInterval(uploadTimer);
       setUploadProgress(100);
@@ -76,15 +77,14 @@ function Homepage() {
       if (response.ok) {
         fetchImages(); // Refresh images after upload
 
-        // ✅ Call the `/add-report` API
         await fetch("http://localhost:3000/report/add-report", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: username, // Replace with actual username
-            activityLog: `[Manage Homepage] Uploaded an Image: ${selectedFile.name}` // Activity log message
+            username: username,
+            activityLog: `[Manage Homepage] Uploaded an Image: ${selectedFile.name}`,
           }),
         });
       }
@@ -95,14 +95,12 @@ function Homepage() {
         setPreviewImage(null);
         setSelectedFile(null);
       }, 500);
-      
     } catch (error) {
       setIsUploading(false);
       console.error("Error uploading image:", error);
     }
   };
 
-  
   const cancelUpload = () => {
     setPreviewImage(null);
     setSelectedFile(null);
@@ -115,26 +113,28 @@ function Homepage() {
 
   const handleDelete = async () => {
     if (!selectedImage) return;
-    
+
     try {
-      const response = await fetch(`http://localhost:3000/homepage/delete-image/${selectedImage.image_url}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:3000/homepage/delete-image/${selectedImage.image_url}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         fetchImages();
         setShowDeleteConfirm(false);
         setSelectedImage(null);
 
-        // ✅ Call the `/add-report` API
         await fetch("http://localhost:3000/report/add-report", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: username, // Replace with actual username
-            activityLog: `[Manage Homepage] Deleted Image: ${selectedImage.image_url}` // Log message
+            username: username,
+            activityLog: `[Manage Homepage] Deleted Image: ${selectedImage.image_url}`,
           }),
         });
       }
@@ -148,9 +148,9 @@ function Homepage() {
       <AdminHeader />
       <div className="content-container">
         <div className="page-header">
-            <h1>Manage Latest News</h1>
-            <p>Manage the images that appear in the news section</p>
-            </div>
+          <h1>Manage Latest News</h1>
+          <p>Manage the images that appear in the news section</p>
+        </div>
       </div>
       <div className="admin-container">
         {/* Upload Section */}
@@ -159,10 +159,13 @@ function Homepage() {
             <h3>Upload New Image</h3>
             <p>Accepted formats: JPG, PNG, GIF (Max: 5MB)</p>
           </div>
-          
+
           {isUploading ? (
             <div className="upload-progress-container">
-              <div className="upload-progress-bar" style={{ width: `${uploadProgress}%` }}></div>
+              <div
+                className="upload-progress-bar"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
               <span className="upload-progress-text">{uploadProgress}%</span>
             </div>
           ) : previewImage ? (
@@ -181,16 +184,34 @@ function Homepage() {
             </div>
           ) : (
             <label className="custom-file-upload">
+                      {/* Upload Button Component */}
+                      {/* <UploadButton
+                      endpoint="imageUploader"
+                      onClientUploadComplete={(res) => {
+                        console.log("Upload Response:", res); // Debugging
+                        if (!res || !res[0]?.fileUrl) {
+                          alert("Upload failed: Invalid response format.");
+                          return;
+                        }
+                        console.log("Uploaded file URL:", res[0].fileUrl);
+                        alert("Upload Completed");
+                      }}
+                      onUploadError={(error) => {
+                        console.error("Upload error:", error); // Debugging
+                        alert(`ERROR! ${error.message}`);
+                      }}
+                    /> */}
+
+
               <input type="file" accept="image/*" onChange={handleFileSelect} />
               <span className="upload-icon">📷</span> Choose Image
             </label>
           )}
         </div>
-
         {/* Image List Grid */}
         <div className="images-container">
           <h3 className="section-title">Current Images ({images.length})</h3>
-          
+
           {images.length === 0 ? (
             <div className="no-images">
               <p>No images uploaded yet. Add your first image to get started.</p>
@@ -224,15 +245,17 @@ function Homepage() {
           <div className="delete-modal">
             <div className="modal-header">
               <h3>Confirm Deletion</h3>
-              <button className="close-modal" onClick={() => setShowDeleteConfirm(false)}>×</button>
+              <button className="close-modal" onClick={() => setShowDeleteConfirm(false)}>
+                ×
+              </button>
             </div>
             <div className="modal-body">
               <p>Are you sure you want to delete this image?</p>
               {selectedImage && (
                 <div className="confirm-image-preview">
-                  <img 
-                    src={`http://localhost:3000/homepage/${selectedImage.image_url}`} 
-                    alt="To be deleted" 
+                  <img
+                    src={`http://localhost:3000/homepage/${selectedImage.image_url}`}
+                    alt="To be deleted"
                     className="confirm-preview"
                   />
                 </div>
@@ -240,8 +263,12 @@ function Homepage() {
               <p className="warning-text">This action cannot be undone.</p>
             </div>
             <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
-              <button className="confirm-delete-btn" onClick={handleDelete}>Delete</button>
+              <button className="cancel-btn" onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </button>
+              <button className="confirm-delete-btn" onClick={handleDelete}>
+                Delete
+              </button>
             </div>
           </div>
         </div>
