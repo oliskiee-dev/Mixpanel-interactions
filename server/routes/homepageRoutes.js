@@ -9,7 +9,8 @@ const {
     getAllImages
 } = require("../controllers/homepageController");
 
-router.post("/upload-image", uploadHomepage.single("image"), uploadImage);
+// router.post("/upload-image", uploadHomepage.single("image"), uploadImage);
+router.post("/upload-image", fileUpload(), uploadImage);
 router.delete("/delete-image/:filename", deleteImage);
 router.get("/images", getAllImages);
 
