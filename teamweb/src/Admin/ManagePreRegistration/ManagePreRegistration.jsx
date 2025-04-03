@@ -759,9 +759,7 @@ function ManagePreRegistration() {
                                 <Filter size={16} />
                                 <select value={selectedGrade} onChange={handleGradeChange} className="filter-select">
                                     <option value="">All Grades</option>
-                                    <option value="Nursery">Nursery</option>
-                                    <option value="Kinder 1">Kinder 1</option>
-                                    <option value="Kinder 2">Kinder 2</option>
+                                    <option value="Kinder">Kinder</option>
                                     <option value="1">Grade 1</option>
                                     <option value="2">Grade 2</option>
                                     <option value="3">Grade 3</option>
