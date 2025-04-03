@@ -26,7 +26,7 @@ const uploadImage = async (req, res) => {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     try {
-        const {file} = req.file; //this could be files instead of file (check later)
+        const {file} = req.files; //this could be files instead of file (check later)
         const fileName = "/images"+v4();
 
         //upload image to s3
