@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const uploadHomepage = require("../middleware/uploadHomepage"); // Make sure you have this middleware for file uploads
+//const uploadHomepage = require("../middleware/uploadHomepage"); // Make sure you have this middleware for file uploads
 const fileUpload = require("express-fileupload");
 
 const {

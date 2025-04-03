@@ -23,25 +23,26 @@ const { putObject } = require('../util/putObject');
 //     }
 // };
 const uploadImage = async (req, res) => {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    if (!req.files || !req.files.image) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
 
     try {
-        const {file} = req.files; //this could be files instead of file (check later)
-        const fileName = "/images"+v4();
+        const file = req.files.image;
+        const fileName = `images/${v4()}`;
 
-        //upload image to s3
-        const {url, key} = await putObject(file.data,fileName);
+        // Upload image to S3
+        const { url, key } = await putObject(file.data, fileName);
 
-        if(!url || !key){
-            return res.status(400).json({
-                "status":"error",
-                "data":"Image is not uploaded",
-            })
+        if (!url || !key) {
+            return res.status(400).json({ status: "error", data: "Image is not uploaded" });
         }
+
         const newImage = new Homepage({
-            image_url: url,key, // Save only filename
+            image_url: url,key,
             created_at: new Date(),
         });
+
         await newImage.save();
         res.status(201).json({ message: "Image uploaded successfully", image: newImage });
     } catch (error) {
@@ -49,6 +50,7 @@ const uploadImage = async (req, res) => {
         res.status(500).json({ message: "Error saving image to database" });
     }
 };
+
 
 
 // Delete Image
