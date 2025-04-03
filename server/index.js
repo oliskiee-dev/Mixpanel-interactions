@@ -1,13 +1,8 @@
 const express = require('express')
 const connectDB = require('./db.js')
 
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const path = require('path');
-
-//const userModel = require('./models/User.js')
-//const reportModel = require('./models/Report.js');
 
 const homepageRoutes = require("./routes/homepageRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
@@ -16,8 +11,6 @@ const preRegistrationRoutes = require("./routes/preRegistrationRoutes");
 const bookRoutes = require("./routes/bookRoutes");
 const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
-
-const { sendApprovalEmail } = require('./service/emailService.js'); //Just in case for future use
 
 dotenv.config(); 
 const cors = require('cors')
