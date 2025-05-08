@@ -5,7 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "deploy": "node index.js"
+    "deploy": "node index.js",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:chrome": "cypress run --browser chrome",
+    "test:firefox": "cypress run --browser firefox",
+    "test:edge": "cypress run --browser edge"
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": [
+      "cypress/e2e/step_definitions/**/*.js"
+    ],
+    "filterSpecs": true,
+    "omitFiltered": true
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.779.0",
