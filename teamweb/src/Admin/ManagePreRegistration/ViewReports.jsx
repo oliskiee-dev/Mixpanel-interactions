@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ViewReports.css';
+import Analytics from "../../utils/analytics";
 
 const ViewReports = () => {
   // State for storing registration data
@@ -88,6 +89,12 @@ const fetchRegistrations = async () => {
       return;
     }
     
+    Analytics.track('Report Exported', {
+      report_type: reportView,
+      total_records: registrationData.length,
+      file_format: 'CSV'
+  });
+
     // Create CSV content
     const csvRows = [
       ['Name', 'Phone Number', 'Grade Level', 'Strand', 'Gender', 'Email', 'Student Type', 'Status', 'Registration Date']

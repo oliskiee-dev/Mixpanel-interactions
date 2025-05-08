@@ -32,8 +32,28 @@ import ManageAccount from './Admin/ManageAccount/ManageAccount.jsx';
 
 import ViewReport from './Admin/ViewReport/ViewReport.jsx'
 
+// At the top of your main entry file
+import { Analytics } from './utils/analytics';
+
+// Add this code near the beginning of your file
+Analytics.track('Application Started', {
+  timestamp: new Date().toISOString()
+});
+
+//import { usePageTracking } from './hooks/usePageTracking';
+
+import mixpanel from 'mixpanel-browser';
+
+mixpanel.init('239e9b0b81d9b1fd5a6048017160b9e9', {
+  debug: true, // Set to false in production
+  track_pageview: true,
+  persistence: 'localStorage'
+});
+mixpanel.track('App Loaded');
+
 function App(){
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  //usePageTracking();
 
   useEffect(() => {
       const token = localStorage.getItem("token");

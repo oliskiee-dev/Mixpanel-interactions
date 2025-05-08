@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "mixpanel": "^0.18.1",
+    "mixpanel-browser": "^2.64.0",
+    "react-router-dom": "^7.6.0"
+  }
+}

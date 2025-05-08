@@ -3,12 +3,13 @@ import { useNavigate } from "react-router"; // For navigation
 import { FaUser, FaExclamationCircle, FaEye, FaEyeSlash } from "react-icons/fa"; // Added eye icons
 import "./Login.css";
 import TeamLogo from "../assets/images/TeamLogo.png";
+import Analytics from '../utils/analytics';
 
 function Login() {
     const [formData, setFormData] = useState({ username: "", password: "" });
-    const [error, setError] = useState(""); // State for error messages
-    const [showPassword, setShowPassword] = useState(false); // State for password visibility
-    const navigate = useNavigate(); // Hook for navigation
+    const [error, setError] = useState(""); 
+    const [showPassword, setShowPassword] = useState(false); 
+    const navigate = useNavigate(); 
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,6 +21,9 @@ function Login() {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
+        Analytics.track('Login Attempted', {
+            timestamp: new Date().toISOString()
+          });
         setError(""); 
         console.log(formData); // Debugging
         try {
@@ -31,15 +35,51 @@ function Login() {
     
             const data = await response.json();
             if (response.status === 200 && data.token) {
+                Analytics.identify(formData.username);
+                Analytics.track('Login Successful', { 
+                  username: formData.username,
+                  timestamp: new Date().toISOString()
+                });
                 localStorage.setItem("token", data.token); // Save token
                 localStorage.setItem("username", formData.username); // Save username
+                
+                // Track successful login
+                Analytics.identify(formData.username);
+                Analytics.track('Login', { 
+                    success: true,
+                    method: 'credentials'
+                });
+                Analytics.setUserProfile({
+                    $username: formData.username,
+                    last_login: new Date().toISOString()
+                });
+                Analytics.increment('login_count');
+                
                 navigate("/admin-homepage"); // Navigate to the admin homepage
             } else {
+                Analytics.track('Login Failed', {
+                    reason: data.error || "Unknown error",
+                    timestamp: new Date().toISOString()
+                  });
                 setError(`Error: ${data.error || "Login failed"}`);
             }
         } catch (error) {
+             // Track error
+    Analytics.track('Login Error', {
+        error_message: error.message,
+        timestamp: new Date().toISOString()
+      });
+
             setError("Error: An error occurred. Please try again.");
         }
+
+        if (response.status === 200 && data.token) {
+            Analytics.identify(formData.username);
+            Analytics.track('Login Successful', {
+              method: 'email_password'
+            });
+          }
+
     };
     
     return (

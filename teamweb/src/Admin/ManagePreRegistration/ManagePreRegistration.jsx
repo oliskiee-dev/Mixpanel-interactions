@@ -4,6 +4,7 @@ import UpdateAppointment from './UpdateAppointment';
 import ViewReports from './ViewReports';
 import { Search, Filter, User, Calendar, Phone, Mail, Clock, CheckCircle, AlertCircle, Send, ChartBar } from 'lucide-react';
 import ExpectedStudents from './ExpectedStudents';
+import Analytics from "../../utils/analytics";
 
 import './ManagePreRegistration.css';
 import { toast, ToastContainer } from 'react-toastify';
@@ -337,6 +338,12 @@ function ManagePreRegistration() {
                 },
                 body: JSON.stringify({ status: newStatus }),
             });
+
+            Analytics.track('Student Status Changed', {
+                previous_status: studentToUpdate.currentStatus,
+                new_status: newStatus,
+                student_id: studentToUpdate.id
+            });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -409,6 +416,9 @@ function ManagePreRegistration() {
             toast.error('Failed to update status. Please try again.', {
                 position: "top-center",
                 autoClose: 5000,
+            });
+            Analytics.track('Status Change Error', {
+                error_message: err.message
             });
         } finally {
             setProcessingStatus(null);
