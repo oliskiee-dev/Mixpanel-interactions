@@ -3,6 +3,8 @@ import { FaUser, FaSignOutAlt, FaTimes, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import "./AdminHeader.css";
 import TeamLogo from '../../assets/images/TeamLogo.png';
+import Analytics from "../../utils/analytics";
+
 
 const AdminHeader = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -59,20 +61,33 @@ const AdminHeader = () => {
     }
   }, []);
 
+
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const handleUserClick = () => {
+  const handleUserClick = (menuItem) => {
+    Analytics.track('Navigation Click', {
+      menu_item: menuItem
+    });
     setShowLogout(!showLogout);
   };
 
-  const handleLogout = () => {
+// Inside the handleLogout function
+const handleLogout = () => {
+    // Track logout event
+    Analytics.track('Logout');
+    
+    // Reset Mixpanel user identification
+    Analytics.reset();
+    
+    // Existing logout code
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     setUsername("");
     navigate("/login");
-  };
+};
 
   // Close logout dropdown when clicking outside
   useEffect(() => {

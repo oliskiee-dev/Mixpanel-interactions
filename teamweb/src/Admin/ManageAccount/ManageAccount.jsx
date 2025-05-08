@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from '../Component/AdminHeader.jsx';
 import "./ManageAccount.css";
+import Analytics from "../../utils/analytics";
 
 function ManageAccount() {
   const [accounts, setAccounts] = useState([]);
@@ -180,6 +181,10 @@ function ManageAccount() {
       setLoading(true);
       setApiErrors({});
 
+      Analytics.track('Account Updated', {
+        updated_fields: Object.keys(updatedFields).join(', ')
+    });
+      
       try {
           const token = getToken();
           const response = await fetch('http://localhost:3000/user/update-user-info', {
@@ -383,6 +388,12 @@ function ManageAccount() {
 
       setLoading(true);
       setApiErrors({});
+
+      Analytics.track('Account Deleted', {
+        deleted_by: currentUser.username,
+        deleted_account: selectedAccount.username,
+        self_deletion: targetUserId === currentUser._id
+    });
 
       try {
           const token = getToken();

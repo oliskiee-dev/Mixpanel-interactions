@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminHeader from "../Component/AdminHeader.jsx";
 import "./ManageAnnouncement.css";
+import Analytics from '../../utils/analytics.js';
 
 function ManageAnnouncement() {
     const [announcements, setAnnouncements] = useState([]);
@@ -88,6 +89,14 @@ function ManageAnnouncement() {
                 console.error("Error response:", errorText);
                 throw new Error("Failed to save announcement");
             }
+
+             // Track the event
+            Analytics.track(editingId ? 'Announcement Updated' : 'Announcement Created', {
+            title_length: newAnnouncement.title.trim().length,
+            description_length: newAnnouncement.description.trim().length,
+            has_image: !!newAnnouncement.image_url
+            });
+    
     
             // ✅ Call the `/add-report` API
             await fetch("http://localhost:3000/report/add-report", {
@@ -110,7 +119,14 @@ function ManageAnnouncement() {
             showToast(editingId ? "Announcement updated successfully!" : "Announcement posted successfully!");
         } catch (error) {
             console.error("Error submitting announcement:", error);
-            alert(error.message || "Failed to save. Please try again.");
+        
+        // Track error
+             Analytics.track('Announcement Error', {
+            action: editingId ? 'update' : 'create',
+            error_message: error.message
+            });
+        
+        alert(error.message || "Failed to save. Please try again.");
         } finally {
             // Reset button state
             const submitBtn = document.querySelector('.submit-button');
@@ -119,6 +135,13 @@ function ManageAnnouncement() {
                 submitBtn.textContent = editingId ? "Update Announcement" : "Post Announcement";
             }
         }
+
+        Analytics.track('Announcement Created', {
+            has_image: !!announcement.image,
+            title_length: announcement.title.length,
+            description_length: announcement.description.length
+          });
+
     };
     
     
@@ -138,7 +161,12 @@ function ManageAnnouncement() {
     
             const response = await fetch(`${baseUrl}/announcement/delete/${deleteId}`, {
                 method: "DELETE",
+                
             });
+
+            Analytics.track('Announcement Deleted', {
+                title: announcementTitle
+            });    
     
             if (!response.ok) {
                 throw new Error("Failed to delete announcement");
@@ -172,6 +200,9 @@ function ManageAnnouncement() {
                 deleteBtn.disabled = false;
                 deleteBtn.textContent = "Yes, Delete";
             }
+            Analytics.track('Announcement Delete Error', {
+                error_message: error.message
+            });
         }
     };
     
