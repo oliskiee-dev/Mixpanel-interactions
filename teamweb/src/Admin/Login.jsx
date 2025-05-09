@@ -1,31 +1,40 @@
+// src/Admin/Login.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router"; // For navigation
-import { FaUser, FaExclamationCircle, FaEye, FaEyeSlash } from "react-icons/fa"; // Added eye icons
+import { useNavigate } from "react-router";
+import { FaUser, FaExclamationCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Login.css";
 import TeamLogo from "../assets/images/TeamLogo.png";
-import Analytics from '../utils/analytics';
+import Analytics from "../utils/analytics";
 
 function Login() {
     const [formData, setFormData] = useState({ username: "", password: "" });
-    const [error, setError] = useState(""); 
-    const [showPassword, setShowPassword] = useState(false); 
-    const navigate = useNavigate(); 
+    const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
     
     const togglePasswordVisibility = () => {
+        // Track password visibility toggle
+        Analytics.trackClick(
+            showPassword ? 'hide_password' : 'show_password',
+            'authentication'
+        );
         setShowPassword(!showPassword);
     };
     
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+        
+        // Track login attempt
         Analytics.track('Login Attempted', {
-            timestamp: new Date().toISOString()
-          });
-        setError(""); 
-        console.log(formData); // Debugging
+            has_username: !!formData.username,
+            has_password: !!formData.password
+        });
+        
         try {
             const response = await fetch("http://localhost:3000/user/login", {
                 method: "POST",
@@ -35,56 +44,42 @@ function Login() {
     
             const data = await response.json();
             if (response.status === 200 && data.token) {
-                Analytics.identify(formData.username);
-                Analytics.track('Login Successful', { 
-                  username: formData.username,
-                  timestamp: new Date().toISOString()
-                });
-                localStorage.setItem("token", data.token); // Save token
-                localStorage.setItem("username", formData.username); // Save username
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("username", formData.username);
                 
                 // Track successful login
                 Analytics.identify(formData.username);
-                Analytics.track('Login', { 
-                    success: true,
-                    method: 'credentials'
+                Analytics.track('Login Successful', {
+                    username: formData.username
                 });
                 Analytics.setUserProfile({
-                    $username: formData.username,
-                    last_login: new Date().toISOString()
+                    $name: formData.username,
+                    $last_login: new Date().toISOString()
                 });
-                Analytics.increment('login_count');
                 
-                navigate("/admin-homepage"); // Navigate to the admin homepage
+                navigate("/admin-homepage");
             } else {
+                setError(`Error: ${data.error || "Login failed"}`);
+                
+                // Track failed login
                 Analytics.track('Login Failed', {
                     reason: data.error || "Unknown error",
-                    timestamp: new Date().toISOString()
-                  });
-                setError(`Error: ${data.error || "Login failed"}`);
+                    username: formData.username
+                });
             }
         } catch (error) {
-             // Track error
-    Analytics.track('Login Error', {
-        error_message: error.message,
-        timestamp: new Date().toISOString()
-      });
-
             setError("Error: An error occurred. Please try again.");
-        }
-
-        if (response.status === 200 && data.token) {
-            Analytics.identify(formData.username);
-            Analytics.track('Login Successful', {
-              method: 'email_password'
+            
+            // Track error
+            Analytics.track('Login Error', {
+                error_message: error.message
             });
-          }
-
+        }
     };
-    
+
     return (
         <div className="page-container">
-            <img src={TeamLogo} alt="Team Logo" className="team-logo" /> {/* Logo at the top left */}
+            <img src={TeamLogo} alt="Team Logo" className="team-logo" />
             <div className="login-container">
                 <div className="form-box">
                     <div className="form-content">
@@ -96,7 +91,10 @@ function Login() {
                                 <span>{error}</span>
                             </div>
                         )}
-                        <form onSubmit={handleSubmit}>
+                        <form 
+                            onSubmit={handleSubmit}
+                            data-mp-form="login-form"
+                        >
                             <input
                                 type="text"
                                 name="username"
@@ -105,6 +103,7 @@ function Login() {
                                 value={formData.username}
                                 onChange={handleChange}
                                 required
+                                data-mp-field="username"
                             />
                             <div className="password-input-container">
                                 <input
@@ -115,14 +114,31 @@ function Login() {
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
+                                    data-mp-field="password"
                                 />
-                                <span className="password-toggle-icon" onClick={togglePasswordVisibility}>
+                                <span 
+                                    className="password-toggle-icon" 
+                                    onClick={togglePasswordVisibility}
+                                    data-mp-event="Toggle Password Visibility"
+                                >
                                     {showPassword ? <FaEye /> : <FaEyeSlash />}
                                 </span>
                             </div>
-                            <button type="submit" className="btn">LOGIN</button>
+                            <button 
+                                type="submit" 
+                                className="btn"
+                                data-mp-event="Login Submit"
+                            >
+                                LOGIN
+                            </button>
                         </form>
-                        <a href="/forgot-password" className="forgot-password">Forgot Password?</a>
+                        <a 
+                            href="/forgot-password" 
+                            className="forgot-password"
+                            data-mp-event="Forgot Password"
+                        >
+                            Forgot Password?
+                        </a>
                     </div>
                 </div>
             </div>

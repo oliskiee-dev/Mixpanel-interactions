@@ -1,10 +1,10 @@
+// src/Admin/Component/AdminHeader.jsx
 import { useState, useEffect } from "react";
 import { FaUser, FaSignOutAlt, FaTimes, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import "./AdminHeader.css";
 import TeamLogo from '../../assets/images/TeamLogo.png';
 import Analytics from "../../utils/analytics";
-
 
 const AdminHeader = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -13,23 +13,7 @@ const AdminHeader = () => {
   const [showLogout, setShowLogout] = useState(false);
   const navigate = useNavigate();
 
-  // Handle responsive behavior
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  // Set active tab based on current URL
+  // Set active tab based on URL
   useEffect(() => {
     const path = window.location.pathname;
     if (path === "/manage-announcement") {
@@ -61,47 +45,47 @@ const AdminHeader = () => {
     }
   }, []);
 
-
-
   const toggleMenu = () => {
+    Analytics.track('Menu Toggle', {
+      state: menuOpen ? 'closed' : 'opened'
+    });
     setMenuOpen(!menuOpen);
   };
 
-  const handleUserClick = (menuItem) => {
-    Analytics.track('Navigation Click', {
-      menu_item: menuItem
-    });
+  const handleUserClick = () => {
+    Analytics.track('User Profile Click');
     setShowLogout(!showLogout);
   };
 
-// Inside the handleLogout function
-const handleLogout = () => {
-    // Track logout event
+  const handleLogout = () => {
+    // Track logout
     Analytics.track('Logout');
-    
-    // Reset Mixpanel user identification
     Analytics.reset();
     
-    // Existing logout code
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     setUsername("");
     navigate("/login");
-};
+  };
 
-  // Close logout dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showLogout && !event.target.closest('.user-profile-container')) {
-        setShowLogout(false);
-      }
+  // Helper for nav attributes
+  const getNavAttributes = (menuItem) => {
+    return {
+      'data-mp-event': "Navigation Click",
+      'data-mp-menu-item': menuItem,
+      'data-mp-category': "navigation"
     };
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showLogout]);
+  // Handle menu item click
+  const handleMenuClick = (tab) => {
+    Analytics.track('Navigation Click', {
+      menu_item: tab,
+      previous_page: activeTab
+    });
+    setActiveTab(tab);
+    setMenuOpen(false);
+  };
 
   return (
     <header className="admin-header">
@@ -113,7 +97,11 @@ const handleLogout = () => {
         </div>
         
         <div className="admin-controls">
-          <div className="user-profile-container" onClick={handleUserClick}>
+          <div 
+            className="user-profile-container" 
+            onClick={handleUserClick}
+            data-mp-event="User Profile Click"
+          >
             <div className="user-profile">
               <div className="user-avatar">
                 <FaUser />
@@ -123,14 +111,24 @@ const handleLogout = () => {
             
             {showLogout && (
               <div className="logout-dropdown">
-                <button className="logout-btn" onClick={handleLogout}>
+                <button 
+                  className="logout-btn" 
+                  onClick={handleLogout}
+                  data-mp-event="Logout Click"
+                >
                   <FaSignOutAlt /> Logout
                 </button>
               </div>
             )}
           </div>
           
-          <button className="menu-toggle" onClick={toggleMenu} aria-label="Toggle navigation menu">
+          <button 
+            className="menu-toggle" 
+            onClick={toggleMenu} 
+            aria-label="Toggle navigation menu"
+            data-mp-event="Menu Toggle"
+            data-mp-state={menuOpen ? "open" : "closed"}
+          >
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
         </div>
@@ -142,60 +140,48 @@ const handleLogout = () => {
           <a
             href="/admin-homepage"
             className={activeTab === "home" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("home");
-              setMenuOpen(false);
-            }}
+            onClick={() => handleMenuClick("home")}
+            {...getNavAttributes("home")}
           >
             Manage Home
           </a>
           <a
             href="/manage-announcement"
             className={activeTab === "manageannouncement" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("manageannouncement");
-              setMenuOpen(false);
-            }}
+            onClick={() => handleMenuClick("manageannouncement")}
+            {...getNavAttributes("manageannouncement")}
           >
             Manage Announcements
           </a>
           <a
             href="/manage-calendar"
             className={activeTab === "managecalendar" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("managecalendar");
-              setMenuOpen(false);
-            }}
+            onClick={() => handleMenuClick("managecalendar")}
+            {...getNavAttributes("managecalendar")}
           >
             Manage School Calendar
           </a>
           <a
             href="/manage-preregistration"
             className={activeTab === "managepreregistration" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("managepreregistration");
-              setMenuOpen(false);
-            }}
+            onClick={() => handleMenuClick("managepreregistration")}
+            {...getNavAttributes("managepreregistration")}
           >
             Manage Pre-Registration
           </a>
           <a
             href="/manage-account"
             className={activeTab === "manageaccount" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("manageaccount");
-              setMenuOpen(false);
-            }}
+            onClick={() => handleMenuClick("manageaccount")}
+            {...getNavAttributes("manageaccount")}
           >
             Manage Accounts
           </a>
           <a
             href="/view-report"
             className={activeTab === "viewreport" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("viewreport");
-              setMenuOpen(false);
-            }}
+            onClick={() => handleMenuClick("viewreport")}
+            {...getNavAttributes("viewreport")}
           >
             Admin Logs
           </a>

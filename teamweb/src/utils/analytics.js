@@ -1,26 +1,37 @@
 // src/utils/analytics.js
 import mixpanel from 'mixpanel-browser';
 
-// Replace with your actual project token
 const MIXPANEL_TOKEN = '239e9b0b81d9b1fd5a6048017160b9e9';
 
-// Initialize Mixpanel with error handling
+// Configure Mixpanel with existing settings PLUS autocapture
 try {
-    mixpanel.init(MIXPANEL_TOKEN, {
-        debug: true,
-        track_pageview: false,
-        ignore_dnt: true // Add this line to ignore the "Do Not Track" setting
-      });
-  console.log('Mixpanel initialized successfully');
+  mixpanel.init(MIXPANEL_TOKEN, {
+    debug: process.env.NODE_ENV !== 'production',
+    track_pageview: true,
+    persistence: 'localStorage',
+    ignore_dnt: true,
+    
+    // Add autocapture configuration
+    autocapture: {
+      enabled: true,
+      exclude_elements: ['input[type=password]'],
+      capture_form_field_changes: true,
+      capture_links: true,
+      capture_forms: true
+    }
+  });
+  console.log('Mixpanel initialized successfully with autocapture enabled');
 } catch (error) {
   console.error('Failed to initialize Mixpanel:', error);
 }
 
-// Simple tracking functions
 export const Analytics = {
   track: (eventName, properties = {}) => {
     try {
-      mixpanel.track(eventName, properties);
+      mixpanel.track(eventName, {
+        ...properties,
+        timestamp: new Date().toISOString()
+      });
       console.log(`Tracked event: ${eventName}`, properties);
     } catch (error) {
       console.error(`Failed to track event ${eventName}:`, error);
@@ -36,21 +47,56 @@ export const Analytics = {
     }
   },
   
-  trackPageView: () => {
+  setUserProfile: (properties) => {
     try {
-      const pageName = window.location.pathname;
+      mixpanel.people.set(properties);
+      console.log('Set user properties:', properties);
+    } catch (error) {
+      console.error('Failed to set user properties:', error);
+    }
+  },
+  
+  trackPageView: (pageName) => {
+    try {
+      const pageTitle = pageName || document.title || window.location.pathname;
       mixpanel.track('Page View', { 
-        path: pageName,
-        url: window.location.href 
+        page_name: pageTitle,
+        page_path: window.location.pathname,
+        page_url: window.location.href,
+        referrer: document.referrer
       });
-      console.log(`Tracked page view: ${pageName}`);
+      console.log(`Tracked page view: ${pageTitle}`);
     } catch (error) {
       console.error('Failed to track page view:', error);
+    }
+  },
+  
+  reset: () => {
+    try {
+      mixpanel.reset();
+      console.log('Reset user identity');
+    } catch (error) {
+      console.error('Failed to reset user:', error);
     }
   }
 };
 
+let lastTrackedPage = null;
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    const currentPath = window.location.pathname;
+    if (currentPath !== lastTrackedPage) {
+      lastTrackedPage = currentPath;
+      Analytics.trackPageView();
+    }
+  }, 1000);
+}
+
 // Track initial page load
-Analytics.trackPageView();
+Analytics.track('Application Started', {
+  url: window.location.href,
+  referrer: document.referrer,
+  user_agent: navigator.userAgent
+});
 
 export default Analytics;
